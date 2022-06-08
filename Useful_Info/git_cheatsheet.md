@@ -17,4 +17,12 @@
     git commit -m "update"
     git push
 ### Update your code to main branch (better use pull requests if you are not maintainer)
+
+### Update your work dairy
+    git checkout main
+    git pull
+    cd Work_Diary
+    git add .
+    git commit -m "update my work dairy of week x"
+    git push
     
