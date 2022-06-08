@@ -1,0 +1,29 @@
+Week 1
+
+What was planned for the period since the last work diary entry:
+
+1. Form a group
+2. Set up GitHub team and jira project
+3. Write user stories and sprints backlog
+
+What was finished:
+
+I joined the GitHub classroom team and integrate with our jira account.
+I start up a template project code with react and flask and push to the main branch.
+We decided on the timing of the three sprints and write user stories together, still work on it.
+Finally, we create some backlog on jira.
+
+What were the main technical and non-technical obstacles and how they were
+overcome (or what was tried and did not work):
+
+1. Jira workflow: we have a meeting together to figure how it works.
+2. Two functional novelties: search google and do research of other similar projects.
+3. User stories: brain storming.
+4. Development Framework: self study.
+
+what is planned for the next week:
+
+1. Main page of front end.
+2. finish the proposal.
+3. find some movie data provider or API.
+4. decide the two functional novelties.
