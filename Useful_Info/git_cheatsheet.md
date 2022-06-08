@@ -8,7 +8,7 @@
     git checkout main
     git pull
     git checkout your_branch_name
-    git merge master
+    git merge main
 ### Change your shown name when you want to commit
     git config --global user.name "your name"
 ### Update your code to your branch (change update_directory)
