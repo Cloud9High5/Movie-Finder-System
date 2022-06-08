@@ -1,0 +1,25 @@
+Week 1
+
+Formed a group of 5.
+I created a Jira account, invited all my teammates and our lecturer Rachid into the Jira group. 
+Nothing was behind the schedule in this week.
+
+Week 2
+
+what was planned for the period since the last work diary entry
+1.	Make updates to the Jira backlog
+2.	Join GitHub classroom
+3.	Start working on the project proposal
+what was finished
+1.	The whole group joined into GitHub classroom
+2.	Get familiar with using Jira
+3.	Decide on the project topic and sprint’s structure
+what were the main technical and non-technical obstacles and how they were overcome (or what was tried and did not work)
+1.	Operations on Jira: we discussed and did some test operations on it
+2.	Project functionalities and user stories: group discussion and web searching
+3.	Interface design of the project: Rachid gave us some advises (figma, invision…), will check it later.
+what was not finished, why this happened, how this affects the overall project progress and what adjustments (if any) are needed so the success of the project is not endangered
+N/A
+what is planned for the next period (e.g., next week)
+1.	Finish the project proposal.
+2.	Start working on the project (writing code, DB implementation…)
