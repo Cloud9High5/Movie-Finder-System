@@ -38,6 +38,38 @@ Week 2 (0606/0612)
 
 1. What was planned for the period since the last work diary entry?
 
+- Brainstorming on the selected topic. Come up with some user stories.
+- Thinking of technology stack of the project.
+- Thinking of the frame work of proposal and division of labor.
+
+2. What was finished
+
+- all the tasks in the week.
+
+3. What were the main technical and non-technical obstacles and how they were 
+overcome (or what was tried and did not work)
+
+- Hard to define the scope of the project. Need more discussion and suggestions from teacher.
+
+4. What was not finished, why this happened, how this affects the overall project 
+progress and what adjustments (if any) are needed so the success of the project is not 
+endangered.
+
+None
+
+5. what is planned for the next period
+
+- decide the selection for user story in sprint 1.
+- communicate with teacher to determine the scope of the project.
+- start the sprint 1.
+- finish proposal before weekend (due date is 20, Jun.).
+
+----------------------------------------------------------------------------------------------------
+
+Week 3 (0613/0619)
+
+1. What was planned for the period since the last work diary entry?
+
 
 
 2. What was finished
