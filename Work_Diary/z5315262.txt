@@ -10,10 +10,12 @@ what was planned for the period since the last work diary entry
 1.	Make updates to the Jira backlog
 2.	Join GitHub classroom
 3.	Start working on the project proposal
+4.  Decide on the framework/technologies that will be used for this project
 what was finished
 1.	The whole group joined into GitHub classroom
 2.	Get familiar with using Jira
 3.	Decide on the project topic and sprint’s structure
+4.  I complete most of the UI design and page relationships
 what were the main technical and non-technical obstacles and how they were overcome (or what was tried and did not work)
 1.	Operations on Jira: we discussed and did some test operations on it
 2.	Project functionalities and user stories: group discussion and web searching
