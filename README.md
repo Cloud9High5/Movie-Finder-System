@@ -4,5 +4,3 @@
 2. react(yarn)
 3. flask 2.0.2
 
-## activate python virtual environment
-source ./venv/bin/activate
