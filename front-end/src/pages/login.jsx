@@ -1,4 +1,5 @@
 import React from 'react';
+import ModalBlock from '../components/modal'
 import { makeStyles } from '@material-ui/styles';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
@@ -26,8 +27,12 @@ const styles = makeStyles({
 
 function Login () {
   const classes = styles();
+  const [visibility, setVisibility] = React.useState(false); // modal properties
+  const [modalMsg, setModalMsg] = React.useState(''); // modal properties
+
   return (
     <Container component="main" maxWidth="xs">
+      <ModalBlock msg={modalMsg} visibility={visibility} setVisibility={setVisibility}/>
       <h1 id={'appTitle'}>DOUBI</h1>
       <div className={classes.loginForm}>
         <Box component="form" noValidate>
@@ -66,11 +71,12 @@ function Login () {
             type="submit"
             fullWidth
             variant="contained"
+            onClick={(e) => {setVisibility(true); setModalMsg('logging in')}}
           >
             Login
           </Button>
           Don&apos;t have an account?
-          <Link variant="body2">
+          <Link variant="body2" onClick={(e) => {setVisibility(true); setModalMsg('signing up')}}>
             {'Sign Up Now'}
           </Link>
         </Box>
