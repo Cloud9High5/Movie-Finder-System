@@ -18,3 +18,12 @@ Week Two
 //what is planned for next week:
 1 Confirm the final proposal
 2 Divide the project tasks and realize them
+
+
+Week Three
+//what was planned:
+1. Complete the final proposal
+2. Complete filling in sprint 123 etc.
+3. Code tasks are discussed and assigned/ Assign tasks to team members (front end and back end)
+//what was finished:
+1. Submitted proposal
