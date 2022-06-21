@@ -1,0 +1,93 @@
+Week 1 (0530/0605)
+
+1. What was planned for the period since the last work diary entry?
+
+- Form a group
+- Set up GitHub team and Jira project
+
+2. What was finished
+
+- Team forming during lab section.
+- Join Jira group and github classroom.
+- Discuss with teammates and decide the topic.
+
+3. What were the main technical and non-technical obstacles and how they were 
+overcome (or what was tried and did not work)
+
+- Jira is a platform that we haven't used before. We need to try its functions and usage more
+- Topic choice. For the selection of topics, analyze the implementation methods of each topic, 
+and make the selection in combination with the development experience of the team members.
+
+4. What was not finished, why this happened, how this affects the overall project 
+progress and what adjustments (if any) are needed so the success of the project is not 
+endangered.
+
+- None
+
+5. what is planned for the next period
+
+- Brainstorming on the selected topic. And put forward some possibilities of user stories
+- Consider the structure of the proposal
+
+----------------------------------------------------------------------------------------------------
+
+Week 2 (0606/0612)
+
+1. What was planned for the period since the last work diary entry?
+
+- Brainstorming on the selected topic. And put forward some possibilities of user stories
+- Consider the structure of the proposal
+
+2. What was finished
+
+- Determined some user stories.
+- The whole group joined into GitHub classroom
+- Already able to use JIRA
+- Start working on the project proposal
+
+3. What were the main technical and non-technical obstacles and how they were 
+overcome (or what was tried and did not work)
+
+- Group discussion on user stories and specific contents of project functions
+- Discussed how JIRA adds issues and add user stories to it
+
+
+4. What was not finished, why this happened, how this affects the overall project 
+progress and what adjustments (if any) are needed so the success of the project is not 
+endangered.
+
+- None
+
+5. what is planned for the next period
+
+- Group discussion on what needs to be implemented in sprint 1
+- Complete the proposal
+
+----------------------------------------------------------------------------------------------------
+
+Week 3 (0613/0619)
+
+1. What was planned for the period since the last work diary entry?
+
+
+
+2. What was finished
+
+
+
+3. What were the main technical and non-technical obstacles and how they were 
+overcome (or what was tried and did not work)
+
+
+
+4. What was not finished, why this happened, how this affects the overall project 
+progress and what adjustments (if any) are needed so the success of the project is not 
+endangered.
+
+
+
+5. what is planned for the next period
+
+
+
+----------------------------------------------------------------------------------------------------
