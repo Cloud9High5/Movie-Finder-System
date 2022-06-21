@@ -25,3 +25,19 @@ N/A
 what is planned for the next period (e.g., next week)
 1.	Finish the project proposal.
 2.	Start working on the project (writing code, DB implementation…)
+
+Week 3
+
+what was planned for the period since the last work diary entry
+1.	Finish and submit the project proposal
+2.	Setting up the backend/frontend environment
+3.	Start working on sprint 1
+what was finished
+1.	Project proposal
+2.	The program can run successfully
+what were the main technical and non-technical obstacles and how they were overcome (or what was tried and did not work)
+1.	The version of the package used in development was different, and we spent some time solving the problem.
+what was not finished, why this happened, how this affects the overall project progress and what adjustments (if any) are needed so the success of the project is not endangered
+N/A
+what is planned for the next period (e.g., next week)
+1.	Finish writing login/sign up page, movie information page and part of dashboard page.
