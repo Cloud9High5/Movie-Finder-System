@@ -70,6 +70,38 @@ Week 3 (0613/0619)
 
 1. What was planned for the period since the last work diary entry?
 
+- decide the selection for user story in sprint 1.
+- communicate with teacher to determine the scope of the project.
+- start the sprint 1.
+- finish proposal before weekend (due date is 20, Jun.).
+
+2. What was finished
+
+- all the task planned last week.
+- Jira user stories.
+
+3. What were the main technical and non-technical obstacles and how they were 
+overcome (or what was tried and did not work)
+
+- have trouble with dataset. Need more preprocessing to have the basic dataset of the project.
+
+4. What was not finished, why this happened, how this affects the overall project 
+progress and what adjustments (if any) are needed so the success of the project is not 
+endangered.
+
+- None
+
+5. what is planned for the next period
+
+- Finish the sprint 1 (back-end).
+
+
+----------------------------------------------------------------------------------------------------
+
+Week 3 (0613/0619)
+
+1. What was planned for the period since the last work diary entry?
+
 
 
 2. What was finished
