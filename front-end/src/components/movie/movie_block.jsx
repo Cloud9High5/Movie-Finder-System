@@ -1,13 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import {makeStyles} from '@material-ui/styles';
-import Paper from '@mui/material/Paper';
 import Card from "@material-ui/core/Card";
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import Button from '@mui/material/Button';
+// import Button from '@mui/material/Button';
 import Typography from "@material-ui/core/Typography";
-import CardActions from '@mui/material/CardActions';
+// import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import {Rating} from "@mui/material";
