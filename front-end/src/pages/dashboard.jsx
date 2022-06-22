@@ -1,9 +1,11 @@
 import React from 'react';
+import NavBar from "../components/navBar";
 
 function Dashboard () {
   return (
     <div>
-      This is the dashboard page.
+      <NavBar/>
+      <div style={{ fontSize: 40 }}>Dashboard Page</div>
     </div>
   )
 }

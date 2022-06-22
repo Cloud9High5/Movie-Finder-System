@@ -10,8 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Link from '@mui/material/Link';
-import { useHistory } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
+import { useNavigate } from 'react-router-dom';
 
 const styles = makeStyles({
   loginForm: {
@@ -27,8 +26,24 @@ const styles = makeStyles({
 
 function Login () {
   const classes = styles();
+  const path = useNavigate();
   const [visibility, setVisibility] = React.useState(false); // modal properties
   const [modalMsg, setModalMsg] = React.useState(''); // modal properties
+  const [states, setStates] = React.useState(
+    {
+      email: '',
+      password: '',
+      showPassword: false,
+    }
+  );
+
+  const handleChange = (prop) => (event) => {
+    setStates({ ...states, [prop]: event.target.value });
+
+  };
+  const handleClickShowPassword = () => {
+    setStates({ ...states, showPassword: !states.showPassword });
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -45,6 +60,7 @@ function Login () {
             name="email"
             autoComplete="email"
             autoFocus
+            onChange={handleChange('email')}
           />
           <TextField
             margin="normal"
@@ -52,7 +68,7 @@ function Login () {
             fullWidth
             name="password"
             label="Password"
-            // type={states.showPassword ? 'text' : 'password'}
+            type={states.showPassword ? 'text' : 'password'}
             id="password"
             autoComplete="current-password"
             InputProps={{
@@ -60,8 +76,9 @@ function Login () {
                 <InputAdornment position="end">
                   <IconButton
                     aria-label="Toggle password visibility"
+                    onClick={handleClickShowPassword}
                   >
-                    {/*{states.showPassword ? <VisibilityOff/> : <Visibility/>}*/}
+                    {states.showPassword ? <VisibilityOff/> : <Visibility/>}
                   </IconButton>
                 </InputAdornment>
               )
@@ -71,12 +88,18 @@ function Login () {
             type="submit"
             fullWidth
             variant="contained"
-            onClick={(e) => {setVisibility(true); setModalMsg('logging in')}}
+            onClick={(e) => {
+              e.preventDefault();
+              setVisibility(true);
+              setModalMsg('log in function is not available')
+            }}
           >
             Login
           </Button>
           Don&apos;t have an account?
-          <Link variant="body2" onClick={(e) => {setVisibility(true); setModalMsg('signing up')}}>
+          <Link variant="body2" onClick={(e) => {
+            path('/signup')
+          }}>
             {'Sign Up Now'}
           </Link>
         </Box>
