@@ -1,12 +1,14 @@
 import React from 'react';
-import NavBar from "../components/navBar";
+import Container from '@material-ui/core/Container';
+import Header from "../components/header";
+
 
 function Dashboard () {
   return (
-    <div>
-      <NavBar/>
+    <Container maxWidth="lg">
+      <Header/>
       <div style={{ fontSize: 40 }}>Dashboard Page</div>
-    </div>
+    </Container>
   )
 }
 

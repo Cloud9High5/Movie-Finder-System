@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {makeStyles} from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Toolbar from '@material-ui/core/Toolbar';
 // import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
-import {lightGreen} from '@material-ui/core/colors';
+import { lightGreen } from '@material-ui/core/colors';
+import { useNavigate } from "react-router-dom";
+import Button from "@mui/material/Button";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -31,31 +33,61 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Header() {
+export default function Header () {
     const classes = useStyles();
+    const path = useNavigate();
+    const [token, setToken] = React.useState('');
+
+
+    const toDashboard = () => {
+        path('/dashboard');
+    }
+    const toLogin = () => {
+        path('/login');
+    }
+    const toSignUp = () => {
+        path('/signup');
+    }
+    const isNotLoggedIn = () => {
+        // return true if token is null or empty
+        return localStorage.getItem('token') === '' || localStorage.getItem('token') === null;
+    }
 
     return (
-        <React.Fragment>
-            <Toolbar className={classes.toolbar}>
+      <React.Fragment>
+          <Toolbar className={classes.toolbar}>
 
-                <Typography
-                    component="h2"
-                    variant="h4"
-                    color="inherit"
-                    align="left"
-                    noWrap
-                    className={classes.toolbarTitle}
-                >
-                    DOUBI
-                </Typography>
-                {/*When not login, sign up button, when login, avator*/}
-                {/*<Button variant="outlined" size="small">*/}
-                {/*    Sign up*/}
-                {/*</Button>*/}
-                <Avatar className={classes.green}>N</Avatar>
-            </Toolbar>
+              <Typography
+                component="h2"
+                variant="h4"
+                color="inherit"
+                align="left"
+                noWrap
+                className={classes.toolbarTitle}
+                onClick={toDashboard}
+              >
+                  DOUBI
+              </Typography>
+              {/*When not login, sign up button, when login, avator*/}
+              {/*<Button variant="outlined" size="small">*/}
+              {/*    Sign up*/}
+              {/*</Button>*/}
+              {
+                  isNotLoggedIn() ?
+                    <Avatar className={classes.green}>N</Avatar>
+                    :
+                    <span>
+                    <Button color="inherit" variant="outlined" onClick={toLogin}
+                            sx={{ textTransform: 'none' }}>Login</Button>
+                    <span> | </span>
+                    <Button color="inherit" variant="outlined" onClick={toSignUp}
+                            sx={{ textTransform: 'none' }}>Sign Up</Button>
+                </span>
+              }
 
-        </React.Fragment>
+          </Toolbar>
+
+      </React.Fragment>
     );
 }
 
