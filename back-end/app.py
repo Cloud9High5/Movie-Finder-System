@@ -2,23 +2,29 @@ from flask import Flask, request
 from flask import send_file
 from flask_restx import Resource, Api
 from flask_restx import fields, reqparse
-from flask_login import LoginManager, login_required, UserMixin
+# from flask_login import LoginManager, login_required, UserMixin
 
 import authorization as auth
 
 app = Flask(__name__)
 api = Api(app)
-login_manager = LoginManager()
-login_manager.init_app(app)
+
+
+# login_manager = LoginManager()
+# login_manager.init_app(app)
 
 # # user class
 # class User(UserMixin):
 #     def __init__(self, )
 
-@login_manager.user_loader
-def load_user(user_id):
-    auth
+# @login_manager.user_loader
+# def load_user(user_id):
+#     auth
 
+
+###############################################################################
+#                                  Signup                                     #
+###############################################################################
 
 
 sign_up_arguments = reqparse.RequestParser()
@@ -38,9 +44,18 @@ class signup(Resource):
             auth.insert_user(args)
             return {'message': 'user created'}, 201
 
-@api.route('/auth/login', methods=['POST'])
-class login(Resource):
 
+###############################################################################
+#                                  Login                                      #
+###############################################################################
+
+# @api.route('/auth/login', methods=['POST'])
+# class login(Resource):
+
+
+###############################################################################
+#                                  Logout                                    #
+###############################################################################
 
 # @api.route('/auth/logout', methods=['POST'])
 # @login_required
