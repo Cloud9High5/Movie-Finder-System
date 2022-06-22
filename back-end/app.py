@@ -2,22 +2,47 @@ from flask import Flask, request
 from flask import send_file
 from flask_restx import Resource, Api
 from flask_restx import fields, reqparse
+from flask_login import LoginManager, login_required, UserMixin
+
+import authorization as auth
 
 app = Flask(__name__)
 api = Api(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+# # user class
+# class User(UserMixin):
+#     def 
+
 
 
 sign_up_arguments = reqparse.RequestParser()
-sign_up_arguments.add_argument('Email')
-sign_up_arguments.add_argument('Password')
+sign_up_arguments.add_argument('email')
+sign_up_arguments.add_argument('password')
+sign_up_arguments.add_argument('username')
 
-@api.route('/signup', methods=['PUT'])
-class users(Resource):
+@api.route('/auth/signup', methods=['POST'])
+class signup(Resource):
     @api.expect(sign_up_arguments)
-    def put(self):
+    def post(self):
         args = sign_up_arguments.parse_args()
-        returnedMsg = {'message': 'hola'}
-        return returnedMsg, 200
+
+        if auth.check_user_exist(args['email']):
+            return {'message': 'user already exist'}, 400
+        else:
+            auth.insert_user(args)
+            return {'message': 'user created'}, 201
+
+# @api.route('/auth/login', methods=['POST'])
+# class login(Resource):
+
+
+@api.route('/auth/logout', methods=['POST'])
+@login_required
+class logout(Resource):
+
+
 
 movie_arguments = reqparse.RequestParser()
 movie_arguments.add_argument('title')
