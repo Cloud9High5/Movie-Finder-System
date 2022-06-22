@@ -13,7 +13,11 @@ login_manager.init_app(app)
 
 # # user class
 # class User(UserMixin):
-#     def 
+#     def __init__(self, )
+
+@login_manager.user_loader
+def load_user(user_id):
+    auth
 
 
 
@@ -34,26 +38,26 @@ class signup(Resource):
             auth.insert_user(args)
             return {'message': 'user created'}, 201
 
-# @api.route('/auth/login', methods=['POST'])
-# class login(Resource):
+@api.route('/auth/login', methods=['POST'])
+class login(Resource):
 
 
-@api.route('/auth/logout', methods=['POST'])
-@login_required
-class logout(Resource):
+# @api.route('/auth/logout', methods=['POST'])
+# @login_required
+# class logout(Resource):
 
 
 
-movie_arguments = reqparse.RequestParser()
-movie_arguments.add_argument('title')
+# movie_arguments = reqparse.RequestParser()
+# movie_arguments.add_argument('title')
 
-@api.route('/movies', methods=['GET'])
-class movies(Resource):
-    @api.expect(movie_arguments)
-    def get(self):
-        args = movie_arguments.parse_args()
-        returnedMsg = {'message': 'hola'}
-        return returnedMsg, 200
+# @api.route('/movies', methods=['GET'])
+# class movies(Resource):
+#     @api.expect(movie_arguments)
+#     def get(self):
+#         args = movie_arguments.parse_args()
+#         returnedMsg = {'message': 'hola'}
+#         return returnedMsg, 200
 
 
 if __name__ == "__main__":

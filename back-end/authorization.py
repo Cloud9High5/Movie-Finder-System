@@ -1,6 +1,8 @@
 import sqlite3
+import os
 
-filename = './db/users.db'
+filename = 'users.db'
+path = os.path.join(os.path.dirname(__file__), 'db', filename)
 
 test_user_info = [
     {
@@ -43,7 +45,7 @@ test_user_info = [
 # create db file and user table
 def init_user_db():
     # create a new database for user if it doesn't exist
-    conn = sqlite3.connect(filename)
+    conn = sqlite3.connect(path)
     c = conn.cursor()
 
     # create a table for user if it doesn't exist
@@ -61,7 +63,7 @@ def init_user_db():
 
 # check if user exists
 def check_user_exist(email):
-    conn = sqlite3.connect(filename)
+    conn = sqlite3.connect(path)
     c = conn.cursor()
 
     c.execute("SELECT * FROM users WHERE username = '%s'" % email)
@@ -76,7 +78,7 @@ def check_user_exist(email):
 
 # check if user is admin
 def check_admin(username):
-    conn = sqlite3.connect(filename)
+    conn = sqlite3.connect(path)
     c = conn.cursor()
 
     c.execute("SELECT is_admin FROM users WHERE username = '%s'" % username)
@@ -91,7 +93,7 @@ def check_admin(username):
 
 # check if user is blocked
 def check_blocked(username):
-    conn = sqlite3.connect(filename)
+    conn = sqlite3.connect(path)
     c = conn.cursor()
 
     c.execute("SELECT is_blocked FROM users WHERE username = '%s'" % username)
@@ -106,7 +108,7 @@ def check_blocked(username):
 
 # insert a new user
 def insert_user(user):
-    conn = sqlite3.connect(filename)
+    conn = sqlite3.connect(path)
     c = conn.cursor()
 
     c.execute("""INSERT INTO users (
@@ -122,7 +124,7 @@ def insert_user(user):
 # insert test user info into db
 def test_data():
     count = 0
-    conn = sqlite3.connect(filename)
+    conn = sqlite3.connect(path)
     c = conn.cursor()
 
     for user in test_user_info:
