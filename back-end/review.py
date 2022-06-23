@@ -1,3 +1,4 @@
+import re
 import sqlite3
 import os
 import pandas as pd
@@ -23,6 +24,39 @@ def init_review_db():
     
     conn.commit()
     conn.close()
+
+
+def insert_review(review):
+    conn = sqlite3.connect(path)
+    c = conn.cursor()
+
+    c.execute("""INSERT INTO reviews (
+        review, rating, uid, movie_id)
+    )""" % (
+        review['review'],
+        review['rating'],
+        review['uid'],
+        review['movie_id'],))
+
+    conn.commit()
+    conn.close()
+
+
+def get_reviews(method = 'uid', value = None):
+    conn = sqlite3.connect(path)
+    c = conn.cursor()
+
+    if method == 'uid':
+        c.execute("""SELECT * FROM reviews WHERE uid = %d""" % (value,))
+    elif method == 'movie_id':
+        c.execute("""SELECT * FROM reviews WHERE movie_id = %d""" % (value,))
+    elif method == 'popular':
+        c.execute("""SELECT * FROM reviews ORDER BY like DESC LIMIT 10""")
+
+    reviews = c.fetchall()
+    
+    conn.close()
+    return reviews
 
 
 
