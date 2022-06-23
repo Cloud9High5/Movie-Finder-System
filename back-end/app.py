@@ -7,9 +7,11 @@ from flask_restx import fields, reqparse
 # from flask_login import LoginManager, login_required, UserMixin
 
 import authorization as auth
+from flask_cors import CORS, cross_origin  # CORS support, DO NOT DELETE
 
 app = Flask(__name__)
 api = Api(app)
+CORS(app)  # CORS support, DO NOT DELETE
 
 
 # login_manager = LoginManager()
@@ -45,7 +47,6 @@ api = Api(app)
 #         else:
 #             auth.insert_user(args)
 #             return {'message': 'user created'}, 201
-
 
 users_model = api.model('users', {
     "email": fields.String,
