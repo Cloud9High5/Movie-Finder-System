@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, request
 from flask import send_file
 from flask_restx import Resource, Api
@@ -5,9 +7,11 @@ from flask_restx import fields, reqparse
 # from flask_login import LoginManager, login_required, UserMixin
 
 import authorization as auth
+from flask_cors import CORS, cross_origin  # CORS support, DO NOT DELETE
 
 app = Flask(__name__)
 api = Api(app)
+CORS(app)  # CORS support, DO NOT DELETE
 
 
 # login_manager = LoginManager()
@@ -27,22 +31,38 @@ api = Api(app)
 ###############################################################################
 
 
-sign_up_arguments = reqparse.RequestParser()
-sign_up_arguments.add_argument('email')
-sign_up_arguments.add_argument('password')
-sign_up_arguments.add_argument('username')
+# sign_up_arguments = reqparse.RequestParser()
+# sign_up_arguments.add_argument('email')
+# sign_up_arguments.add_argument('password')
+# sign_up_arguments.add_argument('username')
 
+# @api.route('/auth/signup', methods=['POST'])
+# class signup(Resource):
+#     @api.expect(sign_up_arguments)
+#     def post(self):
+#         args = sign_up_arguments.parse_args()
+#
+#         if auth.check_user_exist(args['email']):
+#             return {'message': 'user already exist'}, 400
+#         else:
+#             auth.insert_user(args)
+#             return {'message': 'user created'}, 201
+
+users_model = api.model('users', {
+    "email": fields.String,
+    "username": fields.String,
+    "password": fields.String,
+})
 @api.route('/auth/signup', methods=['POST'])
 class signup(Resource):
-    @api.expect(sign_up_arguments)
+    @api.expect(users_model)
     def post(self):
-        args = sign_up_arguments.parse_args()
-
-        if auth.check_user_exist(args['email']):
+        payload = json.loads(str(request.data, 'utf-8'))  # turn request body into python dictionary
+        if auth.check_user_exist(payload['email']):
             return {'message': 'user already exist'}, 400
         else:
-            auth.insert_user(args)
-            return {'message': 'user created'}, 201
+            auth.insert_user(payload)
+            return {'message': 'user created'}, 200
 
 
 ###############################################################################
