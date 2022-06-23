@@ -2,9 +2,11 @@ from flask import Flask, request
 from flask import send_file
 from flask_restx import Resource, Api
 from flask_restx import fields, reqparse
+import json
 # from flask_login import LoginManager, login_required, UserMixin
 
 import authorization as auth
+import review
 
 app = Flask(__name__)
 api = Api(app)
@@ -27,21 +29,20 @@ api = Api(app)
 ###############################################################################
 
 
-sign_up_arguments = reqparse.RequestParser()
-sign_up_arguments.add_argument('email')
-sign_up_arguments.add_argument('password')
-sign_up_arguments.add_argument('username')
-
+users_model = api.model('users', {
+    "email": fields.String,
+    "username": fields.String,
+    "password": fields.String,
+})
 @api.route('/auth/signup', methods=['POST'])
 class signup(Resource):
-    @api.expect(sign_up_arguments)
+    @api.expect(users_model)
     def post(self):
-        args = sign_up_arguments.parse_args()
-
-        if auth.check_user_exist(args['email']):
+        payload = json.loads(str(request.data, 'utf-8'))  # turn request body into python dictionary
+        if auth.check_user_exist(payload['email']):
             return {'message': 'user already exist'}, 400
         else:
-            auth.insert_user(args)
+            auth.insert_user(payload)
             return {'message': 'user created'}, 201
 
 
@@ -60,6 +61,72 @@ class signup(Resource):
 # @api.route('/auth/logout', methods=['POST'])
 # @login_required
 # class logout(Resource):
+
+###############################################################################
+#                                get review                                   #
+###############################################################################
+
+review_arguments = reqparse.RequestParser()
+review_arguments.add_argument('method', type=str, default='uid')
+review_arguments.add_argument('movie_id', type=int)
+review_arguments.add_argument('uid', type=int)
+review_arguments.add_argument('top', type=int)
+
+@api.route('/review', methods=['GET'])
+@api.param('method', 'the method to get review')
+@api.param('movie_id', 'id of the movie')
+@api.param('uid', 'id of the user')
+class search_review(Resource):
+    @api.expect(review_arguments)
+    def get(self):
+        args = review_arguments.parse_args()
+        if args['method'] == 'uid':
+            if args['uid'] is None:
+                return {'message': 'uid is required'}, 400
+            else:
+                return review.get_reviews(method='uid', value=args['uid'])
+        elif args['method'] == 'movie_id':
+            if args['movie_id'] is None:
+                return {'message': 'movie_id is required'}, 400
+            else:
+                return review.get_reviews(method='movie_id', value=args['movie_id'])
+        elif args['method'] == 'both':
+            if args['uid'] is None or args['movie_id'] is None:
+                return {'message': 'uid and movie_id are both required'}, 400
+            else:
+                return review.get_reviews(method='both', value=(args['uid'], args['movie_id']))
+        elif args['method'] == 'popular':
+            if args['top'] is None:
+                return {'message': 'top is required'}, 400
+            else:
+                return review.get_reviews(method='popular', value=args['top'])
+
+
+@api.route('/review/<int:review_id>', methods=['GET'])
+@api.param('review_id', 'id of the review')
+class get_review(Resource):
+    def get(self, review_id):
+        return review.get_reviews(method='review_id', value = review_id)
+
+
+###############################################################################
+#                                post review                                  #
+###############################################################################
+
+review_model = api.model('review', {
+    "movie_id": fields.Integer,
+    "uid": fields.Integer,
+    "rating": fields.Float,
+    "review": fields.String,
+})
+
+@api.route('/review', methods=['POST'])
+@api.expect(review_model)
+class post_review(Resource):
+    def post(self):
+        payload = json.loads(str(request.data, 'utf-8'))
+        review.insert_review(payload)
+        return {'message': 'review created'}, 201
 
 
 

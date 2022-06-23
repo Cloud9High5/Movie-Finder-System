@@ -80,6 +80,7 @@ def get_reviews(method = 'uid', value = None):
             'movie_id': fetch reviews by movie id,
             'both': fetch reviews by both user id and movie id,
             'popular': fetch top N reviews by like count,
+            'review_id': fetch a review by review id,
         }
     
         value: int, the value of the method, for specific
@@ -88,6 +89,7 @@ def get_reviews(method = 'uid', value = None):
             'movie_id': movie id,
             'both': user id and movie id tuple,
             'popular': Top N reviews
+            'review_id': review id
         }
     
     Returns:
@@ -103,19 +105,22 @@ def get_reviews(method = 'uid', value = None):
     elif method == 'both':
         c.execute("""SELECT * FROM reviews WHERE uid = %d AND movie_id = %d""" % (value[0], value[1]))
     elif method == 'popular':
-        c.execute("""SELECT * FROM reviews ORDER BY like DESC LIMIT 10""")
+        c.execute("""SELECT * FROM reviews ORDER BY like DESC LIMIT %d""" % (value,))
+    elif method == 'review_id':
+        c.execute("""SELECT * FROM reviews WHERE review_id = %d""" % (value,))
 
     reviews = c.fetchall()
     if reviews is None:
         return False
 
-    review = {}
+
     result = []
     
     
     conn.close()
 
     for i in reviews:
+        review = {}
         review['review_id'] = i[0]
         review['review'] = i[1]
         review['rating'] = i[2]
@@ -126,6 +131,31 @@ def get_reviews(method = 'uid', value = None):
         result.append(review)
 
     return result
+
+
+def like_dislike_review(review_id, like_dislike):
+    '''
+    like or dislike a review
+
+    Args:
+        review_id: int, the review id
+        like_dislike: str, the like or dislike
+    
+    Returns:
+        None
+
+    '''
+
+    conn = sqlite3.connect(path)
+    c = conn.cursor()
+
+    if like_dislike == 'like':
+        c.execute("""UPDATE reviews SET like = like + 1 WHERE review_id = %d""" % (review_id,))
+    elif like_dislike == 'dislike':
+        c.execute("""UPDATE reviews SET dislike = dislike + 1 WHERE review_id = %d""" % (review_id,))
+
+    conn.commit()
+    conn.close()
 
 
 
