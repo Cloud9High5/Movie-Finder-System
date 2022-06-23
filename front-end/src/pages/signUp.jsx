@@ -12,6 +12,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { makeStyles } from '@material-ui/styles';
 import ModalBlock from '../components/modal';
+import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles({
   box_1: {
@@ -52,8 +53,16 @@ function SignUp () {
   );
 
   // already have account, go to login
-  const gotoLogin = () => {
+  const toLogin = () => {
     path('/login');
+  }
+  // go to dashboard page
+  const toDashboard = () => {
+    path('/dashboard');
+  }
+  // back to previous page
+  const toPreviousPage = () => {
+    path(-1);
   }
 
   // fill states up and wait for further process
@@ -87,10 +96,13 @@ function SignUp () {
   const classes = useStyles();
 
   return (
-    <Container component="main" maxWidth="xs">
-      <h1 id={'appTitle'}>DOUBI</h1>
+    <Container component="main" maxWidth={'xs'}>
+      <h1 id={'appTitle'} onClick={toDashboard}>DOUBI</h1>
       <ModalBlock msg={modalMsg} visibility={visibility} setVisibility={setVisibility}/>
       <CssBaseline/>
+      <Link variant="caption" display="block" onClick={toPreviousPage} gutterBottom>
+        ← Back to previous page
+      </Link>
       <Box className={classes.box_1}>
         <Box component="form" onSubmit={(e) => {
           e.preventDefault();
@@ -175,7 +187,7 @@ function SignUp () {
             Sign Up
           </Button>
           Already have an account?
-          <Link variant="body2" onClick={gotoLogin}>
+          <Link variant="body2" onClick={toLogin}>
             {'Login now'}
           </Link>
         </Box>

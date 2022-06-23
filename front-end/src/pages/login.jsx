@@ -37,6 +37,13 @@ function Login () {
     }
   );
 
+  const toPreviousPage = () => {
+    path(-1);
+  }
+  const toDashboard = () => {
+    path('/dashboard');
+  }
+
   const handleChange = (prop) => (event) => {
     setStates({ ...states, [prop]: event.target.value });
 
@@ -48,7 +55,10 @@ function Login () {
   return (
     <Container component="main" maxWidth="xs">
       <ModalBlock msg={modalMsg} visibility={visibility} setVisibility={setVisibility}/>
-      <h1 id={'appTitle'}>DOUBI</h1>
+      <h1 id={'appTitle'} onClick={toDashboard}>DOUBI</h1>
+      <Link variant="caption" display="block" onClick={toPreviousPage} gutterBottom>
+        ← Back to previous page
+      </Link>
       <div className={classes.loginForm}>
         <Box component="form" noValidate>
           <TextField

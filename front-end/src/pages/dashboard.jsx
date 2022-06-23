@@ -5,7 +5,7 @@ import Header from "../components/header";
 
 function Dashboard () {
   return (
-    <Container maxWidth="lg">
+    <Container>
       <Header/>
       <div style={{ fontSize: 40 }}>Dashboard Page</div>
     </Container>
