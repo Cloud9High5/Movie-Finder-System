@@ -51,9 +51,9 @@ def init_user_db():
     # create a table for user if it doesn't exist
     c.execute("""CREATE TABLE IF NOT EXISTS users (
         uid INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT,
-        password TEXT,
-        email TEXT,
+        username TEXT NOT NULL,
+        password TEXT NOT NULL,
+        email TEXT NOT NULL,
         is_admin INTEGER DEFAULT 0,
         is_blocked INTEGER DEFAULT 0)""")
 
