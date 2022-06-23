@@ -130,11 +130,6 @@ def get_reviews(method = 'uid', value = None):
 
 
 
-# def insert_review(review):
-#     conn = sqlite3.connect(path)
-#     c = conn.cursor()
-#     c.execute("""INSERT INTO reviews (
-#         review, rating, uid, title, movie_id) VALUES (
 
 if __name__ == "__main__":
     # r = get_reviews('both', (1,338))

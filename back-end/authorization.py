@@ -44,7 +44,15 @@ test_user_info = [
 
 # create db file and user table
 def init_user_db():
-    # create a new database for user if it doesn't exist
+    '''
+    create a new database for user if it doesn't exist
+
+    Args:
+        None
+
+    Returns:    
+        None
+    '''
     conn = sqlite3.connect(path)
     c = conn.cursor()
 
@@ -61,12 +69,21 @@ def init_user_db():
     conn.close()
 
 
-# check if user exists
 def check_user_exist(email):
+    '''
+    check if the user exists in db
+
+    Args:
+        email: user's email, it is the unique key for user
+    
+    Returns:
+        True: if user exists
+        False: if user doesn't exist
+    '''
     conn = sqlite3.connect(path)
     c = conn.cursor()
 
-    c.execute("SELECT * FROM users WHERE username = '%s'" % email)
+    c.execute("SELECT * FROM users WHERE email = '%s'" % email)
     user = c.fetchone()
     conn.close()
 
@@ -76,12 +93,22 @@ def check_user_exist(email):
         return True
 
 
-# check if user is admin
-def check_admin(username):
+def check_admin(email):
+    '''
+    check if the user is admin by email
+
+    Args:
+        email: user's email, it is the unique key for user
+
+    Returns:
+        True: if user is admin
+        False: if user isn't admin
+
+    '''
     conn = sqlite3.connect(path)
     c = conn.cursor()
 
-    c.execute("SELECT is_admin FROM users WHERE username = '%s'" % username)
+    c.execute("SELECT is_admin FROM users WHERE email = '%s'" % email)
     is_admin = c.fetchone()[0]
     conn.close()
 
@@ -91,12 +118,21 @@ def check_admin(username):
         return False
 
 
-# check if user is blocked
-def check_blocked(username):
+def check_blocked(email):
+    '''
+    check if the user is blocked by email
+
+    Args:
+        email: user's email, it is the unique key for user
+    
+    Returns:
+        True: if user is blocked
+        False: if user isn't blocked
+    '''
     conn = sqlite3.connect(path)
     c = conn.cursor()
 
-    c.execute("SELECT is_blocked FROM users WHERE username = '%s'" % username)
+    c.execute("SELECT is_blocked FROM users WHERE email = '%s'" % email)
     is_blocked = c.fetchone()[0]
     conn.close()
 
@@ -106,8 +142,22 @@ def check_blocked(username):
         return False
 
 
-# insert a new user
 def insert_user(user):
+    '''
+    insert a new user into db
+    
+    Args:
+        user: a dict containing user info
+        {
+            'username': username, could be duplicated
+            'password': password, encrypted
+            'email': email, unique key
+        }
+
+    Returns:
+        None
+    
+    '''
     conn = sqlite3.connect(path)
     c = conn.cursor()
 
