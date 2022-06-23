@@ -62,7 +62,7 @@ class signup(Resource):
             return {'message': 'user already exist'}, 400
         else:
             auth.insert_user(payload)
-            return {'message': 'user created'}, 201
+            return {'message': 'user created'}, 200
 
 
 ###############################################################################
