@@ -57,9 +57,10 @@ def insert_review(review):
     conn = sqlite3.connect(path)
     c = conn.cursor()
 
+
     c.execute("""INSERT INTO reviews (
-        review, rating, uid, movie_id)
-    )""" % (
+        review, rating, uid, movie_id) VALUES (
+        '%s', %f, %d, %d)""" % (
         review['review'],
         review['rating'],
         review['uid'],
@@ -69,7 +70,7 @@ def insert_review(review):
     conn.close()
 
 
-def get_reviews(method = 'uid', value = None):
+def get_review(method = 'uid', value = None):
     '''
     fetch reviews from db based on method and value
 

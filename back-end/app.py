@@ -72,47 +72,6 @@ review_arguments.add_argument('movie_id', type=int)
 review_arguments.add_argument('uid', type=int)
 review_arguments.add_argument('top', type=int)
 
-@api.route('/review', methods=['GET'])
-@api.param('method', 'the method to get review')
-@api.param('movie_id', 'id of the movie')
-@api.param('uid', 'id of the user')
-class search_review(Resource):
-    @api.expect(review_arguments)
-    def get(self):
-        args = review_arguments.parse_args()
-        if args['method'] == 'uid':
-            if args['uid'] is None:
-                return {'message': 'uid is required'}, 400
-            else:
-                return review.get_reviews(method='uid', value=args['uid'])
-        elif args['method'] == 'movie_id':
-            if args['movie_id'] is None:
-                return {'message': 'movie_id is required'}, 400
-            else:
-                return review.get_reviews(method='movie_id', value=args['movie_id'])
-        elif args['method'] == 'both':
-            if args['uid'] is None or args['movie_id'] is None:
-                return {'message': 'uid and movie_id are both required'}, 400
-            else:
-                return review.get_reviews(method='both', value=(args['uid'], args['movie_id']))
-        elif args['method'] == 'popular':
-            if args['top'] is None:
-                return {'message': 'top is required'}, 400
-            else:
-                return review.get_reviews(method='popular', value=args['top'])
-
-
-@api.route('/review/<int:review_id>', methods=['GET'])
-@api.param('review_id', 'id of the review')
-class get_review(Resource):
-    def get(self, review_id):
-        return review.get_reviews(method='review_id', value = review_id)
-
-
-###############################################################################
-#                                post review                                  #
-###############################################################################
-
 review_model = api.model('review', {
     "movie_id": fields.Integer,
     "uid": fields.Integer,
@@ -120,13 +79,57 @@ review_model = api.model('review', {
     "review": fields.String,
 })
 
-@api.route('/review', methods=['POST'])
-@api.expect(review_model)
-class post_review(Resource):
+@api.route('/review', methods=['GET', 'POST'])
+class reviews(Resource):
+
+    @api.param('method', 'the method to get review')
+    @api.param('movie_id', 'id of the movie')
+    @api.param('uid', 'id of the user')
+    @api.expect(review_arguments)
+    def get(self):
+        args = review_arguments.parse_args()
+        if args['method'] == 'uid':
+            if args['uid'] is None:
+                return {'message': 'uid is required'}, 400
+            else:
+                return review.get_review(method='uid', value=args['uid'])
+        elif args['method'] == 'movie_id':
+            if args['movie_id'] is None:
+                return {'message': 'movie_id is required'}, 400
+            else:
+                return review.get_review(method='movie_id', value=args['movie_id'])
+        elif args['method'] == 'both':
+            if args['uid'] is None or args['movie_id'] is None:
+                return {'message': 'uid and movie_id are both required'}, 400
+            else:
+                return review.get_review(method='both', value=(args['uid'], args['movie_id']))
+        elif args['method'] == 'popular':
+            if args['top'] is None:
+                return {'message': 'top is required'}, 400
+            else:
+                return review.get_review(method='popular', value=args['top'])
+    
+    @api.expect(review_model)
     def post(self):
         payload = json.loads(str(request.data, 'utf-8'))
         review.insert_review(payload)
         return {'message': 'review created'}, 201
+
+
+@api.route('/review/<int:review_id>', methods=['GET'])
+@api.param('review_id', 'id of the review')
+class get_review(Resource):
+    def get(self, review_id):
+        return review.get_review(method='review_id', value = review_id)
+
+
+###############################################################################
+#                                post review                                  #
+###############################################################################
+
+
+
+
 
 
 
