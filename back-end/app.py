@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, request
 from flask import send_file
 from flask_restx import Resource, Api
@@ -7,9 +9,11 @@ import json
 
 import authorization as auth
 import review
+from flask_cors import CORS, cross_origin  # CORS support, DO NOT DELETE
 
 app = Flask(__name__)
 api = Api(app)
+CORS(app)  # CORS support, DO NOT DELETE
 
 
 # login_manager = LoginManager()
@@ -43,7 +47,7 @@ class signup(Resource):
             return {'message': 'user already exist'}, 400
         else:
             auth.insert_user(payload)
-            return {'message': 'user created'}, 201
+            return {'message': 'user created'}, 200
 
 
 ###############################################################################
@@ -132,6 +136,35 @@ class get_review(Resource):
 
 
 
+###############################################################################
+#                                  Film                                       #
+###############################################################################
+
+import Filmdb as Fdb
+
+film_arguments = reqparse.RequestParser()
+film_arguments.add_argument('id')
+
+@api.route('/films', methods=['GET'])
+class film(Resource):
+    @api.expect(film_arguments)
+    def get(self):
+        args = film_arguments.parse_args()
+        if Fdb.check_film_exist(args['id']):
+            film1 = Fdb.find_film(args['id'])
+            response = {
+                'FILM_ID': film1[0],
+                'TITLE': film1[1],
+                'YEAR': film1[2],
+                'RUN_TIME': film1[3],
+                'RATING': film1[4],
+                'OVERVIEW': film1[5],
+                'DIRECTOR': film1[6],
+                'POSTER': film1[7]
+            }
+            return response, 200
+        else:
+            return {'message': 'Film not found'}, 404
 
 # movie_arguments = reqparse.RequestParser()
 # movie_arguments.add_argument('title')
