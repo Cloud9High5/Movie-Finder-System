@@ -153,14 +153,14 @@ class film(Resource):
         if Fdb.check_film_exist(args['id']):
             film1 = Fdb.find_film(args['id'])
             response = {
-                'FILM_ID': film1[0],
-                'TITLE': film1[1],
-                'YEAR': film1[2],
-                'RUN_TIME': film1[3],
-                'RATING': film1[4],
-                'OVERVIEW': film1[5],
-                'DIRECTOR': film1[6],
-                'POSTER': film1[7]
+                'movie_ID': film1[0],
+                'title': film1[1],
+                'year': film1[2],
+                'run_time': film1[3],
+                'rating': film1[4],
+                'overview': film1[5],
+                'director': film1[6],
+                'poster': film1[7]
             }
             return response, 200
         else:
