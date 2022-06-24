@@ -62,6 +62,7 @@ def init_user_db():
         username TEXT NOT NULL,
         password TEXT NOT NULL,
         email TEXT NOT NULL,
+        photo_url TEXT,
         is_admin INTEGER DEFAULT 0,
         is_blocked INTEGER DEFAULT 0)""")
 
