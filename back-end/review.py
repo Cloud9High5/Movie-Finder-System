@@ -30,6 +30,7 @@ def init_review_db():
         rating INTEGER NOT NULL,
         uid INTEGER NOT NULL,
         movie_id INTEGER NOT NULL,
+        release_date INTEGER NOT NULL,
         like INTEGER DEFAULT 0,
         dislike INTEGER DEFAULT 0)""")
     
@@ -163,6 +164,4 @@ def like_dislike_review(review_id, like_dislike):
 
 
 if __name__ == "__main__":
-    # r = get_reviews('both', (1,338))
-    r = get_reviews('popular', 10)
-    print(len(r))
+    init_review_db()
