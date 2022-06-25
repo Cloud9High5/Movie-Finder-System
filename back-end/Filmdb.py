@@ -51,6 +51,24 @@ def find_film(id):
     return film
 
 
+def show_top_rating_film(number):
+    conn = sqlite3.connect(filename)
+    c = conn.cursor()
+
+    film = c.execute("select * from FILM_INFORMATION order by rating desc limit '%d'" % number)
+
+    return film
+
+
+def show_top_recent_film(number):
+    conn = sqlite3.connect(filename)
+    c = conn.cursor()
+
+    film = c.execute("select * from FILM_INFORMATION order by year desc limit '%d'" % number)
+
+    return film
+
+
 # insert a new film
 def insert_film(film):
     conn = sqlite3.connect(filename)

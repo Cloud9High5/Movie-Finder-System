@@ -1,3 +1,13 @@
+
+/shelf/
+/workspace.xml
+/httpRequests/
+/dataSources/
+/dataSources.local.xml
+/.idea
+/_MACOSX
+/_pycacahe_
+/venv
 /.idea/
 /_MACOSX
 /_pycache_
