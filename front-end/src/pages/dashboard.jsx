@@ -21,6 +21,20 @@ function Dashboard () {
 
     // generate a list of random movie id
     React.useEffect(() => {
+        const ids = randomID();
+        // const tempInfo = [...movieInfo];
+        const tempInfo = [];
+        ids.map(async (id) => {
+            const response = await fetch('http://127.0.0.1:5000/films?id=' + id);
+            const data = await response.json();
+            // console.log(tempInfo);
+            // console.log(data);
+            tempInfo.push(data);
+            setMovieInfo([...tempInfo]);
+        })
+    }, [])
+
+    const randomID = () => {
         const tempID = [];
         while (tempID.length < 10) {
             const num = Math.floor(Math.random() * 100);
@@ -29,21 +43,35 @@ function Dashboard () {
                 tempID.push(num);
             }
         }
-
-        const tempInfo = [...movieInfo];
-        tempID.map(async (id) => {
-            const response = await fetch('http://127.0.0.1:5000/films?id=' + id);
-            const data = await response.json();
-            // console.log(tempInfo);
-            // console.log(data);
-            tempInfo.push(data);
-            setMovieInfo(tempInfo);
-        })
-    }, [])
-
-    const changeDisplayMode = (e) => {
-        setDisplayMode(e.target.value);
+        return tempID;
     }
+
+    const changeDisplayMode = async (e) => {
+        console.log('Display mode: ' + e.target.value);
+        setDisplayMode(e.target.value);
+
+        if (e.target.value === 'random') {
+            const ids = randomID();
+            console.log(ids);
+            const tempInfo = [];
+            ids.map(async (id) => {
+                const response = await fetch('http://127.0.0.1:5000/films?id=' + id);
+                const data = await response.json();
+                tempInfo.push(data);
+                setMovieInfo([...tempInfo]);
+            })
+
+        } else if (e.target.value === 'highest') {
+            const response = await fetch('http://127.0.0.1:5000/films/top/10');
+            const data = await response.json();
+            setMovieInfo(data);
+        } else if (e.target.value === 'latest') {
+            const response = await fetch('http://127.0.0.1:5000/films/recent/10');
+            const data = await response.json();
+            setMovieInfo(data);
+        }
+    }
+
 
     return (
         <Container>
