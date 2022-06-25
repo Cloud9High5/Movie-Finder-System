@@ -50,7 +50,6 @@ export default function MovieBlock({props}) {
                             </CardContent>
                         </Card>
                     </Grid>
-                    <Grid item xs={2}></Grid>
                     <Grid item xs={6}>
                         <Typography gutterBottom variant="h5" component="div">
                             Rating
