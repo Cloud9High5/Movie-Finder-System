@@ -14,7 +14,7 @@ function App () {
             <Route exact path={'/dashboard'} element={<Dashboard/>}/>
             <Route exact path={'/login'} element={<Login/>}/>
             <Route exact path={'/signup'} element={<SignUp/>}/>
-            <Route exact path={'/movie_detail'} element={<MovieDetail/>}/>
+            <Route exact path={'/movie_detail/:movieID'} element={<MovieDetail/>}/>
             {/* should be at the bottom */}
             <Route path={'/'} element={<Dashboard/>}/> {/* redirect to homepage */}
           </Routes>
