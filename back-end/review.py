@@ -3,6 +3,7 @@ import sqlite3
 import os
 from webbrowser import get
 import pandas as pd
+import datetime
 
 filename = 'reviews.db'
 path = os.path.join(os.path.dirname(__file__), 'db', filename)
@@ -80,18 +81,23 @@ def get_review(method = 'uid', value = None):
         {
             'uid': fetch reviews by user id,
             'movie_id': fetch reviews by movie id,
-            'both': fetch reviews by both user id and movie id,
-            'popular': fetch top N reviews by like count,
+            'uid_movie_id': fetch reviews by user id and movie id,
             'review_id': fetch a review by review id,
+            'popular': fetch top N reviews by like count,
+            'recent': fetch reviews in the last N months,
+            'recent_popular': fetch top M reviews by like count in the last N months,
+            
         }
     
         value: int, the value of the method, for specific
         {
             'uid': user id,
             'movie_id': movie id,
-            'both': user id and movie id tuple,
+            'uid_movie_id': user id and movie id, (uid, movie_id)
+            'review_id': review id,
             'popular': Top N reviews
-            'review_id': review id
+            'recent': reviews in the last N months
+            'recent_popular': top M reviews in the last N months, (M top, N months)
         }
     
     Returns:
@@ -104,10 +110,14 @@ def get_review(method = 'uid', value = None):
         c.execute("""SELECT * FROM reviews WHERE uid = %d""" % (value,))
     elif method == 'movie_id':
         c.execute("""SELECT * FROM reviews WHERE movie_id = %d""" % (value,))
-    elif method == 'both':
+    elif method == 'uid_movie_id':
         c.execute("""SELECT * FROM reviews WHERE uid = %d AND movie_id = %d""" % (value[0], value[1]))
     elif method == 'popular':
         c.execute("""SELECT * FROM reviews ORDER BY like DESC LIMIT %d""" % (value,))
+    elif method == 'recent':
+        c.execute("""SELECT * FROM reviews WHERE release_date > %d""" % (datetime.datetime.now().timestamp() - value * 30 * 24 * 60 * 60,))
+    elif method == 'recent_popular':
+        c.execute("""SELECT * FROM reviews WHERE release_date > %d ORDER BY like DESC LIMIT %d""" % (datetime.datetime.now().timestamp() - value[0] * 30 * 24 * 60 * 60, value[1],))
     elif method == 'review_id':
         c.execute("""SELECT * FROM reviews WHERE review_id = %d""" % (value,))
 
@@ -158,9 +168,6 @@ def like_dislike_review(review_id, like_dislike):
 
     conn.commit()
     conn.close()
-
-
-
 
 
 if __name__ == "__main__":

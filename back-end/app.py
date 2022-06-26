@@ -75,6 +75,7 @@ review_arguments.add_argument('method', type=str, default='uid')
 review_arguments.add_argument('movie_id', type=int)
 review_arguments.add_argument('uid', type=int)
 review_arguments.add_argument('top', type=int)
+review_arguments.add_argument('recent', type=int)
 
 review_model = api.model('review', {
     "movie_id": fields.Integer,
@@ -102,7 +103,7 @@ class reviews(Resource):
                 return {'message': 'movie_id is required'}, 400
             else:
                 return review.get_review(method='movie_id', value=args['movie_id'])
-        elif args['method'] == 'both':
+        elif args['method'] == 'uid_movie_id':
             if args['uid'] is None or args['movie_id'] is None:
                 return {'message': 'uid and movie_id are both required'}, 400
             else:
@@ -112,6 +113,16 @@ class reviews(Resource):
                 return {'message': 'top is required'}, 400
             else:
                 return review.get_review(method='popular', value=args['top'])
+        elif args['method'] == 'recent':
+            if args['recent'] is None:
+                return {'message': 'recent is required'}, 400
+            else:
+                return review.get_review(method='recent', value=args['recent'])
+        elif args['method'] == 'recent_popular':
+            if args['recent'] is None or args['top'] is None:
+                return {'message': 'recent and top are both required'}, 400
+            else:
+                return review.get_review(method='recent_popular', value=(args['recent'], args['top']))
     
     @api.expect(review_model)
     def post(self):
