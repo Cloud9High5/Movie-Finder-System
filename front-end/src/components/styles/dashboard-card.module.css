@@ -1,0 +1,16 @@
+.movieCard:hover .profile {
+    display: block !important;
+}
+.profile {
+    display: none;
+    box-sizing: border-box;
+    padding: 10px;
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    left: 100%;
+    top: 0;
+    background-color: white;
+    z-index: 100;
+    box-shadow: 5px 5px 10px #333 !important;
+}

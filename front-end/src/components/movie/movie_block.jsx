@@ -117,7 +117,23 @@ export default function MovieBlock(props) {
                                         // }}
                                     />
                                 </Box>
-                            </Box>
+//                     <Grid item xs={6}>
+
+//                         <Typography gutterBottom variant="h5" component="div">
+//                             Rating
+//                         </Typography>
+//                         <Box>Average rate:{props.rating}</Box>
+//                         <div>
+//                             <Box component="fieldset" mb={1} borderColor="transparent">
+//                                 <Typography component="legend">Controlled</Typography>
+//                                 <Rating
+//                                     name="simple-controlled"
+//                                     value={0}
+//                                     // onChange={(event, newValue) => {
+//                                     //     setValue(newValue);
+//                                     // }}
+//                                 />
+//                             </Box>
                         </Stack>
                     </Grid>
                 </Grid>

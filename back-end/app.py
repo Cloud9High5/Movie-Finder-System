@@ -1,10 +1,13 @@
 import json
+from unittest import result
 
 from flask import Flask, request
 from flask import send_file
 from flask_restx import Resource, Api
 from flask_restx import fields, reqparse
 import json
+
+from numpy import require
 # from flask_login import LoginManager, login_required, UserMixin
 
 import authorization as auth
@@ -16,65 +19,125 @@ api = Api(app)
 CORS(app)  # CORS support, DO NOT DELETE
 
 
-# login_manager = LoginManager()
-# login_manager.init_app(app)
-
-# # user class
-# class User(UserMixin):
-#     def __init__(self, )
-
-# @login_manager.user_loader
-# def load_user(user_id):
-#     auth
-
 
 ###############################################################################
 #                                  Signup                                     #
 ###############################################################################
-
 
 users_model = api.model('users', {
     "email": fields.String,
     "username": fields.String,
     "password": fields.String,
 })
+
 @api.route('/auth/signup', methods=['POST'])
+@api.response(201, 'Success, user created')
+@api.response(409, 'Fail, User already exists')
 class signup(Resource):
     @api.expect(users_model)
     def post(self):
+        '''
+        Sign up a new user, send user info to db
+
+        login required: False
+
+        Args:
+            None
+
+        Request body:
+        {
+            'email': str, the email of the user,
+            'username': str, the username of the user,
+            'password': str, the password of the user,
+        }
+        
+        Returns:
+            message and status code 
+        '''
         payload = json.loads(str(request.data, 'utf-8'))  # turn request body into python dictionary
+        if len(payload) != 3:
+            return {'message': 'Invalid request body'}, 400
         if auth.check_user_exist(payload['email']):
-            return {'message': 'user already exist'}, 400
+            return {'message': 'user already exist'}, 409
         else:
             auth.insert_user(payload)
-            return {'message': 'user created'}, 200
+            return {'message': 'user created'}, 201
 
 
 ###############################################################################
 #                                  Login                                      #
 ###############################################################################
 
-# @api.route('/auth/login', methods=['POST'])
-# class login(Resource):
+login_model = api.model('login', {
+    "email": fields.String,
+    "password": fields.String,
+})
 
+@api.route('/auth/login', methods=['POST'])
+@api.response(200, 'Success, user logged in')
+@api.response(401, 'Fail, user not found')
+@api.response(403, 'Fail, wrong password')
+class login(Resource):
+    @api.expect(login_model)
+    def post(self):
+        '''
+        login
 
-###############################################################################
-#                                  Logout                                    #
-###############################################################################
+        login required: False
 
-# @api.route('/auth/logout', methods=['POST'])
-# @login_required
-# class logout(Resource):
+        Args:
+            None
+
+        Request body:
+        {
+            'email': str, the email of the user,
+            'password': str, the password of the user,
+        }
+
+        Returns:
+            Success
+            200
+            {
+                'message': 'login success',
+                'login_flag': True,
+                'uid': uid,
+            }
+            Fail
+            401 or 403
+            {
+                'message': 'user not exist'/'wrong password',
+                'login_flag': False,
+            }        
+        '''
+        payload = json.loads(str(request.data, 'utf-8'))
+
+        if len(payload) != 2:
+            return {'message': 'Invalid request body'}, 400
+
+        if auth.check_user_exist(payload['email']):
+            if auth.check_user_pwd(payload['email'], payload['password']):
+                uid = auth.get_uid(payload['email'])
+                return {
+                    'message': 'login success', 
+                    'login_flag': 'True',
+                    'uid': uid
+                    }, 200
+            else:
+                return {'message': 'wrong password', 'login_flag': 'False'}, 403
+        else:
+            return {'message': 'user not exist', 'login_flag': 'False'}, 401
+
 
 ###############################################################################
 #                                get review                                   #
 ###############################################################################
 
 review_arguments = reqparse.RequestParser()
-review_arguments.add_argument('method', type=str, default='uid')
+review_arguments.add_argument('method', type=str, default='uid', required=True)
 review_arguments.add_argument('movie_id', type=int)
 review_arguments.add_argument('uid', type=int)
 review_arguments.add_argument('top', type=int)
+review_arguments.add_argument('recent', type=int)
 
 review_model = api.model('review', {
     "movie_id": fields.Integer,
@@ -86,53 +149,201 @@ review_model = api.model('review', {
 @api.route('/review', methods=['GET', 'POST'])
 class reviews(Resource):
 
-    @api.param('method', 'the method to get review')
-    @api.param('movie_id', 'id of the movie')
-    @api.param('uid', 'id of the user')
+    @api.param('method', 'the method to get review, one of the following: \nuid, \nmovie_id, \nuid_movie_id, \nreview_id, \ntop, \nrecent, \nrecent_top')
     @api.expect(review_arguments)
+    @api.response(200, 'Success, review found')
+    @api.response(400, 'Fail, invalid method')
+    @api.response(404, 'Fail, review not found')
     def get(self):
+        '''
+        fetch reviews from db according to the method
+
+        login required: False
+
+        Args:
+            method {
+                'uid' return all reviews of a user with uid, 
+                'movie_id' return all reviews of a movie with movie_id,, 
+                'uid_movie_id' return all reviews of a user with uid to the movie with movie_id, 
+                'review_id' return a review with review_id, 
+                'top' return top N reviews with the most likes, 
+                'recent' return all reviews in past N months, 
+                'recent_top return top N reviews in past N months,'
+            }
+            uid: int, the uid of the user, for method 'uid' and 'uid_movie_id'
+            movie_id: int, the movie_id of the movie, for method 'movie_id' and 'uid_movie_id'
+            top: int, the number of reviews to return, for method 'top' and 'recent_top'
+            recent: int, the number of months to return, for method 'recent' and 'recent_top'
+        
+        Request body:
+            None
+
+        Returns:
+            Success
+            
+            Fail
+            400
+            {
+                'message': fail reason
+            }
+        '''
+        result = []
         args = review_arguments.parse_args()
         if args['method'] == 'uid':
             if args['uid'] is None:
                 return {'message': 'uid is required'}, 400
             else:
-                return review.get_review(method='uid', value=args['uid'])
+                result = review.get_review(method='uid', value=args['uid'])
         elif args['method'] == 'movie_id':
             if args['movie_id'] is None:
                 return {'message': 'movie_id is required'}, 400
             else:
-                return review.get_review(method='movie_id', value=args['movie_id'])
-        elif args['method'] == 'both':
+                result = review.get_review(method='movie_id', value=args['movie_id'])
+        elif args['method'] == 'uid_movie_id':
             if args['uid'] is None or args['movie_id'] is None:
                 return {'message': 'uid and movie_id are both required'}, 400
             else:
-                return review.get_review(method='both', value=(args['uid'], args['movie_id']))
-        elif args['method'] == 'popular':
+                result = review.get_review(method='uid_movie_id', value=(args['uid'], args['movie_id']))
+        elif args['method'] == 'top':
             if args['top'] is None:
                 return {'message': 'top is required'}, 400
             else:
-                return review.get_review(method='popular', value=args['top'])
+                result = review.get_review(method='top', value=args['top'])
+        elif args['method'] == 'recent':
+            if args['recent'] is None:
+                return {'message': 'recent is required'}, 400
+            else:
+                result = review.get_review(method='recent', value=args['recent'])
+        elif args['method'] == 'recent_top':
+            if args['recent'] is None or args['top'] is None:
+                return {'message': 'recent and top are both required'}, 400
+            else:
+                result = review.get_review(method='recent_top', value=(args['recent'], args['top']))
+        
+        if len(result) == 0:
+            return {'message': 'review not found'}, 404
+        else:
+            return result, 200
     
     @api.expect(review_model)
+    @api.response(200, 'Success, review added')
+    @api.response(400, 'Fail, invalid review')
+    @api.response(404, 'Fail, user not found')
     def post(self):
+        '''
+        post review to certain movie
+
+        login required: True
+
+        Args:
+            None
+        
+        Request body:
+        {
+            'movie_id': int, the movie_id of the movie,
+            'uid': int, the uid of the user,
+            'rating': float, the rating of the movie,
+            'review': str, the review of the movie, can be empty,
+        }
+        
+        
+        '''
+
         payload = json.loads(str(request.data, 'utf-8'))
-        review.insert_review(payload)
-        return {'message': 'review created'}, 201
+
+        if len(payload) != 4:
+            return {'message': 'Invalid request body'}, 400
+
+        if payload['uid'] is None or payload['movie_id'] is None or payload['rating'] is None:
+            return {'message': 'uid, movie_id and rating are all required'}, 400
+
+        if auth.check_user_exist(payload['uid']):
+            review.insert_review(payload)
+            return {'message': 'review added'}, 200
+        else:
+            return {'message': 'user not exist'}, 404
 
 
 @api.route('/review/<int:review_id>', methods=['GET'])
 @api.param('review_id', 'id of the review')
 class get_review(Resource):
+
+    @api.response(200, 'Success, review found')
+    @api.response(404, 'Fail, review not found')
     def get(self, review_id):
-        return review.get_review(method='review_id', value = review_id)
+        '''
+        get review with review_id
+
+        login required: False
+
+        Args:
+            review_id: int, the id of the review
+        
+        Request body:
+            None
+
+        Returns:
+            Success
+            
+            Fail
+            400
+            {
+                'message': fail reason
+            }
+        '''
+        result = review.get_review(method='review_id', value=review_id)
+        if len(result) == 0:
+            return {'message': 'review not found'}, 404
+        else:
+            return result, 200
 
 
 ###############################################################################
-#                                post review                                  #
+#                               rating review                                 #
 ###############################################################################
 
+@api.route('/review/<int:review_id>/rating', methods=['POST'])
+@api.param('review_id', 'id of the review')
+@api.param('method', 'like or dislike')
+class rating_review(Resource):
 
+    @api.response(400, 'Fail, invalid method')
+    @api.response(200, 'Success')
+    def get(self, review_id):
+        '''
+        rate a review with like or dislike
 
+        login required: True
+
+        Args:
+            None
+        
+        Request body:
+            {
+                'method': 'like' or 'dislike',
+                'uid': int, the uid of the user,
+                'review_id': int, the id of the review,
+            }
+
+        Returns:
+            Message and status code
+        '''
+        payload = json.loads(str(request.data, 'utf-8'))
+
+        if len(payload) != 3:
+            return {'message': 'Invalid request body'}, 400
+
+        if payload['uid'] is None or payload['review_id'] is None:
+            return {'message': 'uid and review_id are both required'}, 400
+        elif payload['method'] not in ['like', 'dislike'] or payload['method'] is None:
+            return {'message': 'method is required and must be like or dislike'}, 400
+        else:
+            if auth.check_user_exist(payload['uid']):
+                review.rating_review(payload['review_id'], payload['method'])
+            else:
+                return {'message': 'user not exist'}, 404
+
+        return {'message': 'Rating received.'}, 200
 
 
 

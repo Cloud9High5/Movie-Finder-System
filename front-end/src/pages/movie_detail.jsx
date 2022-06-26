@@ -3,6 +3,8 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Container from '@material-ui/core/Container';
 import Header from '../components/header';
 import MovieBlock from '../components/movie/movie_block';
+import Comments from "../components/movie/comments";
+import Box from "@mui/material/Box";
 import CommentBlock from "../components/review/comment_block";
 import {useParams} from "react-router-dom";
 
@@ -37,16 +39,21 @@ export default function MovieDetail() {
             <CssBaseline/>
             <Container maxWidth="lg">
                 <Header/>
-                <MovieBlock
-                    title={movie_meta_data.title}
-                    year={movie_meta_data.year}
-                    run_time={movie_meta_data.run_time}
-                    rating={movie_meta_data.rating}
-                    overview={movie_meta_data.overview}
-                    director={movie_meta_data.director}
-                    poster={movie_meta_data.poster}
-                />
-                <CommentBlock/>
+                {/*<MovieBlock props={movie_meta_data}/>*/}
+
+                 <MovieBlock
+                     title={movie_meta_data.title}
+                     year={movie_meta_data.year}
+                     run_time={movie_meta_data.run_time}
+                     rating={movie_meta_data.rating}
+                     overview={movie_meta_data.overview}
+                     director={movie_meta_data.director}
+                     poster={movie_meta_data.poster}
+                 />
+                <Box marginTop={'30px'}>
+                    <Comments />
+                </Box>
+                 {/*<CommentBlock/>*/}
             </Container>
         </React.Fragment>
     );
