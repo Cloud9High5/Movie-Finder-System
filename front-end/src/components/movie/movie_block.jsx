@@ -1,6 +1,6 @@
 import React from 'react';
 // import PropTypes from 'prop-types';
-import {makeStyles} from '@material-ui/styles';
+import { makeStyles } from '@material-ui/styles';
 import Card from "@material-ui/core/Card";
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -9,11 +9,10 @@ import Typography from "@material-ui/core/Typography";
 import Stack from '@mui/material/Stack';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
-import {Rating} from "@mui/material";
+import { Rating } from "@mui/material";
 import PropTypes from "prop-types";
 import Divider from '@mui/material/Divider';
 import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
-import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 
 
@@ -30,7 +29,7 @@ const useStyles = makeStyles({
 });
 
 
-export default function MovieBlock(props) {
+export default function MovieBlock (props) {
     const classes = useStyles();
     const rateNums = {
         five_star: 100,
@@ -42,13 +41,13 @@ export default function MovieBlock(props) {
 
     return (
         <React.Fragment>
-            <Box sx={{flexGrow: 1}}>
+            <Box sx={{ flexGrow: 1 }}>
                 <Grid container rowSpacing={2} columnSpacing={3}>
                     <Grid item xs={12}>
                         <Typography variant="h3">{props.title}</Typography>
                     </Grid>
                     <Grid item xs={4}>
-                        <Card sx={{minWidth: 200}}>
+                        <Card sx={{ minWidth: 200 }}>
                             <CardMedia
                                 component="img"
                                 className={classes.Media}
@@ -64,7 +63,7 @@ export default function MovieBlock(props) {
                     </Grid>
                     <Grid item xs={1}></Grid>
                     <Grid item xs={6}>
-                        <Card sx={{minWidth: 200}}>
+                        <Card sx={{ minWidth: 200 }}>
                             <CardContent>
                                 <Typography gutterBottom variant="h5" component="div">
                                     Overview:
@@ -74,7 +73,7 @@ export default function MovieBlock(props) {
                             </CardContent>
                         </Card>
                         <Stack direction="row" spacing={2}>
-                            <Box sx={{p: 1}}>
+                            <Box sx={{ p: 1 }}>
                                 <Typography gutterBottom variant="h4" component="div">
                                     Average rate: {props.rating}
                                 </Typography>
@@ -98,7 +97,7 @@ export default function MovieBlock(props) {
                                         </Box>)}
                                 </div>
                             </Box>
-                            <Box sx={{p: 1}}>
+                            <Box sx={{ p: 1 }}>
                                 <Stack direction="row">
                                     <Typography gutterBottom variant="h4" component="div">
                                         Your rate: {props.rating}
@@ -117,23 +116,26 @@ export default function MovieBlock(props) {
                                         // }}
                                     />
                                 </Box>
-//                     <Grid item xs={6}>
+                                <Grid item xs={6}>
 
-//                         <Typography gutterBottom variant="h5" component="div">
-//                             Rating
-//                         </Typography>
-//                         <Box>Average rate:{props.rating}</Box>
-//                         <div>
-//                             <Box component="fieldset" mb={1} borderColor="transparent">
-//                                 <Typography component="legend">Controlled</Typography>
-//                                 <Rating
-//                                     name="simple-controlled"
-//                                     value={0}
-//                                     // onChange={(event, newValue) => {
-//                                     //     setValue(newValue);
-//                                     // }}
-//                                 />
-//                             </Box>
+                                    <Typography gutterBottom variant="h5" component="div">
+                                        Rating
+                                    </Typography>
+                                    <Box>Average rate:{props.rating}</Box>
+                                    <div>
+                                        <Box component="fieldset" mb={1} borderColor="transparent">
+                                            <Typography component="legend">Controlled</Typography>
+                                            <Rating
+                                                name="simple-controlled"
+                                                value={0}
+                                                // onChange={(event, newValue) => {
+                                                //     setValue(newValue);
+                                                // }}
+                                            />
+                                        </Box>
+                                    </div>
+                                </Grid>
+                            </Box>
                         </Stack>
                     </Grid>
                 </Grid>
