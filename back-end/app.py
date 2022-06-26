@@ -87,9 +87,7 @@ review_model = api.model('review', {
 @api.route('/review', methods=['GET', 'POST'])
 class reviews(Resource):
 
-    @api.param('method', 'the method to get review')
-    @api.param('movie_id', 'id of the movie')
-    @api.param('uid', 'id of the user')
+    @api.param('method', 'the method to get review, one of the following: \nuid, \nmovie_id, \nuid_movie_id, \nreview_id, \npopular, \nrecent, \nrecent_popular')
     @api.expect(review_arguments)
     def get(self):
         args = review_arguments.parse_args()
@@ -107,7 +105,7 @@ class reviews(Resource):
             if args['uid'] is None or args['movie_id'] is None:
                 return {'message': 'uid and movie_id are both required'}, 400
             else:
-                return review.get_review(method='both', value=(args['uid'], args['movie_id']))
+                return review.get_review(method='uid_movie_id', value=(args['uid'], args['movie_id']))
         elif args['method'] == 'popular':
             if args['top'] is None:
                 return {'message': 'top is required'}, 400
@@ -139,11 +137,19 @@ class get_review(Resource):
 
 
 ###############################################################################
-#                                post review                                  #
+#                               rating review                                 #
 ###############################################################################
 
+rating_review_arguments = reqparse.RequestParser()
+rating_review_arguments.add_argument('method', type=str, default='like')
 
-
+@api.route('/review/<int:review_id>/rating', methods=['GET'])
+@api.param('review_id', 'id of the review')
+@api.param('method', 'like or dislike')
+class rating_review(Resource):
+    def get(self, review_id):
+        args = rating_review_arguments.parse_args()
+        return review.rating_review(review_id, args['method'])
 
 
 

@@ -106,6 +106,8 @@ def get_review(method = 'uid', value = None):
     conn = sqlite3.connect(path)
     c = conn.cursor()
 
+    print(method, value)
+
     if method == 'uid':
         c.execute("""SELECT * FROM reviews WHERE uid = %d""" % (value,))
     elif method == 'movie_id':
@@ -138,14 +140,15 @@ def get_review(method = 'uid', value = None):
         review['rating'] = i[2]
         review['uid'] = i[3]
         review['movie_id'] = i[4]
-        review['like'] = i[5]
-        review['dislike'] = i[6]
+        review['release_date'] = i[5]
+        review['like'] = i[6]
+        review['dislike'] = i[7]
         result.append(review)
 
     return result
 
 
-def like_dislike_review(review_id, like_dislike):
+def rating_review(review_id, method):
     '''
     like or dislike a review
 
@@ -161,9 +164,9 @@ def like_dislike_review(review_id, like_dislike):
     conn = sqlite3.connect(path)
     c = conn.cursor()
 
-    if like_dislike == 'like':
+    if method == 'like':
         c.execute("""UPDATE reviews SET like = like + 1 WHERE review_id = %d""" % (review_id,))
-    elif like_dislike == 'dislike':
+    elif method == 'dislike':
         c.execute("""UPDATE reviews SET dislike = dislike + 1 WHERE review_id = %d""" % (review_id,))
 
     conn.commit()
