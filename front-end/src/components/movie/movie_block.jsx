@@ -68,8 +68,8 @@ export default function MovieBlock(props) {
                             </CardContent>
                         </Card>
                     </Grid>
-                    <Grid item xs={3}></Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={6}>
+
                         <Typography gutterBottom variant="h5" component="div">
                             Rating
                         </Typography>

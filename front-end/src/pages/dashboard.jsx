@@ -3,7 +3,8 @@ import Container from '@material-ui/core/Container';
 import Header from "../components/header";
 import DashboardMovieCard from "../components/dashboardMovieCard";
 import { makeStyles } from '@material-ui/styles';
-import { Chip, Divider, FormControl, FormHelperText, MenuItem, Select } from "@mui/material";
+import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from "@mui/material";
+import MostPopularComments from "../components/movie/most_popular_comments";
 
 const styles = makeStyles({
     cards: {
@@ -100,6 +101,7 @@ function Dashboard () {
                     )
                 })}
             </div>
+            <MostPopularComments />
         </Container>
     )
 }
