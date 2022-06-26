@@ -153,29 +153,71 @@ class film(Resource):
         if Fdb.check_film_exist(args['id']):
             film1 = Fdb.find_film(args['id'])
             response = {
-                'FILM_ID': film1[0],
-                'TITLE': film1[1],
-                'YEAR': film1[2],
-                'RUN_TIME': film1[3],
-                'RATING': film1[4],
-                'OVERVIEW': film1[5],
-                'DIRECTOR': film1[6],
-                'POSTER': film1[7]
+                'movie_id': film1[0],
+                'title': film1[1],
+                'year': film1[2],
+                'run_time': film1[3],
+                'rating': film1[4],
+                'overview': film1[5],
+                'director': film1[6],
+                'poster': film1[7]
             }
             return response, 200
         else:
             return {'message': 'Film not found'}, 404
 
-# movie_arguments = reqparse.RequestParser()
-# movie_arguments.add_argument('title')
 
-# @api.route('/movies', methods=['GET'])
-# class movies(Resource):
-#     @api.expect(movie_arguments)
-#     def get(self):
-#         args = movie_arguments.parse_args()
-#         returnedMsg = {'message': 'hola'}
-#         return returnedMsg, 200
+# return the highest rated N movies
+top_rating_arguments = reqparse.RequestParser()
+top_rating_arguments.add_argument('number')
+
+@api.route('/films/top/<int:number>', methods=['GET'])
+class top_rating(Resource):
+    # @api.expect(top_rating_arguments)
+    def get(self, number):
+        args = top_rating_arguments.parse_args()
+        # film1 = Fdb.show_top_rating_film(int(args['number']))
+        film1 = Fdb.show_top_rating_film(int(number))
+        result = []
+        for row in film1:
+            response = {
+                    'movie_id': row[0],
+                    'title': row[1],
+                    'year': row[2],
+                    'run_time': row[3],
+                    'rating': row[4],
+                    'overview': row[5],
+                    'director': row[6],
+                    'poster': row[7]
+                    }
+            result.append(response)
+        return result, 200
+
+# return the latest released N movies
+top_recent_arguments = reqparse.RequestParser()
+top_recent_arguments.add_argument('number')
+
+@api.route('/films/recent/<int:number>', methods=['GET'])
+class top_recent(Resource):
+    # @api.expect(top_recent_arguments)
+    def get(self, number):
+        args = top_recent_arguments.parse_args()
+        # film1 = Fdb.show_top_recent_film(int(args['number']))
+        film1 = Fdb.show_top_recent_film(int(number))
+        result = []
+        for row in film1:
+            response = {
+                    'movie_id': row[0],
+                    'title': row[1],
+                    'year': row[2],
+                    'run_time': row[3],
+                    'rating': row[4],
+                    'overview': row[5],
+                    'director': row[6],
+                    'poster': row[7]
+                    }
+            result.append(response)
+        return result, 200
 
 
 if __name__ == "__main__":

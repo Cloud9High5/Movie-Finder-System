@@ -55,8 +55,7 @@ export default function Header () {
 
     return (
       <React.Fragment>
-          <Toolbar maxWidth="lg" className={classes.toolbar}>
-
+          <Toolbar className={classes.toolbar} sx={{ maxWidth: 'lg' }}>
               <Typography
                 component="h2"
                 variant="h4"
