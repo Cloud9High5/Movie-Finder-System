@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import { CardActionArea } from "@mui/material";
 
 function DashboardMovieCard (props) {
-    console.log(props);
+    // console.log(props);
     return (
         <Card sx={{ maxWidth: 210, marginLeft: 2, marginRight: 2, marginTop: 2 }}>
             <CardActionArea>

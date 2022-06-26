@@ -1,2 +1,8 @@
+
 /.idea/
 /.DS_Store
+*.pyc
+*.pyc
+back-end/__pycache__/authorization.cpython-310.pyc
+back-end/__pycache__/authorization.cpython-38.pyc
+back-end/__pycache__/review.cpython-310.pyc
