@@ -39,20 +39,21 @@ export default function MovieDetail() {
             <CssBaseline/>
             <Container maxWidth="lg">
                 <Header/>
-                <MovieBlock props={movie_meta_data}/>
+                {/*<MovieBlock props={movie_meta_data}/>*/}
+
+                 <MovieBlock
+                     title={movie_meta_data.title}
+                     year={movie_meta_data.year}
+                     run_time={movie_meta_data.run_time}
+                     rating={movie_meta_data.rating}
+                     overview={movie_meta_data.overview}
+                     director={movie_meta_data.director}
+                     poster={movie_meta_data.poster}
+                 />
                 <Box marginTop={'30px'}>
                     <Comments />
                 </Box>
-//                 <MovieBlock
-//                     title={movie_meta_data.title}
-//                     year={movie_meta_data.year}
-//                     run_time={movie_meta_data.run_time}
-//                     rating={movie_meta_data.rating}
-//                     overview={movie_meta_data.overview}
-//                     director={movie_meta_data.director}
-//                     poster={movie_meta_data.poster}
-//                 />
-//                 <CommentBlock/>
+                 {/*<CommentBlock/>*/}
             </Container>
         </React.Fragment>
     );
