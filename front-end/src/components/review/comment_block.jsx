@@ -11,10 +11,27 @@ import IconButton from '@mui/material/IconButton';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import {Stack} from "@mui/material";
+import SendIcon from '@mui/icons-material/Send';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from "@mui/material/TextField";
+import AutoFixHighOutlinedIcon from "@mui/icons-material/AutoFixHighOutlined";
+import Button from "@mui/material/Button";
 
 export default function CommentBlock() {
     return (
         <React.Fragment>
+            <Box sx={{flexGrow: 1, margin: 2}} sp>
+                <TextField fullWidth label="Leave a comment" id="fullWidth"
+                           InputProps={{
+                               endAdornment: (
+                                   <InputAdornment position="end">
+                                       <IconButton color="primary">
+                                           <SendIcon/>
+                                       </IconButton>
+                                   </InputAdornment>
+                               ),
+                           }}/>
+            </Box>
             <Box sx={{flexGrow: 1, marginTop: 3}} sp>
                 <Typography gutterBottom variant="h5" component="div">Comments:</Typography>
                 <Divider/>
