@@ -55,6 +55,8 @@ class signup(Resource):
             message and status code 
         '''
         payload = json.loads(str(request.data, 'utf-8'))  # turn request body into python dictionary
+        if len(payload) != 3:
+            return {'message': 'Invalid request body'}, 400
         if auth.check_user_exist(payload['email']):
             return {'message': 'user already exist'}, 409
         else:
@@ -108,6 +110,10 @@ class login(Resource):
             }        
         '''
         payload = json.loads(str(request.data, 'utf-8'))
+
+        if len(payload) != 2:
+            return {'message': 'Invalid request body'}, 400
+
         if auth.check_user_exist(payload['email']):
             if auth.check_user_pwd(payload['email'], payload['password']):
                 uid = auth.get_uid(payload['email'])
@@ -244,6 +250,10 @@ class reviews(Resource):
         '''
 
         payload = json.loads(str(request.data, 'utf-8'))
+
+        if len(payload) != 4:
+            return {'message': 'Invalid request body'}, 400
+
         if payload['uid'] is None or payload['movie_id'] is None or payload['rating'] is None:
             return {'message': 'uid, movie_id and rating are all required'}, 400
 
@@ -318,8 +328,11 @@ class rating_review(Resource):
         Returns:
             Message and status code
         '''
-        result = []
         payload = json.loads(str(request.data, 'utf-8'))
+
+        if len(payload) != 3:
+            return {'message': 'Invalid request body'}, 400
+
         if payload['uid'] is None or payload['review_id'] is None:
             return {'message': 'uid and review_id are both required'}, 400
         elif payload['method'] not in ['like', 'dislike'] or payload['method'] is None:
