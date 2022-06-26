@@ -16,17 +16,6 @@ api = Api(app)
 CORS(app)  # CORS support, DO NOT DELETE
 
 
-# login_manager = LoginManager()
-# login_manager.init_app(app)
-
-# # user class
-# class User(UserMixin):
-#     def __init__(self, )
-
-# @login_manager.user_loader
-# def load_user(user_id):
-#     auth
-
 
 ###############################################################################
 #                                  Signup                                     #
@@ -54,8 +43,28 @@ class signup(Resource):
 #                                  Login                                      #
 ###############################################################################
 
-# @api.route('/auth/login', methods=['POST'])
-# class login(Resource):
+login_model = api.model('login', {
+    "email": fields.String,
+    "password": fields.String,
+})
+
+@api.route('/auth/login', methods=['POST'])
+class login(Resource):
+    @api.expect(login_model)
+    def post(self):
+        payload = json.loads(str(request.data, 'utf-8'))
+        if auth.check_user_exist(payload['email']):
+            if auth.check_user_pwd(payload['email'], payload['password']):
+                uid = auth.get_uid(payload['email'])
+                return {
+                    'message': 'login success', 
+                    'login_flag': 'True',
+                    'uid': uid
+                    }, 200
+            else:
+                return {'message': 'wrong password', 'login_flag': 'False'}, 400
+        else:
+            return {'message': 'user not exist', 'login_flag': 'False'}, 400
 
 
 ###############################################################################

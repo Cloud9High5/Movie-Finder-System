@@ -94,6 +94,31 @@ def check_user_exist(email):
         return True
 
 
+def check_user_pwd(email, password):
+    '''
+    check if the password is correct for the user by email
+
+    Args:
+        email: user's email, it is the unique key for user
+        password: user's password, encrypted
+
+    Returns:
+        True: if password is correct
+        False: if password is incorrect
+    '''
+    conn = sqlite3.connect(path)
+    c = conn.cursor()
+
+    c.execute("SELECT password FROM users WHERE email = '%s'" % email)
+    pwd = c.fetchone()[0]
+    conn.close()
+
+    if pwd == password:
+        return True
+    else:
+        return False
+
+
 def check_admin(email):
     '''
     check if the user is admin by email
@@ -142,6 +167,26 @@ def check_blocked(email):
     else:
         return False
 
+
+def get_uid(email):
+    '''
+    get user's uid by email
+
+    Args:
+        email: user's email, it is the unique key for user
+
+    Returns:
+        uid: user's uid
+    '''
+    conn = sqlite3.connect(path)
+    c = conn.cursor()
+
+    c.execute("SELECT uid FROM users WHERE email = '%s'" % email)
+    uid = c.fetchone()[0]
+    conn.close()
+
+    return uid
+    
 
 def insert_user(user):
     '''
