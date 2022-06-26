@@ -39,8 +39,6 @@ export default function MovieDetail() {
             <CssBaseline/>
             <Container maxWidth="lg">
                 <Header/>
-                {/*<MovieBlock props={movie_meta_data}/>*/}
-
                  <MovieBlock
                      title={movie_meta_data.title}
                      year={movie_meta_data.year}
@@ -50,10 +48,12 @@ export default function MovieDetail() {
                      director={movie_meta_data.director}
                      poster={movie_meta_data.poster}
                  />
-                <Box marginTop={'30px'}>
-                    <Comments />
-                </Box>
-                 {/*<CommentBlock/>*/}
+                <CommentBlock/>
+                {/* Region Code below are written by XU Wanyi */}
+                {/*<Box marginTop={'30px'}>*/}
+                {/*    <Comments />*/}
+                {/*</Box>*/}
+                {/* End region */}
             </Container>
         </React.Fragment>
     );
