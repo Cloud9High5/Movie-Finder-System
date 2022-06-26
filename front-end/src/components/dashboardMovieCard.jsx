@@ -36,6 +36,7 @@ function DashboardMovieCard (props) {
         {commentList}
       </List>
     }
+
     return (
         <Card
           className={styles.movieCard}

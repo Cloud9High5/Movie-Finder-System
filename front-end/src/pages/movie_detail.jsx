@@ -5,24 +5,34 @@ import Header from '../components/header';
 import MovieBlock from '../components/movie/movie_block';
 import Comments from "../components/movie/comments";
 import Box from "@mui/material/Box";
+import CommentBlock from "../components/review/comment_block";
+import {useParams} from "react-router-dom";
 
 
 export default function MovieDetail() {
-
+    const movieId = useParams().movieID;
+    // const token = localStorage.getItem('token');
     const [movie_meta_data, setMovie_movie_data] = useState({
-        name: "Titanic",
-        director: "James Cameron",
-        country: "America",
-        img: "example.png",
-        mean_rate: 4.8,
-        rate: {
-            five_star: 100,
-            four_star: 87,
-            three_star: 20,
-            two_star: 4,
-            one_star: 1,
+            title: '',
+            year: '',
+            run_time: '',
+            rating: '',
+            overview: '',
+            director: '',
+            poster: ''
         }
-    });
+    );
+    React.useEffect(() => {
+        async function fetchMovie() {
+            // You can await here
+            const detail = await fetch('http://127.0.0.1:5000/films?id=' + movieId);
+            const detailData = await detail.json();
+            console.log(detailData);
+            setMovie_movie_data(detailData);
+        }
+
+        fetchMovie();
+    }, []);
 
     return (
         <React.Fragment>
@@ -33,6 +43,16 @@ export default function MovieDetail() {
                 <Box marginTop={'30px'}>
                     <Comments />
                 </Box>
+//                 <MovieBlock
+//                     title={movie_meta_data.title}
+//                     year={movie_meta_data.year}
+//                     run_time={movie_meta_data.run_time}
+//                     rating={movie_meta_data.rating}
+//                     overview={movie_meta_data.overview}
+//                     director={movie_meta_data.director}
+//                     poster={movie_meta_data.poster}
+//                 />
+//                 <CommentBlock/>
             </Container>
         </React.Fragment>
     );
