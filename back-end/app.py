@@ -220,6 +220,9 @@ class reviews(Resource):
             return result, 200
     
     @api.expect(review_model)
+    @api.response(200, 'Success, review added')
+    @api.response(400, 'Fail, invalid review')
+    @api.response(404, 'Fail, user not found')
     def post(self):
         '''
         post review to certain movie
@@ -232,36 +235,102 @@ class reviews(Resource):
         Request body:
         {
             'movie_id': int, the movie_id of the movie,
+            'uid': int, the uid of the user,
+            'rating': float, the rating of the movie,
+            'review': str, the review of the movie, can be empty,
+        }
         
         
         '''
 
         payload = json.loads(str(request.data, 'utf-8'))
-        review.insert_review(payload)
-        return {'message': 'review created'}, 201
+        if payload['uid'] is None or payload['movie_id'] is None or payload['rating'] is None:
+            return {'message': 'uid, movie_id and rating are all required'}, 400
+
+        if auth.check_user_exist(payload['uid']):
+            review.insert_review(payload)
+            return {'message': 'review added'}, 200
+        else:
+            return {'message': 'user not exist'}, 404
 
 
 @api.route('/review/<int:review_id>', methods=['GET'])
 @api.param('review_id', 'id of the review')
 class get_review(Resource):
+
+    @api.response(200, 'Success, review found')
+    @api.response(404, 'Fail, review not found')
     def get(self, review_id):
-        return review.get_review(method='review_id', value = review_id)
+        '''
+        get review with review_id
+
+        login required: False
+
+        Args:
+            review_id: int, the id of the review
+        
+        Request body:
+            None
+
+        Returns:
+            Success
+            
+            Fail
+            400
+            {
+                'message': fail reason
+            }
+        '''
+        result = review.get_review(method='review_id', value=review_id)
+        if len(result) == 0:
+            return {'message': 'review not found'}, 404
+        else:
+            return result, 200
 
 
 ###############################################################################
 #                               rating review                                 #
 ###############################################################################
 
-rating_review_arguments = reqparse.RequestParser()
-rating_review_arguments.add_argument('method', type=str, default='like')
-
-@api.route('/review/<int:review_id>/rating', methods=['GET'])
+@api.route('/review/<int:review_id>/rating', methods=['POST'])
 @api.param('review_id', 'id of the review')
 @api.param('method', 'like or dislike')
 class rating_review(Resource):
+
+    @api.response(400, 'Fail, invalid method')
+    @api.response(200, 'Success')
     def get(self, review_id):
-        args = rating_review_arguments.parse_args()
-        return review.rating_review(review_id, args['method'])
+        '''
+        rate a review with like or dislike
+
+        login required: True
+
+        Args:
+            None
+        
+        Request body:
+            {
+                'method': 'like' or 'dislike',
+                'uid': int, the uid of the user,
+                'review_id': int, the id of the review,
+            }
+
+        Returns:
+            Message and status code
+        '''
+        result = []
+        payload = json.loads(str(request.data, 'utf-8'))
+        if payload['uid'] is None or payload['review_id'] is None:
+            return {'message': 'uid and review_id are both required'}, 400
+        elif payload['method'] not in ['like', 'dislike'] or payload['method'] is None:
+            return {'message': 'method is required and must be like or dislike'}, 400
+        else:
+            if auth.check_user_exist(payload['uid']):
+                review.rating_review(payload['review_id'], payload['method'])
+            else:
+                return {'message': 'user not exist'}, 404
+
+        return {'message': 'Rating received.'}, 200
 
 
 

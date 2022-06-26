@@ -61,12 +61,13 @@ def insert_review(review):
 
 
     c.execute("""INSERT INTO reviews (
-        review, rating, uid, movie_id) VALUES (
-        '%s', %f, %d, %d)""" % (
+        review, rating, uid, movie_id, release_date) VALUES (
+        '%s', %f, %d, %d, %d)""" % (
         review['review'],
         review['rating'],
         review['uid'],
-        review['movie_id'],))
+        review['movie_id'],
+        datetime.datetime.now().timestamp()))
 
     conn.commit()
     conn.close()
