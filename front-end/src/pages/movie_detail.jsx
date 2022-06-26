@@ -3,6 +3,8 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Container from '@material-ui/core/Container';
 import Header from '../components/header';
 import MovieBlock from '../components/movie/movie_block';
+import Comments from "../components/movie/comments";
+import Box from "@mui/material/Box";
 
 
 export default function MovieDetail() {
@@ -28,6 +30,9 @@ export default function MovieDetail() {
             <Container maxWidth="lg">
                 <Header/>
                 <MovieBlock props={movie_meta_data}/>
+                <Box marginTop={'30px'}>
+                    <Comments />
+                </Box>
             </Container>
         </React.Fragment>
     );

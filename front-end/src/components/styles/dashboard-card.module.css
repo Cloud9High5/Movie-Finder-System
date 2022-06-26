@@ -12,5 +12,5 @@
     top: 0;
     background-color: white;
     z-index: 100;
-    box-shadow: 5px 5px 10px #333;
+    box-shadow: 5px 5px 10px #333 !important;
 }
