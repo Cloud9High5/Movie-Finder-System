@@ -83,9 +83,9 @@ def get_review(method = 'uid', value = None):
             'movie_id': fetch reviews by movie id,
             'uid_movie_id': fetch reviews by user id and movie id,
             'review_id': fetch a review by review id,
-            'popular': fetch top N reviews by like count,
+            'top': fetch top N reviews by like count,
             'recent': fetch reviews in the last N months,
-            'recent_popular': fetch top M reviews by like count in the last N months,
+            'recent_top': fetch top M reviews by like count in the last N months,
             
         }
     
@@ -95,9 +95,9 @@ def get_review(method = 'uid', value = None):
             'movie_id': movie id,
             'uid_movie_id': user id and movie id, (uid, movie_id)
             'review_id': review id,
-            'popular': Top N reviews
+            'top': Top N reviews
             'recent': reviews in the last N months
-            'recent_popular': top M reviews in the last N months, (M top, N months)
+            'recent_top': top M reviews in the last N months, (M top, N months)
         }
     
     Returns:
@@ -114,11 +114,11 @@ def get_review(method = 'uid', value = None):
         c.execute("""SELECT * FROM reviews WHERE movie_id = %d""" % (value,))
     elif method == 'uid_movie_id':
         c.execute("""SELECT * FROM reviews WHERE uid = %d AND movie_id = %d""" % (value[0], value[1]))
-    elif method == 'popular':
+    elif method == 'top':
         c.execute("""SELECT * FROM reviews ORDER BY like DESC LIMIT %d""" % (value,))
     elif method == 'recent':
         c.execute("""SELECT * FROM reviews WHERE release_date > %d""" % (datetime.datetime.now().timestamp() - value * 30 * 24 * 60 * 60,))
-    elif method == 'recent_popular':
+    elif method == 'recent_top':
         c.execute("""SELECT * FROM reviews WHERE release_date > %d ORDER BY like DESC LIMIT %d""" % (datetime.datetime.now().timestamp() - value[0] * 30 * 24 * 60 * 60, value[1],))
     elif method == 'review_id':
         c.execute("""SELECT * FROM reviews WHERE review_id = %d""" % (value,))

@@ -168,6 +168,30 @@ def check_blocked(email):
         return False
 
 
+def check_uid_vaild(uid):
+    '''
+    check if the uid is valid
+    
+    Args:
+        uid: user's uid
+
+    Returns:
+        True: if uid is valid
+        False: if uid is invalid
+    '''
+    conn = sqlite3.connect(path)
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM users WHERE uid = '%s'" % uid)
+    user = c.fetchone()
+    conn.close()
+
+    if user is None:
+        return False
+    else:
+        return True
+
+
 def get_uid(email):
     '''
     get user's uid by email
@@ -186,7 +210,7 @@ def get_uid(email):
     conn.close()
 
     return uid
-    
+
 
 def insert_user(user):
     '''
