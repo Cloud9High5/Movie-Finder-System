@@ -221,6 +221,21 @@ class reviews(Resource):
     
     @api.expect(review_model)
     def post(self):
+        '''
+        post review to certain movie
+
+        login required: True
+
+        Args:
+            None
+        
+        Request body:
+        {
+            'movie_id': int, the movie_id of the movie,
+        
+        
+        '''
+
         payload = json.loads(str(request.data, 'utf-8'))
         review.insert_review(payload)
         return {'message': 'review created'}, 201
