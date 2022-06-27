@@ -16,7 +16,7 @@ from flask_cors import CORS, cross_origin  # CORS support, DO NOT DELETE
 
 app = Flask(__name__)
 api = Api(app)
-CORS(app)  # CORS support, DO NOT DELETE
+cors = CORS(app)  # CORS support, DO NOT DELETE
 
 
 

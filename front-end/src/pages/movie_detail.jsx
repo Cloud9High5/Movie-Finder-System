@@ -39,6 +39,7 @@ export default function MovieDetail() {
             <Container maxWidth="lg">
                 <Header/>
                 <MovieBlock
+                    id={movieId}
                     title={movie_info.title}
                     year={movie_info.year}
                     run_time={movie_info.run_time}
@@ -47,14 +48,7 @@ export default function MovieDetail() {
                     director={movie_info.director}
                     poster={movie_info.poster}
                 />
-                {/*<CommentBlock/>*/}
                 {movie_review && <CommentMovie props={movie_review}/>}
-
-                {/* Region Code below are written by XU Wanyi */}
-                {/*<Box marginTop={'30px'}>*/}
-                {/*    <Comments />*/}
-                {/*</Box>*/}
-                {/* End region */}
             </Container>
         </React.Fragment>
     );
