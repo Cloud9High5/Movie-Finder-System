@@ -129,6 +129,47 @@ class login(Resource):
 
 
 ###############################################################################
+#                               get user info                                 #
+###############################################################################
+
+
+@api.route('/auth/user/<int:uid>', methods=['GET'])
+@api.response(200, 'Success, user info returned')
+@api.response(401, 'Fail, user not found')
+class user_info(Resource):
+    def get(self, uid):
+        '''
+        get user info
+
+        login required: True
+
+        Args:
+            uid: int, the id of the user
+
+        Request body:
+            None
+
+        Returns:
+            Success
+            200
+            {
+                'message': 'user info returned',
+                'user_info': user_info,
+            }
+            Fail
+            401
+            {
+                'message': 'user not found',
+            }        
+        '''
+        if auth.check_uid_exist(uid):
+            user_info = auth.get_user_info(uid)
+            return user_info, 200
+        else:
+            return {'message': 'user not found'}, 401
+
+
+###############################################################################
 #                                get review                                   #
 ###############################################################################
 
