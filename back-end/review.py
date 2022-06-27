@@ -155,7 +155,7 @@ def rating_review(review_id, method):
 
     Args:
         review_id: int, the review id
-        like_dislike: str, the like or dislike
+        method: str, the like or dislike
     
     Returns:
         None
