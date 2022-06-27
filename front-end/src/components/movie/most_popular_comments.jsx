@@ -12,7 +12,7 @@ function MostPopularComments () {
     React.useEffect(() => {
         fetch('http://127.0.0.1:5000/review?method=recent_top&movie_id=1&top=10&recent=10').then(async (response) => {
             const data = await response.json();
-            console.log(data);
+
             setRawComments([...data]);
         })
     }, [])
@@ -56,7 +56,7 @@ function MostPopularComments () {
             </Typography>
 
             {comments.map((comment, idx) => {
-                console.log(comment)
+
                return (
                     <Box key={idx} padding={'20px 0'} borderTop={'1px solid gainsboro'}>
                         <Grid container spacing={2}>
