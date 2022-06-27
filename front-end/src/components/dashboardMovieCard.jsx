@@ -9,7 +9,7 @@ import styles from './styles/dashboard-card.module.css';
 import { useNavigate } from "react-router-dom";
 
 function DashboardMovieCard (props) {
-    console.log(props);
+    // console.log(props);
     const path = useNavigate();
 
     const renderHotComments = () => {
