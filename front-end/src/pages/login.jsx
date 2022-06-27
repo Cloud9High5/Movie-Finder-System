@@ -52,6 +52,32 @@ function Login () {
     setStates({ ...states, showPassword: !states.showPassword });
   };
 
+  const submitLogin = async (e) => {
+      e.preventDefault();
+      const requestedInfo = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+              email: states.email,
+              password: states.password,
+          }),
+      };
+      const response = await fetch('http://127.0.0.1:5000/auth/login', requestedInfo);
+      const data = await response.json();
+      if (response.status  === 200) {
+          console.log(data);
+          localStorage.setItem('token', data.uid);  // use uid as token
+          localStorage.setItem('email', states.email);  // might be used later
+          toDashboard();
+      } else if (response.status === 401) {
+          setModalMsg('User not found, you need to register a DOUBI account.');
+          setVisibility(true);
+      } else if (response.status === 403) {
+          setModalMsg('Incorrect password, please try again.');
+          setVisibility(true);
+      }
+  }
+
   return (
     <Container component="main" maxWidth="xs">
       <ModalBlock msg={modalMsg} visibility={visibility} setVisibility={setVisibility}/>
@@ -81,6 +107,7 @@ function Login () {
             type={states.showPassword ? 'text' : 'password'}
             id="password"
             autoComplete="current-password"
+            onChange={handleChange('password')}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -98,11 +125,7 @@ function Login () {
             type="submit"
             fullWidth
             variant="contained"
-            onClick={(e) => {
-              e.preventDefault();
-              setVisibility(true);
-              setModalMsg('log in function is not available')
-            }}
+            onClick={submitLogin}
           >
             Login
           </Button>
