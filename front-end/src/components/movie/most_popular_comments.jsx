@@ -1,26 +1,26 @@
 import React from 'react';
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Grid, MenuItem, Select, Typography } from '@mui/material';
 import Rating from "./rating";
-import { string } from "prop-types";
 
 function MostPopularComments () {
     const [rawComments, setRawComments] = React.useState([]);  // comments with uid and movie_id
     const [tempComments, setTempComments] = React.useState([]);  // comments with user name and movie id
     const [comments, setComments] = React.useState([]);  // the combined comments dataset
+    const [commentNum, setCommentNum] = React.useState(10);
+    const [commentMonth, setCommentMonth] = React.useState(1);
 
     // obtain comments from backend
     React.useEffect(() => {
-        fetch('http://127.0.0.1:5000/review?method=recent_top&movie_id=1&top=10&recent=10').then(async (response) => {
+        fetch('http://127.0.0.1:5000/review?method=recent_top&top=' + commentNum + '&recent=' + commentMonth).then(async (response) => {
             const data = await response.json();
-
             setRawComments([...data]);
         })
-    }, [])
+    }, [commentNum, commentMonth])
 
     // obtain user name from backend
     React.useEffect(() => {
         let temp = [...rawComments];
-            temp.map((t) => {
+        temp.map((t) => {
             fetch('http://127.0.0.1:5000/auth/user/' + t.uid).then(async (response) => {
                 const data = await response.json();
                 t['username'] = data.username;
@@ -47,17 +47,47 @@ function MostPopularComments () {
         const temp = d.toString();
         return (temp.substring(0, 24));
     }
+
+    const numOfDisplayComment = () => {
+        return (
+            <Select
+                value={commentNum}
+                onChange={(e) => {setCommentNum(e.target.value)}}
+                size={'small'}
+            >
+                <MenuItem value={'10'}>10</MenuItem>
+                <MenuItem value={'20'}>20</MenuItem>
+                <MenuItem value={'30'}>30</MenuItem>
+            </Select>
+        )
+    }
+    const numOfDisplayMonths = () => {
+        return (
+            <Select
+                value={commentMonth}
+                onChange={(e) => {setCommentMonth(e.target.value)}}
+                size={'small'}
+            >
+                <MenuItem value={'1'}>1 month</MenuItem>
+                <MenuItem value={'2'}>2 months</MenuItem>
+                <MenuItem value={'3'}>3 months</MenuItem>
+                <MenuItem value={'4'}>4 months</MenuItem>
+                <MenuItem value={'5'}>5 months</MenuItem>
+                <MenuItem value={'6'}>6 months</MenuItem>
+            </Select>
+        )
+    }
     // console.log(comments);
 
     return (
         <Box margin={'20px 14px 20px 14px'}>
             <Typography variant={'h6'}>
-                The most popular comments of movies
+                The most popular {numOfDisplayComment()} comments of movies within {numOfDisplayMonths()}
             </Typography>
 
             {comments.map((comment, idx) => {
 
-               return (
+                return (
                     <Box key={idx} padding={'20px 0'} borderTop={'1px solid gainsboro'}>
                         <Grid container spacing={2}>
                             <Grid item xs={1}>
