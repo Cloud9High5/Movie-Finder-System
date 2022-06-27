@@ -33,9 +33,9 @@ function DashboardMovieCard (props) {
       })
     }, [movie_id]);
     const renderHotComments = () => {
-      const commentList = hotComments.map(hotComment => {
+      const commentList = hotComments.map((hotComment, idx) => {
         return (
-          <ListItem alignItems="flex-start" key={hotComment._id}>
+          <ListItem alignItems="flex-start" key={idx}>
             <ListItemAvatar>
               <AccountCircleIcon style={{fontSize: '40px'}}/>
             </ListItemAvatar>
