@@ -1,18 +1,15 @@
 import React, {useState} from 'react';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import Container from '@material-ui/core/Container';
-import Header from '../components/header';
 import MovieBlock from '../components/movie/movie_block';
-import Comments from "../components/movie/comments";
-import Box from "@mui/material/Box";
-import CommentBlock from "../components/review/comment_block";
+import CommentMovie from "../components/review/comment_block";
 import {useParams} from "react-router-dom";
+import Header from "../components/header";
 
 
 export default function MovieDetail() {
     const movieId = useParams().movieID;
     // const token = localStorage.getItem('token');
-    const [movie_meta_data, setMovie_movie_data] = useState({
+    const [movie_info, setMovie_info] = useState({
             title: '',
             year: '',
             run_time: '',
@@ -22,13 +19,15 @@ export default function MovieDetail() {
             poster: ''
         }
     );
+    const [movie_review, setMovie_review] = useState();
     React.useEffect(() => {
         async function fetchMovie() {
-            // You can await here
-            const detail = await fetch('http://127.0.0.1:5000/films?id=' + movieId);
-            const detailData = await detail.json();
-            console.log(detailData);
-            setMovie_movie_data(detailData);
+            const getMovieInfo = await fetch('http://127.0.0.1:5000/films?id=' + movieId);
+            const movieInfo = await getMovieInfo.json();
+            const getMovieReview = await fetch('http://127.0.0.1:5000/review?method=movie_id&movie_id=' + movieId);
+            const movieReview = await getMovieReview.json();
+            setMovie_info(movieInfo);
+            setMovie_review(movieReview);
         }
 
         fetchMovie();
@@ -36,19 +35,21 @@ export default function MovieDetail() {
 
     return (
         <React.Fragment>
-            <CssBaseline/>
+            {/*<CssBaseline/>*/}
             <Container maxWidth="lg">
                 <Header/>
-                 <MovieBlock
-                     title={movie_meta_data.title}
-                     year={movie_meta_data.year}
-                     run_time={movie_meta_data.run_time}
-                     rating={movie_meta_data.rating}
-                     overview={movie_meta_data.overview}
-                     director={movie_meta_data.director}
-                     poster={movie_meta_data.poster}
-                 />
-                <CommentBlock/>
+                <MovieBlock
+                    title={movie_info.title}
+                    year={movie_info.year}
+                    run_time={movie_info.run_time}
+                    rating={movie_info.rating}
+                    overview={movie_info.overview}
+                    director={movie_info.director}
+                    poster={movie_info.poster}
+                />
+                {/*<CommentBlock/>*/}
+                {movie_review && <CommentMovie props={movie_review}/>}
+
                 {/* Region Code below are written by XU Wanyi */}
                 {/*<Box marginTop={'30px'}>*/}
                 {/*    <Comments />*/}
