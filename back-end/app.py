@@ -350,7 +350,7 @@ class rating_review(Resource):
 
     @api.response(400, 'Fail, invalid method')
     @api.response(200, 'Success')
-    def get(self, review_id):
+    def post(self, review_id):
         '''
         rate a review with like or dislike
 
