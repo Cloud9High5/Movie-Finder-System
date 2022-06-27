@@ -298,7 +298,7 @@ class reviews(Resource):
         if payload['uid'] is None or payload['movie_id'] is None or payload['rating'] is None:
             return {'message': 'uid, movie_id and rating are all required'}, 400
 
-        if auth.check_user_exist(payload['uid']):
+        if auth.check_uid_exist(payload['uid']):
             review.insert_review(payload)
             return {'message': 'review added'}, 200
         else:
