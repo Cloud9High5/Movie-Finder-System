@@ -14,7 +14,6 @@ function MostPopularComments () {
     React.useEffect(() => {
         fetch('http://127.0.0.1:5000/review?method=recent_top&top=' + commentNum + '&recent=' + commentMonth).then(async (response) => {
             const data = await response.json();
-            console.log(data);
             setRawComments([...data]);
         })
     }, [commentNum, commentMonth, flag])
@@ -93,7 +92,6 @@ function MostPopularComments () {
                 review_id: rid,
             }),
         };
-        console.log(requestedInfo);
         const response = await fetch('http://127.0.0.1:5000/review/rating', requestedInfo);
         if (response.status === 200) {
             setFlag(!flag);  // force refreshing the comment block

@@ -14,7 +14,8 @@ function DashboardMovieCard (props) {
     const [hotComments, setHotComments] = useState([]);
     const {movie_id} = props;
     useEffect(() => {
-      fetch(`http://127.0.0.1:5000/review?method=recent_top&movie_id=${movie_id}&top=4&recent=1`)
+      // fetch(`http://127.0.0.1:5000/review?method=recent_top&movie_id=${movie_id}&top=4&recent=1`)
+      fetch(`http://127.0.0.1:5000/review?method=movie_id&movie_id=${movie_id}`)
         .then(async (response) => {
         const comments = await response.json();
         const getUserPromises = comments.map(comment => {
