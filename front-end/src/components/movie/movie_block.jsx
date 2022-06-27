@@ -1,6 +1,6 @@
 import React from 'react';
 // import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/styles';
+import {makeStyles} from '@material-ui/styles';
 import Card from "@material-ui/core/Card";
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -9,12 +9,11 @@ import Typography from "@material-ui/core/Typography";
 import Stack from '@mui/material/Stack';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
-import { Rating } from "@mui/material";
+import {Rating} from "@mui/material";
 import PropTypes from "prop-types";
 import Divider from '@mui/material/Divider';
 import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
 import Button from "@mui/material/Button";
-import CommentBlock from "../review/comment_block";
 
 
 const useStyles = makeStyles({
@@ -25,12 +24,12 @@ const useStyles = makeStyles({
         flexWrap: 'wrap',
     },
     Media: {
-        height: 600, width: '100%', objectFit: 'cover'
+        height: 400, width: '100%', objectFit: 'cover'
     }
 });
 
 
-export default function MovieBlock (props) {
+export default function MovieBlock(props) {
     const classes = useStyles();
     const rateNums = {
         five_star: 100,
@@ -42,13 +41,13 @@ export default function MovieBlock (props) {
 
     return (
         <React.Fragment>
-            <Box sx={{ flexGrow: 1 }}>
+            <Box sx={{flexGrow: 1}}>
                 <Grid container rowSpacing={2} columnSpacing={3}>
                     <Grid item xs={12}>
-                        <Typography variant="h3">{props.title}</Typography>
+                        <Typography variant="h3" component={"span"}>{props.title}</Typography>
                     </Grid>
-                    <Grid item xs={4}>
-                        <Card sx={{ minWidth: 200 }}>
+                    <Grid item xs={3}>
+                        <Card sx={{minWidth: 200}}>
                             <CardMedia
                                 component="img"
                                 className={classes.Media}
@@ -56,7 +55,7 @@ export default function MovieBlock (props) {
                                 alt={props.title}
                             />
                             <CardContent>
-                                <Typography gutterBottom variant="body2" component="div">
+                                <Typography gutterBottom variant="body2" component="span">
                                     <strong>Director:</strong> {props.director} / {props.year} / {props.run_time}
                                 </Typography>
                             </CardContent>
@@ -64,9 +63,9 @@ export default function MovieBlock (props) {
                     </Grid>
                     <Grid item xs={1}></Grid>
                     <Grid item xs={6}>
-                        <Card sx={{ minWidth: 200 }}>
+                        <Card sx={{minWidth: 200}}>
                             <CardContent>
-                                <Typography gutterBottom variant="h5" component="div">
+                                <Typography gutterBottom variant="h5" component="span">
                                     Overview:
                                 </Typography>
                                 <Divider/>
@@ -74,11 +73,11 @@ export default function MovieBlock (props) {
                             </CardContent>
                         </Card>
                         <Stack direction="row" spacing={2}>
-                            <Box sx={{ p: 1 }}>
-                                <Typography gutterBottom variant="h4" component="div">
+                            <Box sx={{p: 1}}>
+                                <Typography gutterBottom variant="h4" component="span">
                                     Average rate: {props.rating}
                                 </Typography>
-                                <div>
+                                <React.Fragment>
                                     {Object.keys(rateNums).map((num, index) =>
                                         <Box component="fieldset" mb={3}
                                              borderColor="transparent"
@@ -96,11 +95,11 @@ export default function MovieBlock (props) {
                                                          readOnly/></Box>
                                             <Box><Typography component="legend">{rateNums[num]}</Typography></Box>
                                         </Box>)}
-                                </div>
+                                </React.Fragment>
                             </Box>
-                            <Box sx={{ p: 1 }}>
+                            <Box sx={{p: 1}}>
                                 <Stack direction="row">
-                                    <Typography gutterBottom variant="h4" component="div">
+                                    <Typography gutterBottom variant="h4" component="span">
                                         Your rate: {props.rating}
                                     </Typography>
                                     <Button variant="outlined" size="small" startIcon={<AutoFixHighOutlinedIcon/>}>
@@ -112,49 +111,8 @@ export default function MovieBlock (props) {
                                         name="simple-controlled"
                                         defaultValue={0}
                                         size="large"
-                                        // onChange={(event, newValue) => {
-                                        //     setValue(newValue);
-                                        // }}
                                     />
                                 </Box>
-                                <Grid item xs={6}>
-
-                                    <Typography gutterBottom variant="h5" component="div">
-                                        Rating
-                                    </Typography>
-                                    <Box>Average rate:{props.rating}</Box>
-                                    <div>
-                                        <Box component="fieldset" mb={1} borderColor="transparent">
-                                            <Typography component="legend">Controlled</Typography>
-                                            <Rating
-                                                name="simple-controlled"
-                                                value={0}
-                                                // onChange={(event, newValue) => {
-                                                //     setValue(newValue);
-                                                // }}
-                                            />
-                                        </Box>
-                                    </div>
-                                </Grid>
-                                {/*<Grid item xs={6}>*/}
-
-                                {/*    <Typography gutterBottom variant="h5" component="div">*/}
-                                {/*        Rating*/}
-                                {/*    </Typography>*/}
-                                {/*    <Box>Average rate:{props.rating}</Box>*/}
-                                {/*    <div>*/}
-                                {/*        <Box component="fieldset" mb={1} borderColor="transparent">*/}
-                                {/*            <Typography component="legend">Controlled</Typography>*/}
-                                {/*            <Rating*/}
-                                {/*                name="simple-controlled"*/}
-                                {/*                value={0}*/}
-                                {/*                // onChange={(event, newValue) => {*/}
-                                {/*                //     setValue(newValue);*/}
-                                {/*                // }}*/}
-                                {/*            />*/}
-                                {/*        </Box>*/}
-                                {/*    </div>*/}
-                                {/*</Grid>*/}
                             </Box>
                         </Stack>
                     </Grid>
