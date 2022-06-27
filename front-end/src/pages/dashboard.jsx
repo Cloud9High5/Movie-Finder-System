@@ -95,9 +95,10 @@ function Dashboard () {
             </Divider>
             <div className={classes.cards}>
                 {movieInfo.map((movie, idx) => {
+                    console.log(movie)
                     return (
                         <DashboardMovieCard key={idx} title={movie.title} poster={movie.poster}
-                                            rating={movie.rating}/>
+                                            rating={movie.rating} movie_id={movie.movie_id}/>
                     )
                 })}
             </div>

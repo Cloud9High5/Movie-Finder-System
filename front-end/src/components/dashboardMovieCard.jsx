@@ -6,9 +6,12 @@ import CardContent from '@mui/material/CardContent';
 import { CardActionArea, Paper, Typography, List, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import styles from './styles/dashboard-card.module.css';
+import { useNavigate } from "react-router-dom";
 
 function DashboardMovieCard (props) {
     console.log(props);
+    const path = useNavigate();
+
     const renderHotComments = () => {
       const hotComments = [
         {
@@ -47,7 +50,8 @@ function DashboardMovieCard (props) {
                     position: 'relative',
                     overflow: 'visible'
                 }}>
-            <CardActionArea>
+            <CardActionArea onClick={() => {path('../movie_detail/' + props.movie_id)}}>
+            {/*<CardActionArea>*/}
                 <CardMedia
                     component="img"
                     image={props.poster}
@@ -75,6 +79,7 @@ DashboardMovieCard.propTypes = {
     title: PropTypes.string,
     rating: PropTypes.string,
     poster: PropTypes.string,
+    movie_id: PropTypes.number,
 }
 
 export default DashboardMovieCard;
