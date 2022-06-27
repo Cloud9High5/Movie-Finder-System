@@ -354,6 +354,7 @@ class rating_review(Resource):
 
     @api.response(400, 'Fail, invalid method')
     @api.response(200, 'Success')
+
     @api.expect(review_rating_model)
     def post(self):
         '''
