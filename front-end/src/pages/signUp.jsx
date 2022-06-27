@@ -92,7 +92,7 @@ function SignUp () {
         setStates({ ...states, [prop]: event.target.value.length <= 16 });
     }
 
-    const signUpUser = (e) => {
+    const signUpUser = async (e) => {
         e.preventDefault();
         if (states.password === states.c_password) {
             if (states.emailValid && states.nameValid) {
@@ -106,17 +106,13 @@ function SignUp () {
                     }),
                     // mode: 'no-cors',
                 };
-                fetch('http://127.0.0.1:5000/auth/signup', requestedInfo).then(async response => {
-                    if (response.status === 200) {
-                        await response.json().then((data) => {
-                            console.log(data);
-                        });
-                    } else {
-                        await response.json().then((data) => {
-                            console.log(data);
-                        });
-                    }
-                });
+                const response = await fetch('http://127.0.0.1:5000/auth/signup', requestedInfo);
+                if (response.status === 201) {
+                    toLogin();
+                } else if (response.status === 409) {
+                    setModalMsg('User already exist, please use another email address');
+                    setVisibility(true);
+                }
 
             } else {
                 setModalMsg('Please input a valid email address and user name.');

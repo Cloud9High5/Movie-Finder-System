@@ -48,12 +48,12 @@ function Dashboard () {
     }
 
     const changeDisplayMode = async (e) => {
-        console.log('Display mode: ' + e.target.value);
+        // console.log('Display mode: ' + e.target.value);
         setDisplayMode(e.target.value);
 
         if (e.target.value === 'random') {
             const ids = randomID();
-            console.log(ids);
+            // console.log(ids);
             const tempInfo = [];
             ids.map(async (id) => {
                 const response = await fetch('http://127.0.0.1:5000/films?id=' + id);
@@ -95,9 +95,10 @@ function Dashboard () {
             </Divider>
             <div className={classes.cards}>
                 {movieInfo.map((movie, idx) => {
+                    // console.log(movie)
                     return (
                         <DashboardMovieCard key={idx} title={movie.title} poster={movie.poster}
-                                            rating={movie.rating}/>
+                                            rating={movie.rating} movie_id={movie.movie_id}/>
                     )
                 })}
             </div>

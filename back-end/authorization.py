@@ -168,7 +168,7 @@ def check_blocked(email):
         return False
 
 
-def check_uid_vaild(uid):
+def check_uid_exist(uid):
     '''
     check if the uid is valid
     
@@ -210,6 +210,37 @@ def get_uid(email):
     conn.close()
 
     return uid
+
+
+def get_user_info(uid):
+    '''
+    get user's info by uid
+
+    Args:
+        uid: user's uid
+
+    Returns:
+        user_info: user's info, dict
+    '''
+    conn = sqlite3.connect(path)
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM users WHERE uid = '%s'" % uid)
+    user_info = c.fetchone()
+    conn.close()
+
+    result = {
+        'uid': user_info[0],
+        'username': user_info[1],
+        'email': user_info[3],
+        'photo_url': user_info[4],
+        'is_admin': user_info[5],
+        'is_blocked': user_info[6],
+    }
+
+    return result
+
+    return user_info
 
 
 def insert_user(user):

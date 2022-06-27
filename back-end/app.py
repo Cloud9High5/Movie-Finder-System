@@ -129,6 +129,47 @@ class login(Resource):
 
 
 ###############################################################################
+#                               get user info                                 #
+###############################################################################
+
+
+@api.route('/auth/user/<int:uid>', methods=['GET'])
+@api.response(200, 'Success, user info returned')
+@api.response(401, 'Fail, user not found')
+class user_info(Resource):
+    def get(self, uid):
+        '''
+        get user info
+
+        login required: True
+
+        Args:
+            uid: int, the id of the user
+
+        Request body:
+            None
+
+        Returns:
+            Success
+            200
+            {
+                'message': 'user info returned',
+                'user_info': user_info,
+            }
+            Fail
+            401
+            {
+                'message': 'user not found',
+            }        
+        '''
+        if auth.check_uid_exist(uid):
+            user_info = auth.get_user_info(uid)
+            return user_info, 200
+        else:
+            return {'message': 'user not found'}, 401
+
+
+###############################################################################
 #                                get review                                   #
 ###############################################################################
 
@@ -302,14 +343,20 @@ class get_review(Resource):
 #                               rating review                                 #
 ###############################################################################
 
-@api.route('/review/<int:review_id>/rating', methods=['POST'])
-@api.param('review_id', 'id of the review')
-@api.param('method', 'like or dislike')
+review_rating_model = api.model('review_rating_model', {
+    'method': fields.Integer,
+    'uid': fields.Integer,
+    'review_id': fields.Integer,
+})
+
+@api.route('/review/rating', methods=['POST'])
 class rating_review(Resource):
 
     @api.response(400, 'Fail, invalid method')
     @api.response(200, 'Success')
-    def get(self, review_id):
+
+    @api.expect(review_rating_model)
+    def post(self):
         '''
         rate a review with like or dislike
 
@@ -320,7 +367,7 @@ class rating_review(Resource):
         
         Request body:
             {
-                'method': 'like' or 'dislike',
+                'method': 1 for like, 0 for dislike,
                 'uid': int, the uid of the user,
                 'review_id': int, the id of the review,
             }
@@ -335,11 +382,11 @@ class rating_review(Resource):
 
         if payload['uid'] is None or payload['review_id'] is None:
             return {'message': 'uid and review_id are both required'}, 400
-        elif payload['method'] not in ['like', 'dislike'] or payload['method'] is None:
-            return {'message': 'method is required and must be like or dislike'}, 400
+        elif payload['method'] not in [0,1] or payload['method'] is None:
+            return {'message': 'method is required and must be 1, for like or 0, for dislike'}, 400
         else:
-            if auth.check_user_exist(payload['uid']):
-                review.rating_review(payload['review_id'], payload['method'])
+            if auth.check_uid_exist(payload['uid']):
+                review.rating_review(payload['review_id'], 'like' if payload['method'] else 'dislike')
             else:
                 return {'message': 'user not exist'}, 404
 

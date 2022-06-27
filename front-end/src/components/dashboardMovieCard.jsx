@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import Card from '@mui/material/Card';
 import CardMedia from '@mui/material/CardMedia';
@@ -6,33 +6,48 @@ import CardContent from '@mui/material/CardContent';
 import { CardActionArea, Paper, Typography, List, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import styles from './styles/dashboard-card.module.css';
+import { useNavigate } from "react-router-dom";
 
 function DashboardMovieCard (props) {
-    console.log(props);
-    const renderHotComments = () => {
-      const hotComments = [
-        {
-          user: {
-            username: 'xuwanyi'
-          },
-          comment: 'Wow, it is the best movie I saw from I was human!'
+    // console.log(props);
+    const path = useNavigate();
+    const [hotComments, setHotComments] = useState([]);
+    const {movie_id} = props;
+    useEffect(() => {
+      fetch(`http://127.0.0.1:5000/review?method=recent_top&movie_id=${movie_id}&top=4&recent=1`)
+        .then(async (response) => {
+        const comments = await response.json();
+        const getUserPromises = comments.map(comment => {
+          return new Promise(async resolve => {
+            const httpRes = await fetch(`http://127.0.0.1:5000/auth/user/${comment.uid}`);
+            const user = await httpRes.json();
+            resolve(user);
+          })
+        });
+        const users = await Promise.all(getUserPromises);
+        for (let i = 0; i < comments.length; i ++) {
+          comments[i].user = users[i];
         }
-      ];
+        setHotComments(comments);
+
+      })
+    }, [movie_id]);
+    const renderHotComments = () => {
       const commentList = hotComments.map(hotComment => {
         return (
-          <ListItem alignItems="flex-start" key={hotComment.comment}>
+          <ListItem alignItems="flex-start" key={hotComment._id}>
             <ListItemAvatar>
               <AccountCircleIcon style={{fontSize: '40px'}}/>
             </ListItemAvatar>
             <ListItemText
               primary={hotComment.user.username}
               secondary={
-                hotComment.comment
+                hotComment.review
               }/>
           </ListItem>
         )
       });
-      return <List>
+      return <List style={{maxHeight: '80%', overflow: 'auto'}}>
         {commentList}
       </List>
     }
@@ -47,7 +62,8 @@ function DashboardMovieCard (props) {
                     position: 'relative',
                     overflow: 'visible'
                 }}>
-            <CardActionArea>
+            <CardActionArea onClick={() => {path('../movie_detail/' + props.movie_id)}}>
+            {/*<CardActionArea>*/}
                 <CardMedia
                     component="img"
                     image={props.poster}
@@ -75,6 +91,7 @@ DashboardMovieCard.propTypes = {
     title: PropTypes.string,
     rating: PropTypes.string,
     poster: PropTypes.string,
+    movie_id: PropTypes.number,
 }
 
 export default DashboardMovieCard;
