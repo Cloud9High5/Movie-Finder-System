@@ -59,12 +59,11 @@ export default function MovieBlock(props) {
     };
 
     const rateMovie = async () => {
-        handleOpen();
+        handleClose();
 
         const requestInfo = {
             method: 'POST',
             headers: {
-                // 'Access-Control-Allow-Origin': '*',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
