@@ -8,6 +8,7 @@ import {lightGreen} from "@material-ui/core/colors";
 import {Button, Grid} from "@mui/material";
 import Rating from '@mui/material/Rating';
 import React from 'react';
+import { useParams } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
     textBar: {
@@ -65,14 +66,14 @@ function CommentMovie({props}) {
         setFlag(!flag);
     }
 
-    const mid = props[0].movie_id;
     const [rawComments, setRawComments] = React.useState([]);  // comments with uid and movie_id
     const [tempComments, setTempComments] = React.useState([]);  // comments with user name and movie id
     const [comments, setComments] = React.useState([]);  // the combined comments dataset
     const [flag, setFlag] = React.useState(false);
+    const mid = useParams()['movieID'];
     // obtain comments from backend
     React.useEffect(() => {
-        fetch('http://127.0.0.1:5000/review?method=movie_id&movie_id=' + props[0].movie_id).then(async (response) => {
+        fetch('http://127.0.0.1:5000/review?method=movie_id&movie_id=' + mid).then(async (response) => {
             const data = await response.json();
             setRawComments([...data]);
         })
