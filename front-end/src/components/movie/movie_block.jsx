@@ -32,7 +32,6 @@ const useStyles = makeStyles({
 
 export default function MovieBlock(props) {
     const classes = useStyles();
-    const token = localStorage.getItem('token');
     const [visibility, setVisibility] = React.useState(false);
     const [rate, setRate] = React.useState(0);
     const commentRef = useRef('');
@@ -69,7 +68,7 @@ export default function MovieBlock(props) {
             body: JSON.stringify({
                 // movie_id: props.id,
                 movie_id: parseInt(props.id),
-                uid: parseInt(token),
+                uid: localStorage.getItem('token'),
                 rating: rate,
                 review: commentRef.current.value
             }),
