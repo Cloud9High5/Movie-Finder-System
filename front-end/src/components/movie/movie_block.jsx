@@ -38,13 +38,13 @@ export default function MovieBlock(props) {
     const commentRef = useRef('');
     const handleOpen = () => setVisibility(true);
     const handleClose = () => setVisibility(false);
-    const rateNums = {
-        five_star: 100,
-        four_star: 87,
-        three_star: 20,
-        two_star: 4,
-        one_star: 1,
-    };
+    // const rateNums = {
+    //     five_star: 100,
+    //     four_star: 87,
+    //     three_star: 20,
+    //     two_star: 4,
+    //     one_star: 1,
+    // };
     const style = {
         position: 'absolute',
         top: '50%',
@@ -69,7 +69,7 @@ export default function MovieBlock(props) {
             body: JSON.stringify({
                 // movie_id: props.id,
                 movie_id: parseInt(props.id),
-                uid: 6,
+                uid: parseInt(token),
                 rating: rate,
                 review: commentRef.current.value
             }),
@@ -121,25 +121,25 @@ export default function MovieBlock(props) {
                                 <Typography gutterBottom variant="h4" component="span">
                                     Average rate: {props.rating}
                                 </Typography>
-                                <React.Fragment>
-                                    {Object.keys(rateNums).map((num, index) =>
-                                        <Box component="fieldset" mb={3}
-                                             borderColor="transparent"
-                                             sx={{
-                                                 display: 'flex',
-                                                 flexDirection: 'row',
-                                                 p: 1,
-                                                 m: 1,
-                                                 borderRadius: 1,
-                                             }}
-                                             key={index}
-                                        >
-                                            <Box><Rating name="read-only"
-                                                         value={Object.entries(rateNums).length - index}
-                                                         readOnly/></Box>
-                                            <Box><Typography component="legend">{rateNums[num]}</Typography></Box>
-                                        </Box>)}
-                                </React.Fragment>
+                                {/*<React.Fragment>*/}
+                                {/*    {Object.keys(rateNums).map((num, index) =>*/}
+                                {/*        <Box component="fieldset" mb={3}*/}
+                                {/*             borderColor="transparent"*/}
+                                {/*             sx={{*/}
+                                {/*                 display: 'flex',*/}
+                                {/*                 flexDirection: 'row',*/}
+                                {/*                 p: 1,*/}
+                                {/*                 m: 1,*/}
+                                {/*                 borderRadius: 1,*/}
+                                {/*             }}*/}
+                                {/*             key={index}*/}
+                                {/*        >*/}
+                                {/*            <Box><Rating name="read-only"*/}
+                                {/*                         value={Object.entries(rateNums).length - index}*/}
+                                {/*                         readOnly/></Box>*/}
+                                {/*            <Box><Typography component="legend">{rateNums[num]}</Typography></Box>*/}
+                                {/*        </Box>)}*/}
+                                {/*</React.Fragment>*/}
                             </Box>
                             <Box sx={{p: 1}}>
                                 <Stack direction="row">
