@@ -7,7 +7,7 @@ function Thumb({type = 'up', quantity}) {
   const [active, setActive] = useState(false);
   const Icon = type === 'up' ? ThumbUpIcon : ThumbDownIcon;
   const handleClick = () => {
-    setActive(!active);
+    // setActive(!active);
   }
   return (
     <Box display={'flex'} alignItems={'center'}>
