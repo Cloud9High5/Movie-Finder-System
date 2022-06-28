@@ -68,7 +68,7 @@ export default function MovieBlock(props) {
             body: JSON.stringify({
                 // movie_id: props.id,
                 movie_id: parseInt(props.id),
-                uid: localStorage.getItem('token'),
+                uid: parseInt(localStorage.getItem('token')),
                 rating: rate,
                 review: commentRef.current.value
             }),
