@@ -64,11 +64,12 @@ export default function MovieBlock(props) {
         const requestInfo = {
             method: 'POST',
             headers: {
-                'Access-Control-Allow-Origin': '*',
+                // 'Access-Control-Allow-Origin': '*',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                movie_id: props.id,
+                // movie_id: props.id,
+                movie_id: parseInt(props.id),
                 uid: 6,
                 rating: rate,
                 review: commentRef.current.value
