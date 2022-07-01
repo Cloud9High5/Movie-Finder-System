@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import Container from '@material-ui/core/Container';
-import MovieBlock from '../components/movie/movie_block';
-import CommentMovie from "../components/review/comment_block";
+import MovieBlock from '../components/movie/movieBlock';
+import CommentMovie from "../components/review/commentBlock";
 import {useParams} from "react-router-dom";
 import Header from "../components/header";
 

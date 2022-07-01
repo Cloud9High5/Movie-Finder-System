@@ -4,7 +4,7 @@ import {Typography} from "@mui/material";
 import Avatar from "@material-ui/core/Avatar";
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import Thumb from "./Thumb";
+import Thumb from "./thumb";
 
 function Comments() {
   const renderComments = () => {

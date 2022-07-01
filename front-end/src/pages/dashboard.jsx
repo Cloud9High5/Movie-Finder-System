@@ -4,7 +4,7 @@ import Header from "../components/header";
 import DashboardMovieCard from "../components/dashboardMovieCard";
 import { makeStyles } from '@material-ui/styles';
 import { Divider, FormControl, FormHelperText, InputLabel, MenuItem, Select } from "@mui/material";
-import MostPopularComments from "../components/movie/most_popular_comments";
+import MostPopularComments from "../components/movie/mostPopularComments";
 
 const styles = makeStyles({
     cards: {

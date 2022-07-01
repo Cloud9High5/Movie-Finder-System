@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Dashboard from './dashboard';
 import Login from "./login";
 import SignUp from "./signUp";
-import MovieDetail  from "./movie_detail";
+import MovieDetail  from "./movieDetail";
 
 function App () {
   return (
