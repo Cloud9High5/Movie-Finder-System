@@ -27,7 +27,7 @@ def init_review_db():
     # create a table for user if it doesn't exist
     c.execute("""CREATE TABLE IF NOT EXISTS reviews (
         review_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        review TEXT,
+        movieDetail TEXT,
         rating INTEGER NOT NULL,
         uid INTEGER NOT NULL,
         movie_id INTEGER NOT NULL,
@@ -41,15 +41,15 @@ def init_review_db():
 
 def insert_review(review):
     '''
-    insert a review into db
+    insert a movieDetail into db
 
     Args:
-        review: dict, the review to insert
+        review: dict, the movieDetail to insert
         {
-            'review': str, the review text,
-            'rating': float, the rating of the movie,
+            'movieDetail': str, the movieDetail text,
+            'rating': float, the rating of the mostPopularComments,
             'uid': int, the user id,
-            'movie_id': int, the movie id,
+            'movie_id': int, the mostPopularComments id,
         }
     
     Returns:
@@ -61,9 +61,9 @@ def insert_review(review):
 
 
     c.execute("""INSERT INTO reviews (
-        review, rating, uid, movie_id, release_date) VALUES (
+        movieDetail, rating, uid, movie_id, release_date) VALUES (
         '%s', %f, %d, %d, %d)""" % (
-        review['review'],
+        review['movieDetail'],
         review['rating'],
         review['uid'],
         review['movie_id'],
@@ -81,9 +81,9 @@ def get_review(method = 'uid', value = None):
         method: str, the method to fetch reviews by. 
         {
             'uid': fetch reviews by user id,
-            'movie_id': fetch reviews by movie id,
-            'uid_movie_id': fetch reviews by user id and movie id,
-            'review_id': fetch a review by review id,
+            'movie_id': fetch reviews by mostPopularComments id,
+            'uid_movie_id': fetch reviews by user id and mostPopularComments id,
+            'review_id': fetch a movieDetail by movieDetail id,
             'top': fetch top N reviews by like count,
             'recent': fetch reviews in the last N months,
             'recent_top': fetch top M reviews by like count in the last N months,
@@ -93,9 +93,9 @@ def get_review(method = 'uid', value = None):
         value: int, the value of the method, for specific
         {
             'uid': user id,
-            'movie_id': movie id,
-            'uid_movie_id': user id and movie id, (uid, movie_id)
-            'review_id': review id,
+            'movie_id': mostPopularComments id,
+            'uid_movie_id': user id and mostPopularComments id, (uid, movie_id)
+            'review_id': movieDetail id,
             'top': Top N reviews
             'recent': reviews in the last N months
             'recent_top': top M reviews in the last N months, (M top, N months)
@@ -137,7 +137,7 @@ def get_review(method = 'uid', value = None):
     for i in reviews:
         review = {}
         review['review_id'] = i[0]
-        review['review'] = i[1]
+        review['movieDetail'] = i[1]
         review['rating'] = i[2]
         review['uid'] = i[3]
         review['movie_id'] = i[4]
@@ -151,10 +151,10 @@ def get_review(method = 'uid', value = None):
 
 def rating_review(review_id, method):
     '''
-    like or dislike a review
+    like or dislike a movieDetail
 
     Args:
-        review_id: int, the review id
+        review_id: int, the movieDetail id
         method: str, the like or dislike
     
     Returns:
