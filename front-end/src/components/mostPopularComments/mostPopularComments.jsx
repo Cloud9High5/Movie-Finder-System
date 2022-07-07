@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button, Grid, Link, MenuItem, Select, Typography } from '@mui/material';
-import { Rating } from "../../components";
+import Rating from '@mui/material/Rating';
 import { useNavigate } from "react-router-dom";
 
 function MostPopularComments () {
@@ -134,7 +134,7 @@ function MostPopularComments () {
                                         {comment.username}
                                     </Typography>
                                     <Box marginLeft={'10px'}>
-                                        <Rating rating={comment.rating}/>
+                                        <Rating value={comment.rating} readOnly />
                                     </Box>
                                 </Box>
                                 <Typography variant={'p'} color={'gray'}>
