@@ -84,22 +84,10 @@ function CommentBlock({props}) {
       fetch('http://127.0.0.1:5000/auth/user/' + t.uid).then(async (response) => {
         const data = await response.json();
         t['username'] = data.username;
-        setTempComments([...temp]);
-      })
-    })
-  }, [rawComments])
-  // obtain mostPopularComments title and poster from backend
-  React.useEffect(() => {
-    let temp = [...tempComments];
-    temp.map((t) => {
-      fetch('http://127.0.0.1:5000/films?id=' + t.movie_id).then(async (response) => {
-        const data = await response.json();
-        t['title'] = data.title;
-        t['poster'] = data.poster;
         setComments([...temp]);
       })
     })
-  }, [tempComments])
+  }, [rawComments])
 
   return (
     <Box sx={{marginTop: 3}}>
