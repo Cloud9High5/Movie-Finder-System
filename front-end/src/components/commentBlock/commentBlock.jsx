@@ -1,7 +1,8 @@
 import Box from "@mui/material/Box";
 import {Typography} from '@mui/material';
 import Avatar from "@material-ui/core/Avatar";
-import {Thumb, Rating} from "../../components";
+import {Thumb} from "../../components";
+import Rating from '@mui/material/Rating';
 import {Divider} from "@material-ui/core";
 import Grid from '@mui/material/Grid';
 import {makeStyles} from "@material-ui/core/styles";
