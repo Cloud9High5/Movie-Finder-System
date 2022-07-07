@@ -120,7 +120,7 @@ function CommentBlock({props}) {
                     U
                   </Avatar>
                   <Box marginLeft={'10px'}>
-                    <Typography variant={'body2'} color={'gray'}>
+                    <Typography variant={'p'} color={'gray'}>
                       {review.username}
                     </Typography>
                   </Box>
