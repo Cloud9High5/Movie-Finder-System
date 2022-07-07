@@ -137,7 +137,7 @@ function MostPopularComments() {
                 </Typography>
                 <Box>
                   <Typography variant={'p'}>
-                    {comment.review}
+                    {comment.movieDetail}
                   </Typography>
                 </Box>
               </Grid>

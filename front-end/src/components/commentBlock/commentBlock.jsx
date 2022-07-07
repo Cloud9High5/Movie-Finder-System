@@ -132,7 +132,7 @@ function CommentBlock({props}) {
                 </Box>
                 <Box>
                   <Typography component={'span'} variant={'body2'}>
-                    {review.review}
+                    {review.movieDetail}
                   </Typography>
                 </Box>
                 <Box display={'flex'} marginTop={'10px'}>
