@@ -41,3 +41,38 @@ what was not finished, why this happened, how this affects the overall project p
 N/A
 what is planned for the next period (e.g., next week)
 1.	Finish writing login/sign up page, movie information page and part of dashboard page.
+
+Week 4
+
+what was planned for the period since the last work diary entry
+1.	Writing code for front-end pages (login/register page, dashboard page, movie detail page)
+What was finished
+1.	Login/register page
+2.	Dashboard page
+3.	Fixing discovered bugs
+What were the main technical and non-technical obstacles and how they were overcome (or what was tried and did not work)
+1.	Fetching kinds of information from different APIs, this was solved by re-designing backend database structure.
+What was not finished, why this happened, how this affects the overall project progress and what adjustments (if any) are needed so the success of the project is not endangered
+1.	Movie detail page’s progress is not going well, 
+What is planned for the next period (e.g., next week)
+1.	Movie detail page
+2.	Like/dislike functions
+
+Week 5
+
+what was planned for the period since the last work diary entry
+1.	Movie detail page getting information from backend APIs.
+2.	Preparation for demo A.
+3.	Retrospective A document
+What was finished
+1.	Sprint 1
+2.	Demo A
+3.	Retrospective A document
+What were the main technical and non-technical obstacles and how they were overcome (or what was tried and did not work)
+1.	Self-learning on useful React components.
+What was not finished, why this happened, how this affects the overall project progress and what adjustments (if any) are needed so the success of the project is not endangered
+N/A 
+What is planned for the next period (e.g., next week)
+1.	Fixing bugs that Rachid pointed out
+2.	Start working on sprint 2
+
