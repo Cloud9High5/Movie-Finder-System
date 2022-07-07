@@ -56,3 +56,84 @@ what is planned for the next week:
 
 1. dashboard, login, signup, movie page UI.
 2. ajax with api.
+
+--------------------------------------------------------------------------------------------------------
+
+Week 3
+
+What was planned for the period since the last work diary entry:
+
+1. Movie Detail page coding
+2. communicate backend api with teammates
+3. Debugging
+
+What was finished:
+
+Finish all backlog and assign tasks for sprint 1.
+Create dashboard and login/signup page and part of Movie Detail page using React.
+
+What were the main technical and non-technical obstacles and how they were
+overcome (or what was tried and did not work):
+
+1. Python library: there are too many functions should consider, so we need to decide which library is better.
+2. React UI theme: decide which theme(color, form) is suitable for our website.
+3. Sprint 1: hard to know how much can we finish before the date.
+4. Development Framework: self study.
+5. Ajax: fix bug
+
+what is planned for the next week:
+
+1. movie page UI.
+2. ajax with api.
+
+--------------------------------------------------------------------------------------------------------
+
+Week 4
+
+What was planned for the period since the last work diary entry:
+
+1. Movie Detail page coding
+2. MUI component coding
+3. Debugging
+
+What was finished:
+
+Create dashboard and login/signup page and part of Movie Detail page using React, and fetch data from backend.
+
+What were the main technical and non-technical obstacles and how they were
+overcome (or what was tried and did not work):
+
+1. React UI theme: decide which theme(color, form) is suitable for our website.
+2. Sprint 1: hard to know how much can we finish before the date.
+3. Development Framework: self study.
+4. Ajax: fix bug
+
+what is planned for the next week:
+
+1. movie page UI.
+2. ajax with api.
+
+--------------------------------------------------------------------------------------------------------
+
+Week 4
+
+What was planned for the period since the last work diary entry:
+
+1. Movie Detail page finished
+2. MUI component coding
+3. Debugging
+
+What was finished:
+
+Sprint 1 almost done
+
+What were the main technical and non-technical obstacles and how they were
+overcome (or what was tried and did not work):
+
+1. React UI theme: decide which theme(color, form) is suitable for our website.
+2. Development Framework: self study.
+3. Ajax: fix bug
+
+what is planned for the next week:
+
+1. fix sprint 1 bug
