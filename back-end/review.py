@@ -61,9 +61,9 @@ def insert_review(review):
 
 
     c.execute("""INSERT INTO reviews (
-        movieDetail, rating, uid, movie_id, release_date) VALUES (
+        review, rating, uid, movie_id, release_date) VALUES (
         '%s', %f, %d, %d, %d)""" % (
-        review['movieDetail'],
+        review['review'],
         review['rating'],
         review['uid'],
         review['movie_id'],
