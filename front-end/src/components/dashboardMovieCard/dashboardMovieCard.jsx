@@ -18,19 +18,12 @@ function DashboardMovieCard(props) {
     fetch(`http://127.0.0.1:5000/review?method=movie_id&movie_id=${movie_id}`)
       .then(async (response) => {
         const comments = await response.json();
-        const getUserPromises = comments.map(comment => {
-          return new Promise(async resolve => {
-            const httpRes = await fetch(`http://127.0.0.1:5000/auth/user/${comment.uid}`);
-            const user = await httpRes.json();
-            resolve(user);
-          })
-        });
-        const users = await Promise.all(getUserPromises);
-        for (let i = 0; i < comments.length; i++) {
-          comments[i].user = users[i];
-        }
-        setHotComments(comments);
-
+        comments.map(async (comment) => {
+            const userInfo = await fetch(`http://127.0.0.1:5000/auth/user/${comment.uid}`);
+            const data = await userInfo.json();
+            comment['username'] = data['username'];
+            setHotComments([...comments]);
+        })
       })
   }, [movie_id]);
   const renderHotComments = () => {
@@ -41,7 +34,7 @@ function DashboardMovieCard(props) {
             <AccountCircleIcon style={{fontSize: '40px'}}/>
           </ListItemAvatar>
           <ListItemText
-            primary={hotComment.user.username}
+            primary={hotComment['username']}
             secondary={
               hotComment.movieDetail
             }/>
