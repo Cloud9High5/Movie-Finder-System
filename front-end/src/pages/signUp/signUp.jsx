@@ -53,7 +53,7 @@ function SignUp() {
 
   // already have account, go to login
   const toLogin = () => {
-    path('/login');
+    path('/login' , { state: {'from' : '/signup'} });
   }
   // go to mostPopularComments page
   const toDashboard = () => {

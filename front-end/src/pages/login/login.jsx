@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Link from '@mui/material/Link';
-import {useNavigate} from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const styles = makeStyles({
   loginForm: {
@@ -36,6 +36,7 @@ function Login() {
       showPassword: false,
     }
   );
+  const {state:{from}} = useLocation()
 
   const toPreviousPage = () => {
     path(-1);
@@ -86,7 +87,11 @@ function Login() {
       console.log(data);
       localStorage.setItem('token', data.uid);  // use uid as token
       localStorage.setItem('email', states.email);  // might be used later
-      toDashboard();
+      if (from === '/signup') {
+        path('/mostPopularComments') // from sign up page to login, go to dashboard page
+      } else {
+        path(from) // return to the page before logging in
+      }
     } else if (response.status === 401) {
       setModalMsg('User not found, you need to register a DOUBI account.');
       setVisibility(true);

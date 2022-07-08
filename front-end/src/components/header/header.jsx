@@ -6,7 +6,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
 import {lightGreen} from '@material-ui/core/colors';
-import {useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 import {Menu, MenuItem} from "@mui/material";
 
@@ -41,6 +41,7 @@ export default function Header() {
   const [token, setToken] = React.useState(localStorage.getItem('token'));
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+  const from = useLocation().pathname;
 
 
   const toDashboard = () => {
@@ -48,7 +49,7 @@ export default function Header() {
   }
 
   const toLogin = () => {
-    path('/login');
+    path('/login', { state: {'from' : from} });
   }
 
   const toSignUp = () => {
@@ -106,7 +107,7 @@ export default function Header() {
           isNotLoggedIn() ?
             // region UI displayed when not logged in
             <span>
-                        <Button color="inherit" variant="outlined" onClick={toLogin}
+                        <Button color="inherit" variant="outlined" onClick={() => toLogin()}
                                 sx={{textTransform: 'none'}}>Login</Button>
                         <span> | </span>
                         <Button color="inherit" variant="outlined" onClick={toSignUp}
