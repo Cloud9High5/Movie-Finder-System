@@ -1,12 +1,15 @@
+from fileinput import filename
 import sqlite3
+import os
 
-filename = 'db/Film_1.db'
+filename = 'Film_1.db'
+path = os.path.join(os.path.dirname(__file__), 'db', filename)
 
 
 # create db file and film table
 def init_film_db():
     # create a new database for film if it doesn't exist
-    conn = sqlite3.connect(filename)
+    conn = sqlite3.connect(path)
     c = conn.cursor()
 
     # create a table for user if it doesn't exist
@@ -26,7 +29,7 @@ def init_film_db():
 
 # check if film exists
 def check_film_exist(id):
-    conn = sqlite3.connect(filename)
+    conn = sqlite3.connect(path)
     c = conn.cursor()
 
     c.execute("SELECT * FROM FILM_INFORMATION WHERE FILM_ID = '%s'" % id)
@@ -41,7 +44,7 @@ def check_film_exist(id):
 
 # Find the corresponding film information by ID
 def find_film(id):
-    conn = sqlite3.connect(filename)
+    conn = sqlite3.connect(path)
     c = conn.cursor()
 
     c.execute("SELECT * FROM FILM_INFORMATION WHERE FILM_ID = '%s'" % id)
@@ -52,7 +55,7 @@ def find_film(id):
 
 
 def show_top_rating_film(number):
-    conn = sqlite3.connect(filename)
+    conn = sqlite3.connect(path)
     c = conn.cursor()
 
     film = c.execute("select * from FILM_INFORMATION order by rating desc limit '%d'" % number)
@@ -61,7 +64,7 @@ def show_top_rating_film(number):
 
 
 def show_top_recent_film(number):
-    conn = sqlite3.connect(filename)
+    conn = sqlite3.connect(path)
     c = conn.cursor()
 
     film = c.execute("select * from FILM_INFORMATION order by year desc limit '%d'" % number)
@@ -71,7 +74,7 @@ def show_top_recent_film(number):
 
 # insert a new film
 def insert_film(film):
-    conn = sqlite3.connect(filename)
+    conn = sqlite3.connect(path)
     c = conn.cursor()
 
     c.execute("""INSERT INTO FILM_INFORMATION (
