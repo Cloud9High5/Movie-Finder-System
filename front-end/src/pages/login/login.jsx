@@ -36,7 +36,13 @@ function Login() {
       showPassword: false,
     }
   );
-  const {state:{from}} = useLocation()
+
+  const location = useLocation();
+  let from;
+  if (location.state != null) {
+      // const {state:{from}} = location;
+    from = location.state['from']
+  }
 
   const toPreviousPage = () => {
     path(-1);
@@ -87,7 +93,7 @@ function Login() {
       console.log(data);
       localStorage.setItem('token', data.uid);  // use uid as token
       localStorage.setItem('email', states.email);  // might be used later
-      if (from === '/signup') {
+      if (from === undefined) {
         path('/mostPopularComments') // from sign up page to login, go to dashboard page
       } else {
         path(from) // return to the page before logging in
