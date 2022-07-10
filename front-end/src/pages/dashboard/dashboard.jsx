@@ -37,7 +37,7 @@ function Dashboard() {
   const randomID = () => {
     const tempID = [];
     while (tempID.length < 10) {
-      const num = Math.floor(Math.random() * 100);
+      const num = Math.floor(Math.random() * 1000);
       if (num === 0) continue;
       if (tempID.indexOf(num) === -1) {
         tempID.push(num);
