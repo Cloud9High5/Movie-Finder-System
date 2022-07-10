@@ -5,7 +5,7 @@ export {default as Header} from './header/header';
 export {default as ModalBlock} from './modalBlock/modalBlock';
 export {default as NavBar} from './navBar/navBar';
 export {default as RateMovieModal} from './rateMovieModal/rateMovieModal';
-export {default as Rating} from './rating/rating';
 export {default as Thumb} from './thumb/thumb';
 export {default as MostPopularComments} from './mostPopularComments/mostPopularComments';
 export {default as MovieBlock} from './movieBlock/movieBlock';
+export {default as ProfileCard} from './profileCard/profileCard';
