@@ -6,7 +6,7 @@ function App() {
   return (
     <>
       <Router>
-        <div className={'pageBody'}>
+        <div>
           <Routes>
             <Route exact path={'/mostPopularComments'} element={<Dashboard/>}/>
             <Route exact path={'/login'} element={<Login/>}/>
