@@ -11,6 +11,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Link from '@mui/material/Link';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Typography } from "@mui/material";
 
 const styles = makeStyles({
   loginForm: {
@@ -21,7 +22,7 @@ const styles = makeStyles({
   copyright: {
     mt: 8,
     mb: 4
-  }
+  },
 })
 
 function Login() {
@@ -36,7 +37,13 @@ function Login() {
       showPassword: false,
     }
   );
-  const {state:{from}} = useLocation()
+
+  const location = useLocation();
+  let from;
+  if (location.state != null) {
+      // const {state:{from}} = location;
+    from = location.state['from']
+  }
 
   const toPreviousPage = () => {
     path(-1);
@@ -87,7 +94,7 @@ function Login() {
       console.log(data);
       localStorage.setItem('token', data.uid);  // use uid as token
       localStorage.setItem('email', states.email);  // might be used later
-      if (from === '/signup') {
+      if (from === undefined) {
         path('/mostPopularComments') // from sign up page to login, go to dashboard page
       } else {
         path(from) // return to the page before logging in
@@ -104,7 +111,10 @@ function Login() {
   return (
     <Container component="main" maxWidth="xs">
       <ModalBlock msg={modalMsg} visibility={visibility} setVisibility={setVisibility}/>
-      <h1 id={'appTitle'} onClick={toDashboard}>DOUBI</h1>
+      <h1 className={'title'} onClick={toDashboard}>DOUBI</h1>
+      <Typography variant="subtitle2" display="block" gutterBottom>
+        Login to the DOUBI platform
+      </Typography>
       <Link variant="caption" display="block" onClick={toPreviousPage} gutterBottom>
         ← Back to previous page
       </Link>
@@ -152,12 +162,22 @@ function Login() {
           >
             Login
           </Button>
-          Don&apos;t have an account?
-          <Link variant="body2" onClick={(e) => {
-            path('/signup')
-          }}>
-            {'Sign Up Now'}
-          </Link>
+          <div>
+            Don&apos;t have an account? &nbsp;&nbsp;
+            <Link variant="body2" onClick={(e) => {
+              path('/signup')
+            }}>
+              {'Sign Up Now'}
+            </Link>
+          </div>
+          <div>
+            Forgot password?&nbsp;&nbsp;
+            <Link variant="body2" onClick={(e) => {
+              path('/resetPassword')
+            }}>
+              {'Reset Now'}
+            </Link>
+          </div>
         </Box>
       </div>
     </Container>
