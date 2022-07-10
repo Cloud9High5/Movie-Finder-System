@@ -37,13 +37,7 @@ function MovieBlock(props) {
   const commentRef = useRef('');
   const handleOpen = () => setVisibility(true);
   const handleClose = () => setVisibility(false);
-  // const rateNums = {
-  //     five_star: 100,
-  //     four_star: 87,
-  //     three_star: 20,
-  //     two_star: 4,
-  //     one_star: 1,
-  // };
+  
   const style = {
     position: 'absolute',
     top: '50%',
@@ -56,10 +50,10 @@ function MovieBlock(props) {
     boxShadow: 24,
     p: 4,
   };
-
+  
   const rateMovie = async () => {
     handleClose();
-
+    
     const requestInfo = {
       method: 'POST',
       headers: {
@@ -75,16 +69,15 @@ function MovieBlock(props) {
     };
     console.log(requestInfo)
     const response = await fetch('http://127.0.0.1:5000/review', requestInfo);
-
-    const result = await response.json();
     if (response.status === 200) {
-      window.location.reload(false);
+      window.location.reload();
+    } else {
+      alert("Please login first")
+      window.location.reload();
+      
     }
-    console.log('result is: ', JSON.stringify(result));
-
-
   }
-
+  
   return (
     <React.Fragment>
       <Box sx={{flexGrow: 1}}>
@@ -193,7 +186,7 @@ function MovieBlock(props) {
           </Grid>
         </Grid>
       </Box>
-
+    
     </React.Fragment>
   );
 }

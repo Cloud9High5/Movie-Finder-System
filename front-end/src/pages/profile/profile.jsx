@@ -1,15 +1,16 @@
 import Container from '@material-ui/core/Container';
 import Header from "../../components/header/header";
 import Box from "@mui/material/Box";
-import * as React from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
-import ProfileCard from "../../components/profileCard";
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
+import {ProfileCard} from "../../components/";
 
+function TabPanel(props) {
+  const {children, value, index, ...other} = props;
+  
   return (
     <div
       role="tabpanel"
@@ -19,7 +20,7 @@ function TabPanel(props) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{p: 3}}>
           <Typography>{children}</Typography>
         </Box>
       )}
@@ -39,18 +40,19 @@ function a11yProps(index) {
     'aria-controls': `vertical-tabpanel-${index}`,
   };
 }
+
 function Profile() {
   const [value, setValue] = React.useState(0);
-
+  
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
   return (
     <Container>
-      <Header />
+      <Header/>
       <Box>
         <Box
-          sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex', height: 224 }}
+          sx={{flexGrow: 1, bgcolor: 'background.paper', display: 'flex', height: 224}}
         >
           <Tabs
             orientation="vertical"
@@ -58,7 +60,7 @@ function Profile() {
             value={value}
             onChange={handleChange}
             aria-label="Vertical tabs example"
-            sx={{ borderRight: 1, borderColor: 'divider' }}
+            sx={{borderRight: 1, borderColor: 'divider'}}
           >
             <Tab label="PROFILE" {...a11yProps(0)} />
             <Tab label="FOLLOWS" {...a11yProps(1)} />
@@ -66,7 +68,7 @@ function Profile() {
           </Tabs>
           <Box style={{width: '100%'}}>
             <TabPanel value={value} index={0}>
-              <ProfileCard />
+              <ProfileCard/>
             </TabPanel>
             <TabPanel value={value} index={1}>
               FOLLOWS

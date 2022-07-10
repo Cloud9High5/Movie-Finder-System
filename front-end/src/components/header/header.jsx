@@ -6,7 +6,7 @@ import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
 import {lightGreen} from '@material-ui/core/colors';
-import { useLocation, useNavigate } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import Button from "@mui/material/Button";
 import {Menu, MenuItem} from "@mui/material";
 
@@ -43,16 +43,16 @@ export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const from = useLocation().pathname;
-
-
+  
+  
   const toDashboard = () => {
     path('/mostPopularComments');
   }
-
+  
   const toLogin = () => {
-    path('/login', { state: {'from' : from} });
+    path('/login', {state: {'from': from}});
   }
-
+  
   const toSignUp = () => {
     path('/signup');
   }
@@ -66,7 +66,7 @@ export default function Header() {
   };
   // hide menu list
   const handleClose = () => {
-
+    
     setAnchorEl(null);
   };
   // when the user click logout
@@ -75,8 +75,9 @@ export default function Header() {
     localStorage.setItem('token', '');
     localStorage.setItem('email', '');
     setToken('');
+    window.location.reload();
   }
-
+  
   React.useEffect(() => {
     fetch('http://127.0.0.1:5000/auth/user/' + token).then(async (response) => {
       if (response.status === 200) {
@@ -87,9 +88,9 @@ export default function Header() {
       }
     })
   }, [token])
-
+  
   // console.log(open);
-
+  
   return (
     <React.Fragment>
       <Toolbar className={classes.toolbar} sx={{maxWidth: 'lg'}}>
@@ -104,7 +105,7 @@ export default function Header() {
         >
           DOUBI
         </Typography>
-
+        
         {
           isNotLoggedIn() ?
             // region UI displayed when not logged in
@@ -134,7 +135,7 @@ export default function Header() {
                                     <MenuItem onClick={() => {
                                       navigate("/profile");
                                       handleClose()
-
+  
                                     }
                                     }>Profile</MenuItem>
                                     <MenuItem onClick={handleClose}>My account</MenuItem>
@@ -143,9 +144,9 @@ export default function Header() {
                         </span>
           // endregion
         }
-
+      
       </Toolbar>
-
+    
     </React.Fragment>
   );
 }

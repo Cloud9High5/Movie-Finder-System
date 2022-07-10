@@ -44,8 +44,10 @@ function CommentBlock({props}) {
     };
     console.log(requestInfo)
     const response = await fetch('http://127.0.0.1:5000/review/rating', requestInfo);
-    const result = await response.json();
-    console.log('result is: ', JSON.stringify(result));
+    // const result = await response.json();
+    if (response.status === 400) {
+      alert("Please login first")
+    }
     setFlag(!flag);
   }
   const dislikeComment = async (review) => {
@@ -63,11 +65,14 @@ function CommentBlock({props}) {
     const response = await fetch('http://127.0.0.1:5000/review/rating', requestInfo);
     const result = await response.json();
     console.log('result is: ', JSON.stringify(result));
+    if (response.status !== 200) {
+      alert("Please login first")
+    }
     setFlag(!flag);
   }
-
+  
   const [rawComments, setRawComments] = React.useState([]);  // comments with uid and movie_id
-  const [tempComments, setTempComments] = React.useState([]);  // comments with user name and mostPopularComments id
+  // const [tempComments, setTempComments] = React.useState([]);  // comments with username and mostPopularComments id
   const [comments, setComments] = React.useState([]);  // the combined comments dataset
   const [flag, setFlag] = React.useState(false);
   const mid = useParams()['movieID'];
@@ -76,20 +81,21 @@ function CommentBlock({props}) {
     fetch('http://127.0.0.1:5000/review?method=movie_id&movie_id=' + mid).then(async (response) => {
       const data = await response.json();
       setRawComments([...data]);
+      console.log('raw comments: ', JSON.stringify(data));
     })
-  }, [flag])
-  // obtain user name from backend
+  }, [flag, mid])
+  // obtain username from backend
   React.useEffect(() => {
     let temp = [...rawComments];
-    temp.map((t) => {
+    temp.map((t) => (
       fetch('http://127.0.0.1:5000/auth/user/' + t.uid).then(async (response) => {
         const data = await response.json();
         t['username'] = data.username;
         setComments([...temp]);
       })
-    })
+    ))
   }, [rawComments])
-
+  
   return (
     <Box sx={{marginTop: 3}}>
       <Typography variant={'h5'}>Comments:</Typography>
