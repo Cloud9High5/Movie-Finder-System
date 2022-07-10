@@ -171,7 +171,7 @@ class user_info(Resource):
 
 
 ###############################################################################
-#                                get movieDetail                                   #
+#                                get review                                   #
 ###############################################################################
 
 review_arguments = reqparse.RequestParser()
@@ -181,21 +181,21 @@ review_arguments.add_argument('uid', type=int)
 review_arguments.add_argument('top', type=int)
 review_arguments.add_argument('recent', type=int)
 
-review_model = api.model('movieDetail', {
+review_model = api.model('review', {
     "movie_id": fields.Integer,
     "uid": fields.Integer,
     "rating": fields.Float,
-    "movieDetail": fields.String,
+    "review": fields.String,
 })
 
 @api.route('/review', methods=['GET', 'POST'])
 class reviews(Resource):
 
-    @api.param('method', 'the method to get movieDetail, one of the following: \nuid, \nmovie_id, \nuid_movie_id, \nreview_id, \ntop, \nrecent, \nrecent_top')
+    @api.param('method', 'the method to get review, one of the following: \nuid, \nmovie_id, \nuid_movie_id, \nreview_id, \ntop, \nrecent, \nrecent_top')
     @api.expect(review_arguments)
-    @api.response(200, 'Success, movieDetail found')
+    @api.response(200, 'Success, review found')
     @api.response(400, 'Fail, invalid method')
-    @api.response(404, 'Fail, movieDetail not found')
+    @api.response(404, 'Fail, review not found')
     def get(self):
         '''
         fetch reviews from db according to the method
@@ -205,15 +205,15 @@ class reviews(Resource):
         Args:
             method {
                 'uid' return all reviews of a user with uid, 
-                'movie_id' return all reviews of a mostPopularComments with movie_id,,
-                'uid_movie_id' return all reviews of a user with uid to the mostPopularComments with movie_id,
-                'review_id' return a movieDetail with review_id,
+                'movie_id' return all reviews of a movie with movie_id,, 
+                'uid_movie_id' return all reviews of a user with uid to the movie with movie_id, 
+                'review_id' return a review with review_id, 
                 'top' return top N reviews with the most likes, 
                 'recent' return all reviews in past N months, 
                 'recent_top return top N reviews in past N months,'
             }
             uid: int, the uid of the user, for method 'uid' and 'uid_movie_id'
-            movie_id: int, the movie_id of the mostPopularComments, for method 'movie_id' and 'uid_movie_id'
+            movie_id: int, the movie_id of the movie, for method 'movie_id' and 'uid_movie_id'
             top: int, the number of reviews to return, for method 'top' and 'recent_top'
             recent: int, the number of months to return, for method 'recent' and 'recent_top'
         
@@ -263,17 +263,17 @@ class reviews(Resource):
                 result = review.get_review(method='recent_top', value=(args['recent'], args['top']))
         
         if len(result) == 0:
-            return {'message': 'movieDetail not found'}, 404
+            return {'message': 'review not found'}, 404
         else:
             return result, 200
     
     @api.expect(review_model)
-    @api.response(200, 'Success, movieDetail added')
-    @api.response(400, 'Fail, invalid movieDetail')
+    @api.response(200, 'Success, review added')
+    @api.response(400, 'Fail, invalid review')
     @api.response(404, 'Fail, user not found')
     def post(self):
         '''
-        post movieDetail to certain mostPopularComments
+        post review to certain movie
 
         login required: True
 
@@ -282,10 +282,10 @@ class reviews(Resource):
         
         Request body:
         {
-            'movie_id': int, the movie_id of the mostPopularComments,
+            'movie_id': int, the movie_id of the movie,
             'uid': int, the uid of the user,
-            'rating': float, the rating of the mostPopularComments,
-            'movieDetail': str, the movieDetail of the mostPopularComments, can be empty,
+            'rating': float, the rating of the movie,
+            'review': str, the review of the movie, can be empty,
         }
         
         
@@ -301,25 +301,25 @@ class reviews(Resource):
 
         if auth.check_uid_exist(payload['uid']):
             review.insert_review(payload)
-            return {'message': 'movieDetail added'}, 200
+            return {'message': 'review added'}, 200
         else:
             return {'message': 'user not exist'}, 404
 
 
 @api.route('/review/<int:review_id>', methods=['GET'])
-@api.param('review_id', 'id of the movieDetail')
+@api.param('review_id', 'id of the review')
 class get_review(Resource):
 
-    @api.response(200, 'Success, movieDetail found')
-    @api.response(404, 'Fail, movieDetail not found')
+    @api.response(200, 'Success, review found')
+    @api.response(404, 'Fail, review not found')
     def get(self, review_id):
         '''
-        get movieDetail with review_id
+        get review with review_id
 
         login required: False
 
         Args:
-            review_id: int, the id of the movieDetail
+            review_id: int, the id of the review
         
         Request body:
             None
@@ -335,13 +335,13 @@ class get_review(Resource):
         '''
         result = review.get_review(method='review_id', value=review_id)
         if len(result) == 0:
-            return {'message': 'movieDetail not found'}, 404
+            return {'message': 'review not found'}, 404
         else:
             return result, 200
 
 
 ###############################################################################
-#                               rating movieDetail                                 #
+#                               rating review                                 #
 ###############################################################################
 
 review_rating_model = api.model('review_rating_model', {
@@ -359,7 +359,7 @@ class rating_review(Resource):
     @api.expect(review_rating_model)
     def post(self):
         '''
-        rate a movieDetail with like or dislike
+        rate a review with like or dislike
 
         login required: True
 
@@ -370,7 +370,7 @@ class rating_review(Resource):
             {
                 'method': 1 for like, 0 for dislike,
                 'uid': int, the uid of the user,
-                'review_id': int, the id of the movieDetail,
+                'review_id': int, the id of the review,
             }
 
         Returns:

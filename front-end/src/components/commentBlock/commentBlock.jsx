@@ -1,7 +1,8 @@
 import Box from "@mui/material/Box";
 import {Typography} from '@mui/material';
 import Avatar from "@material-ui/core/Avatar";
-import {Thumb, Rating} from "../../components";
+import {Thumb} from "../../components";
+import Rating from '@mui/material/Rating';
 import {Divider} from "@material-ui/core";
 import Grid from '@mui/material/Grid';
 import {makeStyles} from "@material-ui/core/styles";
@@ -84,22 +85,10 @@ function CommentBlock({props}) {
       fetch('http://127.0.0.1:5000/auth/user/' + t.uid).then(async (response) => {
         const data = await response.json();
         t['username'] = data.username;
-        setTempComments([...temp]);
-      })
-    })
-  }, [rawComments])
-  // obtain mostPopularComments title and poster from backend
-  React.useEffect(() => {
-    let temp = [...tempComments];
-    temp.map((t) => {
-      fetch('http://127.0.0.1:5000/films?id=' + t.movie_id).then(async (response) => {
-        const data = await response.json();
-        t['title'] = data.title;
-        t['poster'] = data.poster;
         setComments([...temp]);
       })
     })
-  }, [tempComments])
+  }, [rawComments])
 
   return (
     <Box sx={{marginTop: 3}}>
@@ -120,7 +109,7 @@ function CommentBlock({props}) {
                     U
                   </Avatar>
                   <Box marginLeft={'10px'}>
-                    <Typography variant={'body2'} color={'gray'}>
+                    <Typography variant={'p'} color={'gray'}>
                       {review.username}
                     </Typography>
                   </Box>
@@ -132,7 +121,7 @@ function CommentBlock({props}) {
                 </Box>
                 <Box>
                   <Typography component={'span'} variant={'body2'}>
-                    {review.review}
+                    {review.movieDetail}
                   </Typography>
                 </Box>
                 <Box display={'flex'} marginTop={'10px'}>

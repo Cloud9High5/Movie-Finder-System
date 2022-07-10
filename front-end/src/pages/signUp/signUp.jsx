@@ -1,4 +1,5 @@
 import * as React from 'react';
+import './signUp.css';
 import {useNavigate} from "react-router-dom";
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,6 +13,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import {makeStyles} from '@material-ui/styles';
 import ModalBlock from '../../components/modalBlock/modalBlock';
+import { Typography } from "@mui/material";
 
 const useStyles = makeStyles({
   box_1: {
@@ -53,6 +55,7 @@ function SignUp() {
 
   // already have account, go to login
   const toLogin = () => {
+    // path('/login' , { state: {'from' : '/signup'} });
     path('/login');
   }
   // go to mostPopularComments page
@@ -132,9 +135,12 @@ function SignUp() {
 
   return (
     <Container component="main" maxWidth={'xs'}>
-      <h1 id={'appTitle'} onClick={toDashboard}>DOUBI</h1>
+      <h1 className={'title'} onClick={toDashboard}>DOUBI</h1>
       <ModalBlock msg={modalMsg} visibility={visibility} setVisibility={setVisibility}/>
-      <CssBaseline/>
+      {/*<CssBaseline/>*/}
+      <Typography variant="subtitle2" display="block" gutterBottom>
+        Register on the DOUBI platform
+      </Typography>
       <Link variant="caption" display="block" onClick={toPreviousPage} gutterBottom>
         ← Back to previous page
       </Link>

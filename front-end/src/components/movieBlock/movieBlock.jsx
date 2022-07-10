@@ -77,6 +77,9 @@ function MovieBlock(props) {
     const response = await fetch('http://127.0.0.1:5000/review', requestInfo);
 
     const result = await response.json();
+    if (response.status === 200) {
+      window.location.reload(false);
+    }
     console.log('result is: ', JSON.stringify(result));
 
 
