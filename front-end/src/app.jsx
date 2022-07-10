@@ -1,7 +1,6 @@
 import React from 'react';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import Profile from "./pages/profile";
-import {Dashboard, Login, SignUp, MovieDetail, ResetPassword} from "./pages";
+import {Dashboard, Login, SignUp, MovieDetail, ResetPassword, Profile} from "./pages";
 
 function App() {
   return (
