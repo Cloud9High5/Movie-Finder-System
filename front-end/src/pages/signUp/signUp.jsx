@@ -92,7 +92,14 @@ function SignUp() {
   }
 
   const validatePassword = (prop) => (event) => {
-    setStates({...states, [prop]: event.target.value.length <= 16});
+    let password = event.target.value;
+    let valid = password.length >= 8 && password.length <= 12;
+    valid = valid && !/[^0-9a-zA-Z]/.test(password);
+    valid = valid && /\d/.test(password);
+    valid = valid && /[a-z]/.test(password);
+    valid = valid && /[A-Z]/.test(password);
+    console.log(valid);
+    setStates({...states, [prop]: valid});
   }
 
   const signUpUser = async (e) => {
@@ -177,7 +184,7 @@ function SignUp() {
             type={states.showPassword ? 'text' : 'password'}
             id="password"
             autoComplete="current-password"
-            helperText={states.passwordValid ? '' : 'Password length should less or equal to 16'}
+            helperText={states.passwordValid ? '' : 'Password length should in 8-12, and composed by upper case letters, lower case letters and numbers'}
             onKeyUp={validatePassword('passwordValid')}
             onChange={handleChange('password')}
             InputProps={{
