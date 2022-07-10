@@ -1,8 +1,22 @@
 import {Box, Grid, Typography, Button, TextField} from '@mui/material';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 function ProfileCard() {
   const [mode, setMode] = useState('display');
+  const [profile, setProfile] = useState(null);
+  useEffect(() => {
+    const userID = localStorage.getItem('token');
+    if (!profile && userID) {
+      fetch(`http://127.0.0.1:5000/auth/user/${userID}`)
+        .then(res => res.json())
+        .then(data => {
+          setProfile(data);
+        })
+    }
+  }, []);
+  if (!profile) {
+    return <></>
+  }
   return (
     <Box >
       {mode === 'display' && (
@@ -13,8 +27,8 @@ function ProfileCard() {
           <Grid item xs={8}
                 style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
             <Box>
-              <Typography variant={'h3'}>Username</Typography>
-              <Typography variant={'h6'}>Job@gmail.com</Typography>
+              <Typography variant={'h3'}>{profile.username}</Typography>
+              <Typography variant={'h6'}>{profile.email}</Typography>
             </Box>
             <Box>
               <Button variant={'contained'} onClick={() => setMode('edit')}>UPDATE</Button>
