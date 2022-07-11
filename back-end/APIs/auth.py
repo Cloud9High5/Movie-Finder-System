@@ -1,8 +1,167 @@
+import json
+from flask import request
+from flask_restx import Resource, Namespace, fields
+
+api = Namespace("auth", description="Authentication related operations", path="/")
+
+###############################################################################
+#                                  Signup                                     #
+###############################################################################
+
+users_model = api.model('users', {
+    "email": fields.String,
+    "username": fields.String,
+    "password": fields.String,
+})
+
+@api.route('/auth/signup', methods=['POST'])
+@api.response(201, 'Success, user created')
+@api.response(409, 'Fail, User already exists')
+class signup(Resource):
+    @api.expect(users_model)
+    def post(self):
+        '''
+        Sign up a new user, send user info to db
+
+        login required: False
+
+        Args:
+            None
+
+        Request body:
+        {
+            'email': str, the email of the user,
+            'username': str, the username of the user,
+            'password': str, the password of the user,
+        }
+        
+        Returns:
+            message and status code 
+        '''
+        payload = json.loads(str(request.data, 'utf-8'))  # turn request body into python dictionary
+        if len(payload) != 3:
+            return {'message': 'Invalid request body'}, 400
+        if check_user_exist(payload['email']):
+            return {'message': 'user already exist'}, 409
+        else:
+            insert_user(payload)
+            return {'message': 'user created'}, 201
+
+
+###############################################################################
+#                                  Login                                      #
+###############################################################################
+
+login_model = api.model('login', {
+    "email": fields.String,
+    "password": fields.String,
+})
+
+@api.route('/auth/login', methods=['POST'])
+@api.response(200, 'Success, user logged in')
+@api.response(401, 'Fail, user not found')
+@api.response(403, 'Fail, wrong password')
+class login(Resource):
+    @api.expect(login_model)
+    def post(self):
+        '''
+        login
+
+        login required: False
+
+        Args:
+            None
+
+        Request body:
+        {
+            'email': str, the email of the user,
+            'password': str, the password of the user,
+        }
+
+        Returns:
+            Success
+            200
+            {
+                'message': 'login success',
+                'login_flag': True,
+                'uid': uid,
+            }
+            Fail
+            401 or 403
+            {
+                'message': 'user not exist'/'wrong password',
+                'login_flag': False,
+            }        
+        '''
+        payload = json.loads(str(request.data, 'utf-8'))
+
+        if len(payload) != 2:
+            return {'message': 'Invalid request body'}, 400
+
+        if check_user_exist(payload['email']):
+            if check_user_pwd(payload['email'], payload['password']):
+                uid = get_uid(payload['email'])
+                return {
+                    'message': 'login success', 
+                    'login_flag': 'True',
+                    'uid': uid
+                    }, 200
+            else:
+                return {'message': 'wrong password', 'login_flag': 'False'}, 403
+        else:
+            return {'message': 'user not exist', 'login_flag': 'False'}, 401
+
+
+###############################################################################
+#                               get user info                                 #
+###############################################################################
+
+
+@api.route('/auth/user/<int:uid>', methods=['GET'])
+@api.response(200, 'Success, user info returned')
+@api.response(401, 'Fail, user not found')
+class user_info(Resource):
+    def get(self, uid):
+        '''
+        get user info
+
+        login required: True
+
+        Args:
+            uid: int, the id of the user
+
+        Request body:
+            None
+
+        Returns:
+            Success
+            200
+            {
+                'message': 'user info returned',
+                'user_info': user_info,
+            }
+            Fail
+            401
+            {
+                'message': 'user not found',
+            }        
+        '''
+        if check_uid_exist(uid):
+            user_info = get_user_info(uid)
+            return user_info, 200
+        else:
+            return {'message': 'user not found'}, 401
+
+
+###############################################################################
+#                               helping funcs                                 #
+###############################################################################
+
 import sqlite3
 import os
 
 filename = 'users.db'
-path = os.path.join(os.path.dirname(__file__), 'db', filename)
+path = os.getcwd() + '/back-end/db/' + filename
 
 test_user_info = [
     {
