@@ -1,26 +1,42 @@
 import {Box, Grid, Typography, Button, TextField} from '@mui/material';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import { useState, useEffect } from 'react';
+import { useParams } from "react-router-dom";
+
+
 function ProfileCard() {
   const [mode, setMode] = useState('display');
   const [profile, setProfile] = useState(null);
+  const userID = useParams().uid;
+
   useEffect(() => {
-    const userID = localStorage.getItem('token');
+    // const userID = localStorage.getItem('token');
     if (!profile && userID) {
-      fetch(`http://127.0.0.1:5000/auth/user/${userID}`)
-        .then(res => res.json())
-        .then(data => {
+      fetch(`http://127.0.0.1:5000/auth/user/${userID}`).then(async (res) => {
+        if (res.status === 200) {
+          const data = await res.json();
           setProfile(data);
-        })
+        }
+      })
     }
   }, []);
+
+  // whether this page displays the user's own info
+  const isSelf = () => {
+    const self = localStorage.getItem('token');
+    return self === userID;
+  }
+
   if (!profile) {
-    return <></>
+    return <Typography component={'span'} variant={'h4'}>Cannot fetch information of this user!</Typography>
   }
   return (
     <Box >
       {mode === 'display' && (
         <Grid container spacing={1}>
+          <Grid item xs={12}>
+            <Typography component={'span'} variant={'h3'}>Account</Typography>
+          </Grid>
           <Grid item xs={4}>
             <img style={{width: '300px'}} src={'https://images.pexels.com/photos/10242803/pexels-photo-10242803.jpeg'}/>
           </Grid>

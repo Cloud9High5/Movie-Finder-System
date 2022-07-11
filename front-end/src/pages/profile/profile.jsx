@@ -7,6 +7,8 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import {ProfileCard} from "../../components/";
+import ProfileReview from "../../components/profileReview/profileReview";
+import { useParams } from "react-router-dom";
 
 function TabPanel(props) {
   const {children, value, index, ...other} = props;
@@ -21,7 +23,7 @@ function TabPanel(props) {
     >
       {value === index && (
         <Box sx={{p: 3}}>
-          <Typography>{children}</Typography>
+          <div>{children}</div>
         </Box>
       )}
     </div>
@@ -43,7 +45,7 @@ function a11yProps(index) {
 
 function Profile() {
   const [value, setValue] = React.useState(0);
-  
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -74,7 +76,7 @@ function Profile() {
               FOLLOWS
             </TabPanel>
             <TabPanel value={value} index={2}>
-              REVIEWS
+              <ProfileReview/>
             </TabPanel>
           </Box>
         </Box>
