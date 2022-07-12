@@ -1,459 +1,118 @@
 import json
-from flask import request
+from flask import jsonify, request
 from flask_restx import Resource, Namespace, fields
+from sqlalchemy import exists
+from extensions import db
+from Models.model import User
 
 api = Namespace("auth", description="Authentication related operations", path="/")
 
-###############################################################################
-#                                  Signup                                     #
-###############################################################################
+################################################################################
+#                             AUTHENTICATION MODEL                             #
+################################################################################
 
-users_model = api.model('users', {
-    "email": fields.String,
-    "username": fields.String,
-    "password": fields.String,
+
+
+signup_model = api.model('users', {
+    "email": fields.String(required=True, description="User's email"),
+    "username": fields.String(required=True, description="User's username"),
+    "password": fields.String(required=True, description="User's password"),
 })
 
-@api.route('/auth/signup', methods=['POST'])
-@api.response(201, 'Success, user created')
-@api.response(409, 'Fail, User already exists')
-class signup(Resource):
-    @api.expect(users_model)
-    def post(self):
-        '''
-        Sign up a new user, send user info to db
-
-        login required: False
-
-        Args:
-            None
-
-        Request body:
-        {
-            'email': str, the email of the user,
-            'username': str, the username of the user,
-            'password': str, the password of the user,
-        }
-        
-        Returns:
-            message and status code 
-        '''
-        payload = json.loads(str(request.data, 'utf-8'))  # turn request body into python dictionary
-        if len(payload) != 3:
-            return {'message': 'Invalid request body'}, 400
-        if check_user_exist(payload['email']):
-            return {'message': 'user already exist'}, 409
-        else:
-            insert_user(payload)
-            return {'message': 'user created'}, 201
-
-
-###############################################################################
-#                                  Login                                      #
-###############################################################################
 
 login_model = api.model('login', {
     "email": fields.String,
     "password": fields.String,
 })
 
-@api.route('/auth/login', methods=['POST'])
-@api.response(200, 'Success, user logged in')
-@api.response(401, 'Fail, user not found')
-@api.response(403, 'Fail, wrong password')
-class login(Resource):
-    @api.expect(login_model)
-    def post(self):
-        '''
-        login
 
-        login required: False
 
-        Args:
-            None
+################################################################################
+#                                    ROUTES                                    #
+################################################################################
 
-        Request body:
-        {
-            'email': str, the email of the user,
-            'password': str, the password of the user,
+
+@api.route('/auth/signup', methods=['GET', 'POST'])
+class signup(Resource):
+
+    @api.doc(
+        'Sign up',
+        responses = {
+            201: 'Success, user created',
+            409: 'Fail, User already exists'
         }
+    )
+    @api.expect(signup_model, validate=True)
+    def post(self):
+        payload = json.loads(str(request.data, 'utf-8'))  # turn request body into python dictionary
+        email = payload['email']
+        # check if user already exists
+        if db.session.query(exists().where(User.email == email)).scalar():
+            return {'message': 'User already exists'}, 409
+        else:
+            db.session.add(User(email=email, username=payload['username'], password=payload['password']))
+            db.session.commit()
+            return {'message': 'User created'}, 201
 
-        Returns:
-            Success
-            200
-            {
-                'message': 'login success',
-                'login_flag': True,
-                'uid': uid,
-            }
-            Fail
-            401 or 403
-            {
-                'message': 'user not exist'/'wrong password',
-                'login_flag': False,
-            }        
-        '''
+
+@api.route('/auth/login', methods=['GET', 'POST'])
+class login(Resource):
+
+    @api.doc(
+        'Login',
+        responses = {
+            200: 'Success, user logged in',
+            401: 'Fail, user not found',
+            403: 'Fail, wrong password'
+        }
+    )
+    @api.expect(login_model, validate=True)
+    def post(self):
         payload = json.loads(str(request.data, 'utf-8'))
+        email = payload['email']
+        password = payload['password']
 
-        if len(payload) != 2:
-            return {'message': 'Invalid request body'}, 400
-
-        if check_user_exist(payload['email']):
-            if check_user_pwd(payload['email'], payload['password']):
-                uid = get_uid(payload['email'])
+        if db.session.query(exists().where(User.email == email)).scalar():
+            user = db.session.query(User).filter(User.email == email).first()
+            if user.password == password:
                 return {
-                    'message': 'login success', 
+                    'message': 'login success',
                     'login_flag': 'True',
-                    'uid': uid
+                    'u_id': user.u_id,
                     }, 200
             else:
-                return {'message': 'wrong password', 'login_flag': 'False'}, 403
+                return {
+                    'message': 'Wrong password',
+                    'login_flag': 'False'
+                    }, 403
         else:
-            return {'message': 'user not exist', 'login_flag': 'False'}, 401
+            return {
+                'message': 'User not found',
+                'login_flag': 'False'
+                }, 401
 
 
-###############################################################################
-#                               get user info                                 #
-###############################################################################
 
-
-@api.route('/auth/user/<int:uid>', methods=['GET'])
-@api.response(200, 'Success, user info returned')
-@api.response(401, 'Fail, user not found')
+@api.route('/auth/user/<string:u_id>', methods=['GET'])
 class user_info(Resource):
-    def get(self, uid):
-        '''
-        get user info
-
-        login required: True
-
-        Args:
-            uid: int, the id of the user
-
-        Request body:
-            None
-
-        Returns:
-            Success
-            200
-            {
-                'message': 'user info returned',
-                'user_info': user_info,
-            }
-            Fail
-            401
-            {
-                'message': 'user not found',
-            }        
-        '''
-        if check_uid_exist(uid):
-            user_info = get_user_info(uid)
-            return user_info, 200
-        else:
-            return {'message': 'user not found'}, 401
-
-
-###############################################################################
-#                               helping funcs                                 #
-###############################################################################
-
-import sqlite3
-import os
-
-filename = 'users.db'
-path = os.getcwd() + '/back-end/db/' + filename
-
-test_user_info = [
-    {
-        'username': 'turing',
-        'password': 'turing123',
-        'email': 'turing@doubi.com',
-        'is_admin': 1,
-        'is_blocked': 0,
-    },
-    {
-        'username': 'spielberg',
-        'password': 'spielberg123',
-        'email': 'spielberg@doubi.com',
-        'is_admin': 0,
-        'is_blocked': 0,
-    },
-    {
-        'username': 'andrew',
-        'password': 'andrew123',
-        'email': 'andrew@doubi.com',
-        'is_admin': 0,
-        'is_blocked': 0,
-    },
-    {
-        'username': 'putin',
-        'password': 'putin123',
-        'email': 'putin@doubi.com',
-        'is_admin': 0,
-        'is_blocked': 0,
-    },
-    {
-        'username': 'trump',
-        'password': 'trump123',
-        'email': 'trump@doubi.com',
-        'is_admin': 0,
-        'is_blocked': 1,
-    },
-]
-
-# create db file and user table
-def init_user_db():
-    '''
-    create a new database for user if it doesn't exist
-
-    Args:
-        None
-
-    Returns:    
-        None
-    '''
-    conn = sqlite3.connect(path)
-    c = conn.cursor()
-
-    # create a table for user if it doesn't exist
-    c.execute("""CREATE TABLE IF NOT EXISTS users (
-        uid INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL,
-        password TEXT NOT NULL,
-        email TEXT NOT NULL,
-        photo_url TEXT,
-        is_admin INTEGER DEFAULT 0,
-        is_blocked INTEGER DEFAULT 0)""")
-
-    conn.commit()
-    conn.close()
-
-
-def check_user_exist(email):
-    '''
-    check if the user exists in db
-
-    Args:
-        email: user's email, it is the unique key for user
-    
-    Returns:
-        True: if user exists
-        False: if user doesn't exist
-    '''
-    conn = sqlite3.connect(path)
-    c = conn.cursor()
-
-    c.execute("SELECT * FROM users WHERE email = '%s'" % email)
-    user = c.fetchone()
-    conn.close()
-
-    if user is None:
-        return False
-    else:
-        return True
-
-
-def check_user_pwd(email, password):
-    '''
-    check if the password is correct for the user by email
-
-    Args:
-        email: user's email, it is the unique key for user
-        password: user's password, encrypted
-
-    Returns:
-        True: if password is correct
-        False: if password is incorrect
-    '''
-    conn = sqlite3.connect(path)
-    c = conn.cursor()
-
-    c.execute("SELECT password FROM users WHERE email = '%s'" % email)
-    pwd = c.fetchone()[0]
-    conn.close()
-
-    if pwd == password:
-        return True
-    else:
-        return False
-
-
-def check_admin(email):
-    '''
-    check if the user is admin by email
-
-    Args:
-        email: user's email, it is the unique key for user
-
-    Returns:
-        True: if user is admin
-        False: if user isn't admin
-
-    '''
-    conn = sqlite3.connect(path)
-    c = conn.cursor()
-
-    c.execute("SELECT is_admin FROM users WHERE email = '%s'" % email)
-    is_admin = c.fetchone()[0]
-    conn.close()
-
-    if is_admin == 1:
-        return True
-    else:
-        return False
-
-
-def check_blocked(email):
-    '''
-    check if the user is blocked by email
-
-    Args:
-        email: user's email, it is the unique key for user
-    
-    Returns:
-        True: if user is blocked
-        False: if user isn't blocked
-    '''
-    conn = sqlite3.connect(path)
-    c = conn.cursor()
-
-    c.execute("SELECT is_blocked FROM users WHERE email = '%s'" % email)
-    is_blocked = c.fetchone()[0]
-    conn.close()
-
-    if is_blocked == 1:
-        return True
-    else:
-        return False
-
-
-def check_uid_exist(uid):
-    '''
-    check if the uid is valid
-    
-    Args:
-        uid: user's uid
-
-    Returns:
-        True: if uid is valid
-        False: if uid is invalid
-    '''
-    conn = sqlite3.connect(path)
-    c = conn.cursor()
-
-    c.execute("SELECT * FROM users WHERE uid = '%s'" % uid)
-    user = c.fetchone()
-    conn.close()
-
-    if user is None:
-        return False
-    else:
-        return True
-
-
-def get_uid(email):
-    '''
-    get user's uid by email
-
-    Args:
-        email: user's email, it is the unique key for user
-
-    Returns:
-        uid: user's uid
-    '''
-    conn = sqlite3.connect(path)
-    c = conn.cursor()
-
-    c.execute("SELECT uid FROM users WHERE email = '%s'" % email)
-    uid = c.fetchone()[0]
-    conn.close()
-
-    return uid
-
-
-def get_user_info(uid):
-    '''
-    get user's info by uid
-
-    Args:
-        uid: user's uid
-
-    Returns:
-        user_info: user's info, dict
-    '''
-    conn = sqlite3.connect(path)
-    c = conn.cursor()
-
-    c.execute("SELECT * FROM users WHERE uid = '%s'" % uid)
-    user_info = c.fetchone()
-    conn.close()
-
-    result = {
-        'uid': user_info[0],
-        'username': user_info[1],
-        'email': user_info[3],
-        'photo_url': user_info[4],
-        'is_admin': user_info[5],
-        'is_blocked': user_info[6],
-    }
-
-    return result
-
-    return user_info
-
-
-def insert_user(user):
-    '''
-    insert a new user into db
-    
-    Args:
-        user: a dict containing user info
-        {
-            'username': username, could be duplicated
-            'password': password, encrypted
-            'email': email, unique key
+    @api.doc(
+        'Get User Info',
+        params={'u_id': 'User ID'},
+        responses = {
+            200: 'Success, user info returned',
+            401: 'Fail, user not found'
         }
-
-    Returns:
-        None
-    
-    '''
-    conn = sqlite3.connect(path)
-    c = conn.cursor()
-
-    c.execute("""INSERT INTO users (
-        username, password, email) VALUES (
-        '%s', '%s', '%s')""" % (
-        user['username'],
-        user['password'],
-        user['email'],))
-
-    conn.commit()
-    conn.close()
-
-# insert test user info into db
-def test_data():
-    count = 0
-    conn = sqlite3.connect(path)
-    c = conn.cursor()
-
-    for user in test_user_info:
-        if not check_user_exist(user['username']):
-            c.execute("""INSERT INTO users (
-                username, password, email, is_admin, is_blocked) VALUES (
-                '%s', '%s', '%s', %d, %d)""" % (
-                user['username'],
-                user['password'],
-                user['email'],
-                user['is_admin'],
-                user['is_blocked'],))
-            count += 1
-    
-    conn.commit()
-    conn.close()
-    print('insert %d test users' % count)
-
-
-if __name__ == "__main__":
-    init_user_db()
-    test_data()
+    )
+    def get(self, u_id):
+        user = db.session.query(User).filter(User.u_id == u_id).first()
+        if user:
+            return {
+                'u_id': user.u_id,
+                'username': user.username,
+                'email': user.email,
+                'photo_url': user.photo_url,
+            }, 200
+        else:
+            return {
+                'message': 'User not found'
+            }, 401

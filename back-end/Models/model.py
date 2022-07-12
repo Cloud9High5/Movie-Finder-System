@@ -1,5 +1,5 @@
 import datetime 
-from app import db
+from extensions import db
 from .helper import u_id_generator, f_id_generator, r_id_generator
 
 class User(db.Model):
