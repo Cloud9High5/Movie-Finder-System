@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 const columns = [
     { id: 'release_date', label: 'Date', minWidth: 100 },
@@ -95,7 +96,7 @@ function ProfileReview () {
                                             <TableCell>
                                                 {
                                                     isSelf() ?
-                                                        <Button variant={'outlined'} color={'warning'} sx={{textTransform: 'none'}}>Delete</Button>
+                                                        <Button variant={'outlined'} color={'warning'} endIcon={<RemoveCircleOutlineIcon/>} sx={{textTransform: 'none'}}>Delete</Button>
                                                         :
                                                         <>
                                                             <Button variant={'outlined'} color={'info'} endIcon={<ThumbUpIcon sx={{marginLeft: '12px'}}/>} sx={{ width: '80px', marginBottom: '5px', textTransform: 'none' }}>Like</Button>
