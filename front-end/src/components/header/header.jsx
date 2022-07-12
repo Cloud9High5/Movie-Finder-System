@@ -133,7 +133,7 @@ export default function Header() {
                                   onClose={handleClose}
                                 >
                                     <MenuItem onClick={() => {
-                                      navigate("/profile");
+                                      navigate("/profile/" + localStorage.getItem('token'));
                                       handleClose()
   
                                     }
