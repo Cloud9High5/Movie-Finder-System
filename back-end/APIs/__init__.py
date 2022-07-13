@@ -13,5 +13,5 @@ from .film import api as film_api
 
 
 api.add_namespace(auth)
-# api.add_namespace(review_api)
+api.add_namespace(review_api)
 # api.add_namespace(film_api)

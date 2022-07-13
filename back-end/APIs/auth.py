@@ -1,5 +1,5 @@
 import json
-from flask import jsonify, request
+from flask import request
 from flask_restx import Resource, Namespace, fields
 from sqlalchemy import exists
 from extensions import db
@@ -32,6 +32,7 @@ login_model = api.model('login', {
 ################################################################################
 
 
+
 @api.route('/auth/signup', methods=['GET', 'POST'])
 class signup(Resource):
 
@@ -53,6 +54,7 @@ class signup(Resource):
             db.session.add(User(email=email, username=payload['username'], password=payload['password']))
             db.session.commit()
             return {'message': 'User created'}, 201
+
 
 
 @api.route('/auth/login', methods=['GET', 'POST'])
