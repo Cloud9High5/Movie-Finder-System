@@ -1,6 +1,7 @@
 import json
 from logging import NullHandler
 from pydoc import describe
+from urllib import response
 from flask import request
 from flask_restx import Resource, Namespace, fields, reqparse
 from sqlalchemy import exists
@@ -22,16 +23,23 @@ signup_model = api.model('users', {
 
 
 login_model = api.model('login', {
-    "email": fields.String,
-    "password": fields.String,
+    "email": fields.String(required=True, description="User's email"),
+    "password": fields.String(required=True, description="User's password"),
 })
 
 
 user_model = api.model('user', {
-    "u_id": fields.String,
-    "username": fields.String,
-    "email": fields.String,
-    "photo_url": fields.String
+    "u_id": fields.String(required=True, description="User's u_id"),
+    "username": fields.String(required=True, description="User's username"),
+    "email": fields.String(required=True, description="User's email"),
+    "photo_url": fields.String(required=True, description="User's photo_url"),
+})
+
+user_profile_model = api.model('user', {
+    "username": fields.String(required=False, description="User's username"),
+    "password": fields.String(required=False, description="User's password"),
+    "email": fields.String(required=False, description="User's email"),
+    "photo_url": fields.String(required=False, description="User's photo_url"),
 })
 
 modify_list_argument = reqparse.RequestParser()
@@ -106,7 +114,7 @@ class login(Resource):
 
 
 
-@api.route('/auth/user/<string:u_id>', methods=['GET', 'POST'])
+@api.route('/auth/user/<string:u_id>', methods=['GET', 'PUT'])
 class user_info(Resource):
 
     @api.doc(
@@ -132,6 +140,34 @@ class user_info(Resource):
                 'message': 'User not found'
             }, 401
 
+    @api.doc(
+        description = 'Modify User Info by u_id',
+        responses = {
+            200: 'Success, user info modified',
+            401: 'Fail, user not found'
+        }
+    )
+    @api.expect(user_profile_model, validate=True)
+    def put(self, u_id):
+        payload = json.loads(str(request.data, 'utf-8'))
+        user = db.session.query(User).filter(User.u_id == u_id).first()
+        if user:
+            if 'username' in payload:
+                user.username = payload['username']
+            if 'password' in payload:
+                user.password = payload['password']
+            if 'email' in payload:
+                user.email = payload['email']
+            if 'photo_url' in payload:
+                user.photo_url = payload['photo_url']
+            db.session.commit()
+            return {
+                'message': 'User info modified'
+            }, 200
+        else:
+            return {
+                'message': 'User not found'
+            }, 401
 
 @api.route('/auth/user/<string:u_id>/following_list', methods=['GET','POST'])
 class following_list(Resource):
