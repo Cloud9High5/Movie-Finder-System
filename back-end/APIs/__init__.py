@@ -7,11 +7,11 @@ api = Api(api_bp)
 
 
 from .auth import api as auth
-from .review import api as review_api
-from .film import api as film_api
+from .review import api as review
+from .film import api as film
 
 
 
 api.add_namespace(auth)
-api.add_namespace(review_api)
-# api.add_namespace(film_api)
+api.add_namespace(review)
+api.add_namespace(film)
