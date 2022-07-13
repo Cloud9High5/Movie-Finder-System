@@ -11,6 +11,8 @@ class User(db.Model):
     photo_url = db.Column(db.String(80), nullable=True)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     is_blocked = db.Column(db.Boolean, nullable=False, default=False)
+    following_list = db.Column(db.String(6400), nullable=True)
+    black_list = db.Column(db.String(6400), nullable=True)
     created_time = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     updated_time = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     
