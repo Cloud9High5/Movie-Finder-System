@@ -22,6 +22,10 @@ review_arguments.add_argument('u_id', type=str)
 review_arguments.add_argument('top', type=int)
 review_arguments.add_argument('recent', type=int)
 
+review_delete_arguments = reqparse.RequestParser()
+review_delete_arguments.add_argument('u_id', type=str)
+review_delete_arguments.add_argument('r_id', type=str)
+
 review_model = api.model("Review", {
     "r_id": fields.String(required=True, description="Review ID"),
     "f_id": fields.String(required=True, description="Film ID"),
@@ -54,7 +58,7 @@ review_rating_model = api.model('review_rating_model', {
 
 
 
-@api.route('/review', methods=['GET', 'POST'])
+@api.route('/review', methods=['GET', 'POST', 'DELETE'])
 class reviews(Resource):
     @api.doc(
         'get reviews based on the given method',
@@ -140,7 +144,27 @@ class reviews(Resource):
             db.session.commit()
             return {'message': 'review posted'}, 200
     
-    # TODO: delete a review
+
+    @api.doc(
+        description = "delete a review",
+        responses = {
+            200: "Success, review deteled",
+            404: "Fail, review not found",
+        },
+    )
+    @api.expect(review_delete_arguments, validate=True)
+    def delete(self):
+        args = review_delete_arguments.parse_args()
+        if args['r_id'] is None:
+            return {'message': 'r_id is required'}, 400
+        else:
+            if not db.session.query(exists().where(Review.r_id == args['r_id'] and Review.u_id == args['u_id'])).scalar():
+                return {'message': 'review not found'}, 404
+            else:
+                db.session.query(Review).filter(Review.r_id == args['r_id']).delete()
+                db.session.commit()
+                return {'message': 'review deleted'}, 200
+
 
 
 @api.route('/review/<string:review_id>', methods=['GET'])
