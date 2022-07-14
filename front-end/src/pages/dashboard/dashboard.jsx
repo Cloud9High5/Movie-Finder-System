@@ -54,7 +54,7 @@ function Dashboard() {
       const ids = randomID();
       // console.log(ids);
       const tempInfo = [];
-      ids.map(async (id) => {
+      ids.map(async (id) => { // TODO update id generation method
         const response = await fetch('http://127.0.0.1:5000/films?id=' + id);
         const data = await response.json();
         tempInfo.push(data);
@@ -65,7 +65,7 @@ function Dashboard() {
       const response = await fetch('http://127.0.0.1:5000/films/top/10');
       const data = await response.json();
       setMovieInfo(data);
-    } else if (e.target.value === 'latest') {
+    } else if (e.target.value === 'latest') {// TODO update (backend fixing num of movies)
       const response = await fetch('http://127.0.0.1:5000/films/recent/10');
       const data = await response.json();
       setMovieInfo(data);
@@ -94,10 +94,9 @@ function Dashboard() {
       </Divider>
       <div className={classes.cards}>
         {movieInfo.map((movie, idx) => {
-          // console.log(mostPopularComments)
           return (
-            <DashboardMovieCard key={idx} title={movie.title} poster={movie.poster}
-                                rating={movie.rating} movie_id={movie.movie_id}/>
+            <DashboardMovieCard key={idx} title={movie.title} poster={movie.url_poster}
+                                rating={movie.rating_imdb} movie_id={movie.f_id}/>
           )
         })}
       </div>
