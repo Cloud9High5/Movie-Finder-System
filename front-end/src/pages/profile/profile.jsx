@@ -7,8 +7,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import {ProfileCard} from "../../components/";
-import ProfileReview from "../../components/profileReview/profileReview";
-import { useParams } from "react-router-dom";
+import {ProfileReview} from "../../components/";
 
 function TabPanel(props) {
   const {children, value, index, ...other} = props;
