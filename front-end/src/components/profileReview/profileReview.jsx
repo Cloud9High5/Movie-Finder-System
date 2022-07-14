@@ -16,8 +16,8 @@ import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 const columns = [
-    { id: 'release_date', label: 'Date', minWidth: 100 },
-    { id: 'movieDetail', label: 'Content', minWidth: 200 },
+    { id: 'created_time', label: 'Date', minWidth: 100 },
+    { id: 'content', label: 'Content', minWidth: 200 },
     { id: 'rating', label: 'Rating', minWidth: 30 },
     { id: 'like', label: 'Like', minWidth: 30 },
     { id: 'dislike', label: 'Dislike', minWidth: 30 },
@@ -46,11 +46,12 @@ function ProfileReview () {
     }
 
     React.useEffect(() => {
-        fetch("http://localhost:5000/review?method=uid&uid=" + uid).then(async (response) => {
+        fetch("http://localhost:5000/review?method=u_id&u_id=" + uid).then(async (response) => {
             const data = await response.json();
-            for (const review of data) {
-                review['release_date'] = new Date(review['release_date'] * 1000).toString().substring(0, 24);
-            }
+            console.log(data)
+            // for (const review of data) {
+            //     review['release_date'] = new Date(review['release_date'] * 1000).toString().substring(0, 24);
+            // }
             setData(data);
         })
     }, [])
