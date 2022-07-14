@@ -1,20 +1,20 @@
-import datetime
+from datetime import datetime
 from extensions import db
 from .helper import u_id_generator, f_id_generator, r_id_generator
 
 class User(db.Model):
     __tablename__ = 'user'
-    u_id = db.Column(db.String(128), primary_key=True, nullable=False, unique=True, default=u_id_generator)
+    u_id = db.Column(db.String(32), primary_key=True, nullable=False, unique=True, default=u_id_generator)
     username = db.Column(db.String(80), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(80), nullable=False, unique=True)
-    photo_url = db.Column(db.String(80), nullable=True)
+    photo_url = db.Column(db.Text, nullable=True)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     is_blocked = db.Column(db.Boolean, nullable=False, default=False)
     following_list = db.Column(db.String(1600), nullable=True)
     black_list = db.Column(db.String(1600), nullable=True)
-    created_time = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
-    updated_time = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    created_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     
 
 class Film(db.Model):
@@ -26,8 +26,8 @@ class Film(db.Model):
     overview = db.Column(db.String(500), nullable=False)
     director = db.Column(db.String(80), nullable=False)
     url_poster = db.Column(db.String(500), nullable=False)
-    created_time = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
-    updated_time = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    created_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 class Review(db.Model):
@@ -36,11 +36,11 @@ class Review(db.Model):
     f_id = db.Column(db.String(128), db.ForeignKey('film.f_id'), nullable=False)
     content = db.Column(db.String(500), nullable=True)
     rating = db.Column(db.Integer, nullable=False)
-    created_time = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
+    created_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 
 class Review_Like(db.Model):
     r_id = db.Column(db.String(128), db.ForeignKey('review.r_id'), primary_key=True, nullable=False)
     u_id = db.Column(db.String(128), db.ForeignKey('user.u_id'), primary_key=True, nullable=False)
     is_liked = db.Column(db.Boolean, nullable=False, default=True)
-    created_time = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
+    created_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
