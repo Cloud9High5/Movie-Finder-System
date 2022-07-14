@@ -1,4 +1,5 @@
 import json
+from tabnanny import check
 from flask import request
 from flask_restx import Resource, Namespace, fields, reqparse
 from flask_mail import Message
@@ -38,7 +39,8 @@ user_model = api.model('user', {
 
 user_profile_model = api.model('user', {
     "username": fields.String(required=False, description="User's username"),
-    "password": fields.String(required=False, description="User's password"),
+    "old_password": fields.String(required=False, description="User's old password"),
+    "new_password": fields.String(required=False, description="User's new password"),
     "email": fields.String(required=False, description="User's email"),
     "photo_url": fields.String(required=False, description="User's photo_url"),
 })
@@ -251,7 +253,8 @@ class user_info(Resource):
         description = 'Modify User Info by u_id',
         responses = {
             200: 'Success, user info modified',
-            401: 'Fail, user not found'
+            401: 'Fail, user not found',
+            403: 'Fail, wrong password'
         }
     )
     @api.expect(user_profile_model, validate=True)
@@ -261,9 +264,14 @@ class user_info(Resource):
         if user:
             if 'username' in payload:
                 user.username = payload['username']
-            if 'password' in payload:
-                # TODO check old password
-                user.password = payload['password']
+            if 'new_password' in payload:
+                # check if old password is correct
+                if user.password == payload['old_password']:
+                    user.password = payload['new_password']
+                else:
+                    return {
+                        'message': 'Wrong password'
+                    }, 403
             if 'email' in payload:
                 user.email = payload['email']
             if 'photo_url' in payload:
