@@ -1,8 +1,9 @@
 import json
 from flask import request
 from flask_restx import Resource, Namespace, fields, reqparse
+from flask_mail import Message
 from sqlalchemy import exists
-from extensions import db
+from extensions import db, mail
 from Models.model import User
 
 api = Namespace("auth", description="Authentication related operations", path="/")
@@ -42,6 +43,16 @@ user_profile_model = api.model('user', {
 modify_list_argument = reqparse.RequestParser()
 modify_list_argument.add_argument('u_id', type=str, required=True)
 
+resetpwd_arguments = reqparse.RequestParser()
+resetpwd_arguments.add_argument('email', type=str, required=True, help='Email is required')
+resetpwd_arguments.add_argument('verification_code', type=int, required=True)
+
+resetpwd_model = api.model('resetpwd', {
+    "email": fields.String(required=True, description="User's email"),
+    "password": fields.String(required=True, description="User's password"),
+})
+
+
 
 ################################################################################
 #                                    ROUTES                                    #
@@ -72,8 +83,70 @@ class signup(Resource):
             return {'message': 'User created'}, 201
 
 
-# TODO - Add a route to reset a user's password
-# @api.route('/auth/resetpwd', methods=['GET', 'POST'])
+
+@api.route('/auth/resetpwd', methods=['GET', 'POST'])
+class resetpwd(Resource):
+
+    @api.doc(
+        description="Get user email and send a reset password verification email",
+        responses = {
+            200: 'Success, email sent',
+            404: 'Fail, user not found'
+        }
+    )
+    @api.expect(resetpwd_arguments, validate=True)
+    def get(self):
+        args = resetpwd_arguments.parse_args()
+        email = args['email']
+        code = args['verification_code']
+
+        # check if user exists
+        if db.session.query(exists().where(User.email == email)).scalar():
+            msg = Message(
+                subject='DOUBI Password Reset',
+                sender='doubimovie@163.com',
+                recipients=[email],
+                body=
+                """
+                Hello,
+
+                This is a verification email to reset your password on DOUBI.
+                Your verification code is: 
+
+                {}
+                
+                Please enter this code in the reset password page.
+                if you did not request a password reset, please ignore this email.
+                """.format(code)
+            )
+            mail.send(msg)
+            return {'message': 'Email sent'}, 200
+        else:
+            return {'message': 'User not found'}, 404
+    
+    @api.doc(
+        description="Reset user password",
+        responses = {
+            200: 'Success, password reset',
+            404: 'Fail, user not found'
+        }
+    )
+    @api.expect(resetpwd_model, validate=True)
+    def post(self):
+        payload = json.loads(str(request.data, 'utf-8'))
+        email = payload['email']
+        password = payload['password']
+
+        # check if user exists
+        if db.session.query(exists().where(User.email == email)).scalar():
+            user = User.query.filter_by(email=email).first()
+            user.password = password
+            db.session.commit()
+            return {'message': 'Password reset'}, 200
+        else:
+            return {'message': 'User not found'}, 404
+
+
 
 
 @api.route('/auth/login', methods=['GET', 'POST'])
