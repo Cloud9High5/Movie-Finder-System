@@ -88,9 +88,9 @@ function DashboardMovieCard (props) {
 
 DashboardMovieCard.propTypes = {
     title: PropTypes.string,
-    rating: PropTypes.string,
+    rating: PropTypes.number,
     poster: PropTypes.string,
-    movie_id: PropTypes.number,
+    movie_id: PropTypes.string,
 }
 
 export default DashboardMovieCard;
