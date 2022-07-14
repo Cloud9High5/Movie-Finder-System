@@ -72,6 +72,9 @@ class signup(Resource):
             return {'message': 'User created'}, 201
 
 
+# TODO
+# @api.route('/auth/resetpwd', methods=['GET', 'POST'])
+
 
 @api.route('/auth/login', methods=['GET', 'POST'])
 class login(Resource):
@@ -152,6 +155,7 @@ class user_info(Resource):
             if 'username' in payload:
                 user.username = payload['username']
             if 'password' in payload:
+                # TODO check old password
                 user.password = payload['password']
             if 'email' in payload:
                 user.email = payload['email']
