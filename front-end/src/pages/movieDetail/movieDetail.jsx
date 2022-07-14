@@ -31,7 +31,6 @@ function MovieDetail () {
         fetchMovie();
     }, []);
 
-    console.log(movie_info)
     return (
         <React.Fragment>
             {/*<CssBaseline/>*/}
