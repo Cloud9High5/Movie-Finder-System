@@ -1,9 +1,10 @@
 import json
+from winreg import DisableReflectionKey
 from flask import request
 from flask_restx import Resource, Namespace, fields, reqparse
 from sqlalchemy import exists, func
 from extensions import db
-from Models.model import Review, User, Review_Like
+from Models.model import Review, User, Film, Review_Like, Review_Dislike
 from datetime import datetime, timedelta
 
 api = Namespace("reviews", description="Reviews related operations", path="/")
@@ -60,6 +61,10 @@ review_rating_model = api.model('review_rating_model', {
 
 @api.route('/review', methods=['GET', 'POST', 'DELETE'])
 class reviews(Resource):
+
+    ########################################
+    #             Get Reviews              #
+    ########################################
     @api.doc(
         'get reviews based on the given method',
         params = {
@@ -84,38 +89,58 @@ class reviews(Resource):
             if args['u_id'] is None:
                 return {'message': 'u_id is required'}, 400
             else:
-                result = get_review(method='u_id', value=args['u_id'])
+                # result = Review.query.filter_by(u_id=args['u_id']).all()
+                result = User.query.filter_by(u_id=args['u_id']).first().reviews.all()
         elif args['method'] == 'f_id':
             if args['f_id'] is None:
                 return {'message': 'f_id is required'}, 400
             else:
-                result = get_review(method='f_id', value=args['f_id'])
+                # result = Review.query.filter_by(f_id=args['f_id']).all()
+                result = Film.query.filter_by(f_id=args['f_id']).first().reviews.all()
         elif args['method'] == 'u_f_id':
             if args['u_id'] is None or args['f_id'] is None:
                 return {'message': 'u_id and f_id are both required'}, 400
             else:
-                result = get_review(method='u_f_id', value=(args['u_id'], args['f_id']))
+                result = Review.query.filter_by(u_id=args['u_id'], f_id=args['f_id']).all()
         elif args['method'] == 'top':
             if args['top'] is None:
                 return {'message': 'top is required'}, 400
             else:
-                result = get_review(method='top', value=args['top'])
+                result_list = [(x, len(x.likes.all())) for x in Review.query.all()]
+                result_list.sort(key=lambda x: x[1], reverse=True)
+                result = [x[0] for x in result_list[:args['top']]]
         elif args['method'] == 'recent':
             if args['recent'] is None:
                 return {'message': 'recent is required'}, 400
             else:
-                result = get_review(method='recent', value=args['recent'])
+                result = Review.query.filter_by(Review.created_time > datetime.now() - timedelta(weeks=args['recent']*4)).all()
         elif args['method'] == 'recent_top':
             if args['recent'] is None or args['top'] is None:
                 return {'message': 'recent and top are both required'}, 400
             else:
-                result = get_review(method='recent_top', value=(args['recent'], args['top']))
+                reviews = Review.query.filter_by(Review.created_time > datetime.now() - timedelta(weeks=args['recent']*4)).all()
+                result_list = [(x, len(x.likes.all())) for x in reviews]
+                result_list.sort(key=lambda x: x[1], reverse=True)
+                result = [x[0] for x in result_list[:args['top']]]
         
         if len(result) == 0:
             return {'message': 'review not found'}, 404
         else:
+            result = [{
+                'r_id': x.r_id,
+                'f_id': x.f_id,
+                'u_id': x.u_id,
+                'rating': x.rating,
+                'content': x.content,
+                'created_time': x.created_time,
+                'like': len(x.likes.all()),
+                'dislike': len(x.dislikes.all()),
+            } for x in result]
             return result, 200
     
+    ########################################
+    #             Post Review              #
+    ########################################
     @api.doc(
         'post a review',
         responses = {
@@ -144,7 +169,9 @@ class reviews(Resource):
             db.session.commit()
             return {'message': 'review posted'}, 200
     
-
+    ########################################
+    #             Delete Review            #
+    ########################################
     @api.doc(
         description = "delete a review",
         responses = {
@@ -170,6 +197,9 @@ class reviews(Resource):
 @api.route('/review/<string:review_id>', methods=['GET'])
 class get_review(Resource):
 
+    ########################################
+    #         Get Review by r_id           #
+    ########################################
     @api.marshal_with(review_model, code=200)
     @api.doc(
         'get a review based on the given review id',
@@ -182,16 +212,28 @@ class get_review(Resource):
         },
     )
     def get(self, review_id):
-        result = get_review(method='review_id', value=review_id)
-        if len(result) == 0:
+        result = Review.query.filter_by(r_id=review_id).first()
+        if result is None:
             return {'message': 'review not found'}, 404
         else:
-            return result, 200
+            return {
+                'r_id': result.r_id,
+                'f_id': result.f_id,
+                'u_id': result.u_id,
+                'rating': result.rating,
+                'content': result.content,
+                'created_time': result.created_time,
+                'like': len(result.likes.all()),
+                'dislike': len(result.dislikes.all()),
+            }, 200
 
 
 @api.route('/review/rating', methods=['POST'])
 class rating_review(Resource):
 
+    ########################################
+    #       Like & Dislike Review          #
+    ########################################
     @api.doc(
         'rate a review',
         responses = {
@@ -212,107 +254,39 @@ class rating_review(Resource):
             if not db.session.query(exists().where(User.u_id == payload['u_id'])).scalar():
                 return {'message': 'user not found'}, 404
             else:
-                # check if already rated
-                rate = db.session.query(Review_Like).filter(Review_Like.u_id == payload['u_id'] and Review_Like.r_id == payload['r_id']).first()
-                if rate is None:
-                    db.session.add(Review_Like(
-                        u_id = payload['u_id'],
-                        r_id = payload['r_id'],
-                        is_liked = payload['method']
-                    ))
-                    db.session.commit()
-                    return {'message': 'review rated received'}, 200
-                elif rate.is_liked == payload['method']:
-                    db.session.query(Review_Like).\
-                                filter(Review_Like.u_id == payload['u_id'] and Review_Like.r_id == payload['r_id'] and Review_Like.is_liked == payload['method']).\
-                                delete()
-                    db.session.commit()
-                    return {'message': 'review rated canceled'}, 200
-                else:
-                    return {'message': 'review already rated'}, 400
+                like = Review_Like.query.filter_by(u_id=payload['u_id'], r_id=payload['r_id']).first()
+                dislike = Review_Dislike.query.filter_by(u_id=payload['u_id'], r_id=payload['r_id']).first()
+                if payload['method'] == 1:
+                    if dislike is not None:
+                        return {'message': 'you already disliked this review'}, 400
 
-
-################################################################################
-#                                 HELPING FUNCS                                #
-################################################################################
-
-
-
-def get_review(method = 'u_id', value = None):
-
-    count_like = db.session.query(Review_Like.r_id, func.count(Review_Like.r_id).filter(Review_Like.is_liked==1).label('like_count')).group_by(Review_Like.r_id).subquery()
-    count_dislike = db.session.query(Review_Like.r_id, func.count(Review_Like.r_id).filter(Review_Like.is_liked==0).label('dislike_count')).group_by(Review_Like.r_id).subquery()
-
-    # print(count_like)
-    # print(count_dislike)
-
-    # print(db.session.query(Review, count_like.c.like_count).outerjoin(count_like, Review.r_id == count_like.c.r_id).all())
-    reviews = None
-
-    if method == 'u_id':
-        reviews = db.session.query(Review).filter(Review.u_id == value).subquery()
-        reviews = db.session.query(reviews, count_like.c.like_count, count_dislike.c.dislike_count).\
-                            outerjoin(count_like, reviews.c.r_id == count_like.c.r_id).\
-                            outerjoin(count_dislike, reviews.c.r_id == count_dislike.c.r_id).\
-                            all()
-    elif method == 'f_id':
-        reviews = db.session.query(Review).filter(Review.f_id == value).subquery()
-        reviews = db.session.query(reviews, count_like.c.like_count, count_dislike.c.dislike_count).\
-                            outerjoin(count_like, reviews.c.r_id == count_like.c.r_id).\
-                            outerjoin(count_dislike, reviews.c.r_id == count_dislike.c.r_id).\
-                            all()
-    elif method == 'u_f_id':
-        reviews = db.session.query(Review).filter(Review.u_id == value[0], Review.f_id == value[1]).subquery()
-        reviews = db.session.query(reviews, count_like.c.like_count, count_dislike.c.dislike_count).\
-                            outerjoin(count_like, reviews.c.r_id == count_like.c.r_id).\
-                            outerjoin(count_dislike, reviews.c.r_id == count_dislike.c.r_id).\
-                            all()
-    elif method == 'top':
-        reviews = db.session.query(Review).subquery()
-        reviews = db.session.query(reviews, count_like.c.like_count, count_dislike.c.dislike_count).\
-                            outerjoin(count_like, reviews.c.r_id == count_like.c.r_id).\
-                            outerjoin(count_dislike, reviews.c.r_id == count_dislike.c.r_id).\
-                            order_by(count_like.c.like_count.desc()).\
-                            limit(value).\
-                            all()
-    elif method == 'recent':
-        reviews = db.session.query(Review).filter(Review.created_time > datetime.now() - timedelta(weeks=value*4)).subquery()
-        reviews = db.session.query(reviews, count_like.c.like_count, count_dislike.c.dislike_count).\
-                            outerjoin(count_like, reviews.c.r_id == count_like.c.r_id).\
-                            outerjoin(count_dislike, reviews.c.r_id == count_dislike.c.r_id).\
-                            order_by(reviews.c.created_time.desc()).\
-                            all()
-    elif method == 'recent_top':
-        reviews = db.session.query(Review).filter(Review.created_time > datetime.now() - timedelta(weeks=value[0]*4)).subquery()
-        reviews = db.session.query(reviews, count_like.c.like_count, count_dislike.c.dislike_count).\
-                            outerjoin(count_like, reviews.c.r_id == count_like.c.r_id).\
-                            outerjoin(count_dislike, reviews.c.r_id == count_dislike.c.r_id).\
-                            order_by(count_like.c.like_count.desc()).\
-                            limit(value[1]).\
-                            all()
-    elif method == 'review_id':
-        reviews = db.session.query(Review).filter(Review.r_id == value).subquery()
-        reviews = db.session.query(reviews, count_like.c.like_count, count_dislike.c.dislike_count).\
-                            outerjoin(count_like, reviews.c.r_id == count_like.c.r_id).\
-                            outerjoin(count_dislike, reviews.c.r_id == count_dislike.c.r_id).\
-                            all()
-
-    if reviews is None:
-        return False
-
-
-    result = []
-    
-    for i in reviews:
-        review = {}
-        review['r_id'] = i[0]
-        review['u_id'] = i[1]
-        review['f_id'] = i[2]
-        review['content'] = i[3]
-        review['rating'] = i[4]
-        review['created_time'] = str(i[5])
-        review['like'] = i[6] if i[6] is not None else 0
-        review['dislike'] = i[7] if i[7] is not None else 0
-        result.append(review)
-
-    return result
+                    if like is None:
+                        db.session.add(Review_Like(
+                            u_id = payload['u_id'],
+                            r_id = payload['r_id'],
+                        ))
+                        db.session.commit()
+                        return {'message': 'review liked'}, 200
+                    else:
+                        # if user already liked the review, remove
+                        db.session.query(Review_Like).filter(Review_Like.u_id == payload['u_id'], Review_Like.r_id == payload['r_id']).delete()
+                        db.session.commit()
+                        return {'message': 'review unliked'}, 200
+                elif payload['method'] == 0:
+                    if like is not None:
+                        return {'message': 'you already liked this review'}, 400
+                        
+                    if dislike is None:
+                        db.session.add(Review_Dislike(
+                            u_id = payload['u_id'],
+                            r_id = payload['r_id'],
+                        ))
+                        db.session.commit()
+                        return {'message': 'review disliked'}, 200
+                    else:
+                        # if user already disliked the review, remove
+                        db.session.query(Review_Dislike).filter(Review_Dislike.u_id == payload['u_id'], Review_Dislike.r_id == payload['r_id']).delete()
+                        db.session.commit()
+                        return {'message': 'review undisliked'}, 200
+        
+                    
