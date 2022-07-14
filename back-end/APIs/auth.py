@@ -12,6 +12,9 @@ api = Namespace("auth", description="Authentication related operations", path="/
 #                             AUTHENTICATION MODEL                             #
 ################################################################################
 
+signup_arguments = reqparse.RequestParser()
+signup_arguments.add_argument('email', type=str, required=True)
+signup_arguments.add_argument('verification_code', type=int, required=True)
 
 signup_model = api.model('users', {
     "email": fields.String(required=True, description="User's email"),
@@ -64,6 +67,39 @@ resetpwd_model = api.model('resetpwd', {
 class signup(Resource):
 
     @api.doc(
+        description="Send a verification email to check if the email is valid",
+        responses={
+            200: 'Success, email sent',
+            400: 'Fail, email not sent'
+        }
+    )
+    @api.expect(signup_arguments)
+    def get(self):
+        args = signup_arguments.parse_args()
+        if db.session.query(exists().where(User.email == args['email'])).scalar():
+            return {'message': 'Email already exists'}, 400
+        else:
+            msg = Message(
+                subject = "Verification email", 
+                sender = "doubimovie@163.com",
+                recipients = [args['email']],
+                body = 
+                """
+                Hello,
+
+                This is a verification email to Sign up on DOUBI.
+                Your verification code is: 
+
+                {}
+                
+                Please enter this code in the Sign up page.
+                if you did not request a password reset, please ignore this email.
+                """.format(args['verification_code'])
+            )
+            mail.send(msg)
+            return {'message': 'Email sent'}, 200
+
+    @api.doc(
         description="Sign up a new user",
         responses = {
             201: 'Success, user created',
@@ -97,15 +133,13 @@ class resetpwd(Resource):
     @api.expect(resetpwd_arguments, validate=True)
     def get(self):
         args = resetpwd_arguments.parse_args()
-        email = args['email']
-        code = args['verification_code']
 
         # check if user exists
-        if db.session.query(exists().where(User.email == email)).scalar():
+        if db.session.query(exists().where(User.email == args['email'])).scalar():
             msg = Message(
                 subject='DOUBI Password Reset',
                 sender='doubimovie@163.com',
-                recipients=[email],
+                recipients=[args['email']],
                 body=
                 """
                 Hello,
@@ -117,7 +151,7 @@ class resetpwd(Resource):
                 
                 Please enter this code in the reset password page.
                 if you did not request a password reset, please ignore this email.
-                """.format(code)
+                """.format(args['verification_code'])
             )
             mail.send(msg)
             return {'message': 'Email sent'}, 200
