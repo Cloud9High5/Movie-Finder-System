@@ -23,7 +23,7 @@ function MostPopularComments () {
     React.useEffect(() => {
         let temp = [...rawComments];
         temp.map((t) => {
-            fetch('http://127.0.0.1:5000/auth/user/' + t.uid).then(async (response) => {
+            fetch('http://127.0.0.1:5000/auth/user/' + t.u_id).then(async (response) => {
                 const data = await response.json();
                 t['username'] = data.username;
                 setTempComments([...temp]);
@@ -34,10 +34,10 @@ function MostPopularComments () {
     React.useEffect(() => {
         let temp = [...tempComments];
         temp.map((t) => {
-            fetch('http://127.0.0.1:5000/films?id=' + t.movie_id).then(async (response) => {
+            fetch('http://127.0.0.1:5000/films?f_id=' + t.f_id).then(async (response) => {
                 const data = await response.json();
                 t['title'] = data.title;
-                t['poster'] = data.poster;
+                t['poster'] = data.url_poster;
                 setComments([...temp]);
             })
         })
@@ -90,8 +90,8 @@ function MostPopularComments () {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 method: 1,
-                uid: uid,
-                review_id: rid,
+                u_id: uid,
+                r_id: rid,
             }),
         };
         const response = await fetch('http://127.0.0.1:5000/review/rating', requestedInfo);
@@ -123,7 +123,7 @@ function MostPopularComments () {
                                       {comment.title}
                                     </Link>
                                     <Typography variant={'p'}>{comment.like}
-                                        <Button size="small" onClick={() => likeComment(comment.review_id, comment.uid)}
+                                        <Button size="small" onClick={() => likeComment(comment.r_id, comment.u_id)}
                                                 sx={{ textTransform: 'none', minWidth: 0 }}>
                                             likes
                                         </Button>
@@ -138,11 +138,11 @@ function MostPopularComments () {
                                     </Box>
                                 </Box>
                                 <Typography variant={'p'} color={'gray'}>
-                                    Posted on: {parseDateString(comment.release_date)}
+                                    Posted on: {comment.created_time}
                                 </Typography>
                                 <Box>
                                     <Typography variant={'p'}>
-                                        {comment.movieDetail}
+                                        {comment.content}
                                     </Typography>
                                 </Box>
                             </Grid>
