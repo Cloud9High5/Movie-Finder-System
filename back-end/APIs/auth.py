@@ -72,7 +72,7 @@ class signup(Resource):
             return {'message': 'User created'}, 201
 
 
-# TODO
+# TODO - Add a route to reset a user's password
 # @api.route('/auth/resetpwd', methods=['GET', 'POST'])
 
 

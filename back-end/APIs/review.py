@@ -139,6 +139,8 @@ class reviews(Resource):
             ))
             db.session.commit()
             return {'message': 'review posted'}, 200
+    
+    # TODO: delete a review
 
 
 @api.route('/review/<string:review_id>', methods=['GET'])
