@@ -20,9 +20,9 @@ function MovieDetail () {
     const [movie_review, setMovie_review] = useState();
     React.useEffect(() => {
         async function fetchMovie () {
-            const getMovieInfo = await fetch('http://127.0.0.1:5000/films?id=' + movieId);
+            const getMovieInfo = await fetch('http://127.0.0.1:5000/films?f_id=' + movieId);
             const movieInfo = await getMovieInfo.json();
-            const getMovieReview = await fetch('http://127.0.0.1:5000/review?method=movie_id&movie_id=' + movieId);
+            const getMovieReview = await fetch('http://127.0.0.1:5000/review?method=f_id&f_id=' + movieId);
             const movieReview = await getMovieReview.json();
             setMovie_info(movieInfo);
             setMovie_review(movieReview);
@@ -41,10 +41,10 @@ function MovieDetail () {
                     title={movie_info.title}
                     year={movie_info.year}
                     run_time={movie_info.run_time}
-                    rating={movie_info.rating}
+                    rating={movie_info.rating_imdb}
                     overview={movie_info.overview}
                     director={movie_info.director}
-                    poster={movie_info.poster}
+                    poster={movie_info.url_poster}
                 />
                 {movie_review && <CommentBlock props={movie_review}/>}
             </Container>

@@ -61,10 +61,10 @@ function MovieBlock(props) {
       },
       body: JSON.stringify({
         // movie_id: props.id,
-        movie_id: parseInt(props.id),
-        uid: parseInt(localStorage.getItem('token')),
+        f_id: props.id,
+        u_id: localStorage.getItem('token'),
         rating: rate,
-        review: commentRef.current.value
+        content: commentRef.current.value
       }),
     };
     console.log(requestInfo)
@@ -193,7 +193,7 @@ function MovieBlock(props) {
 
 MovieBlock.propTypes = {
   title: PropTypes.string,
-  rating: PropTypes.string,
+  rating: PropTypes.number,
   poster: PropTypes.string,
   run_time: PropTypes.string,
 }
