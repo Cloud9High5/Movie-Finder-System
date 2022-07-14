@@ -4,15 +4,30 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
-from Models.helper import u_id_generator
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Database/doubi_database.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
+mail_settings = {
+    "MAIL_SERVER": 'smtp.163.com',
+    "MAIL_PORT": 465,
+    "MAIL_USE_TLS": False,
+    "MAIL_USE_SSL": True,
+    "MAIL_USERNAME": 'doubimovie@163.com',
+    "MAIL_PASSWORD": 'GQFCQBTRXCSXNMVY'
+}
 
-from Models.model import User, Film, Review, Review_Like
+app.config.update(mail_settings)
 
-a = db.session.query(User).first()
-print(a.following_list)
+mail = Mail(app)
+
+@app.route('/')
+def hello_world():
+    msg = Message(subject='Hello World', 
+                    sender=app.config.get('MAIL_USERNAME'),
+                    recipients=['zzy801997@gmail.com'],
+                    body='This is the test email body')
+    mail.send(msg)
+    return 'Hello World!'
+
+app.run(debug=True)
