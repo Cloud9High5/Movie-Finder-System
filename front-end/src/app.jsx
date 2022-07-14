@@ -12,7 +12,7 @@ function App() {
             <Route exact path={'/login'} element={<Login/>}/>
             <Route exact path={'/signup'} element={<SignUp/>}/>
             <Route exact path={'/movie_detail/:movieID'} element={<MovieDetail/>}/>
-            <Route exact path={'/profile'} element={<Profile />} />
+            <Route exact path={'/profile/:uid'} element={<Profile/>} />
             <Route exact path={'/resetPassword'} element={<ResetPassword/>}/>
             {/* should be at the bottom */}
             <Route path={'/'} element={<Dashboard/>}/> {/* redirect to homepage */}

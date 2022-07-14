@@ -9,3 +9,4 @@ export {default as Thumb} from './thumb/thumb';
 export {default as MostPopularComments} from './mostPopularComments/mostPopularComments';
 export {default as MovieBlock} from './movieBlock/movieBlock';
 export {default as ProfileCard} from './profileCard/profileCard';
+export {default as ProfileReview} from './profileReview/profileReview';
