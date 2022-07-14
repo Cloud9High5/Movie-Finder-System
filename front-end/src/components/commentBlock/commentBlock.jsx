@@ -85,7 +85,7 @@ function CommentBlock({props}) {
     fetch('http://127.0.0.1:5000/review?method=f_id&f_id=' + mid).then(async (response) => {
       const data = await response.json();
       setRawComments([...data]);
-      console.log('raw comments: ', JSON.stringify(data));
+      // console.log('raw comments: ', JSON.stringify(data));
     })
   }, [flag, mid])
   // obtain username from backend
@@ -106,7 +106,6 @@ function CommentBlock({props}) {
       <Divider/>
       {/*{Array.isArray(props) ? props.map((movieDetail, idx) => {*/}
       {Array.isArray(props) ? comments.map((review, idx) => {
-        console.log(review)
         return (
           <Box borderTop={'1px solid gainsboro'}
                padding={'20px 0'}
