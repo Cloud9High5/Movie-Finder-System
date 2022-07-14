@@ -18,6 +18,7 @@ class User(db.Model):
     
 
 class Film(db.Model):
+    __tablename__ = 'film'
     f_id = db.Column(db.String(128), primary_key=True, nullable=False, unique=True, default=f_id_generator)
     title = db.Column(db.String(80), nullable=False)
     year = db.Column(db.Integer, nullable=False)
@@ -31,6 +32,7 @@ class Film(db.Model):
 
 
 class Review(db.Model):
+    __tablename__ = 'review'
     r_id = db.Column(db.String(128), primary_key=True, nullable=False, unique=True, default=r_id_generator)
     u_id = db.Column(db.String(128), db.ForeignKey('user.u_id'), nullable=False)
     f_id = db.Column(db.String(128), db.ForeignKey('film.f_id'), nullable=False)
@@ -40,6 +42,7 @@ class Review(db.Model):
 
 
 class Review_Like(db.Model):
+    __tablename__ = 'review_like'
     r_id = db.Column(db.String(128), db.ForeignKey('review.r_id'), primary_key=True, nullable=False)
     u_id = db.Column(db.String(128), db.ForeignKey('user.u_id'), primary_key=True, nullable=False)
     is_liked = db.Column(db.Boolean, nullable=False, default=True)
