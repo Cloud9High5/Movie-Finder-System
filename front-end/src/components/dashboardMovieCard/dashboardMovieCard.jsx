@@ -14,13 +14,12 @@ function DashboardMovieCard (props) {
     const [hotComments, setHotComments] = useState([]);
     const { movie_id } = props;
     useEffect(() => {
-        // fetch(`http://127.0.0.1:5000/review?method=recent_top&movie_id=${movie_id}&top=4&recent=1`)
-        fetch(`http://127.0.0.1:5000/review?method=movie_id&movie_id=${movie_id}`)
+        fetch(`http://127.0.0.1:5000/review?method=f_id&f_id=${movie_id}`)
             .then(async (response) => {
                 const comments = await response.json();
                 Array.isArray(comments) ?
                     comments.map(async (comment) => {
-                        const userInfo = await fetch(`http://127.0.0.1:5000/auth/user/${comment.uid}`);
+                        const userInfo = await fetch(`http://127.0.0.1:5000/auth/user/${comment.u_id}`);
                         const data = await userInfo.json();
                         comment['username'] = data['username'];
                         setHotComments([...comments]);
@@ -39,7 +38,7 @@ function DashboardMovieCard (props) {
                     <ListItemText
                         primary={hotComment['username']}
                         secondary={
-                            hotComment.movieDetail
+                            hotComment.content
                         }/>
                 </ListItem>
             )
