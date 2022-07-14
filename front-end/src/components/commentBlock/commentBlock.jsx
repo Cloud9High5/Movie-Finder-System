@@ -38,8 +38,10 @@ function CommentBlock({props}) {
       },
       body: JSON.stringify({
         "method": 1,
-        "uid": parseInt(token),
-        "review_id": parseInt(review.review_id)
+        // "uid": parseInt(token),
+        // "review_id": parseInt(review.review_id)
+        "u_id": token,
+        "r_id": review.review_id,
       }),
     };
     console.log(requestInfo)
@@ -58,8 +60,10 @@ function CommentBlock({props}) {
       },
       body: JSON.stringify({
         "method": 0,
-        "uid": parseInt(token),
-        "review_id": parseInt(review.review_id)
+        // "uid": parseInt(token),
+        // "review_id": parseInt(review.review_id)
+        "u_id": token,
+        "r_id": review.review_id,
       }),
     };
     const response = await fetch('http://127.0.0.1:5000/review/rating', requestInfo);
@@ -78,7 +82,7 @@ function CommentBlock({props}) {
   const mid = useParams()['movieID'];
   // obtain comments from backend
   React.useEffect(() => {
-    fetch('http://127.0.0.1:5000/review?method=movie_id&movie_id=' + mid).then(async (response) => {
+    fetch('http://127.0.0.1:5000/review?method=f_id&f_id=' + mid).then(async (response) => {
       const data = await response.json();
       setRawComments([...data]);
       console.log('raw comments: ', JSON.stringify(data));
@@ -88,7 +92,7 @@ function CommentBlock({props}) {
   React.useEffect(() => {
     let temp = [...rawComments];
     temp.map((t) => (
-      fetch('http://127.0.0.1:5000/auth/user/' + t.uid).then(async (response) => {
+      fetch('http://127.0.0.1:5000/auth/user/' + t.u_id).then(async (response) => {
         const data = await response.json();
         t['username'] = data.username;
         setComments([...temp]);
@@ -102,6 +106,7 @@ function CommentBlock({props}) {
       <Divider/>
       {/*{Array.isArray(props) ? props.map((movieDetail, idx) => {*/}
       {Array.isArray(props) ? comments.map((review, idx) => {
+        console.log(review)
         return (
           <Box borderTop={'1px solid gainsboro'}
                padding={'20px 0'}
@@ -127,7 +132,7 @@ function CommentBlock({props}) {
                 </Box>
                 <Box>
                   <Typography component={'span'} variant={'body2'}>
-                    {review.movieDetail}
+                    {review.content}
                   </Typography>
                 </Box>
                 <Box display={'flex'} marginTop={'10px'}>
@@ -140,7 +145,8 @@ function CommentBlock({props}) {
                 </Box>
                 <Box display={'flex'} alignItems={'flex-end'}>
                   <Typography variant={'p'} color={'gray'}>
-                    Posted on: {parseDateString(review.release_date)}
+                    {/*Posted on: {parseDateString(review.release_date)}*/}
+                    Posted on: {review.created_time}
                   </Typography>
                 </Box>
               </Grid>
