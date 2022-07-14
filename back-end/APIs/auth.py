@@ -1,11 +1,10 @@
 import json
-from logging import NullHandler
-from pydoc import describe
-from urllib import response
+from tabnanny import check
 from flask import request
 from flask_restx import Resource, Namespace, fields, reqparse
+from flask_mail import Message
 from sqlalchemy import exists
-from extensions import db
+from extensions import db, mail
 from Models.model import User
 
 api = Namespace("auth", description="Authentication related operations", path="/")
@@ -14,6 +13,9 @@ api = Namespace("auth", description="Authentication related operations", path="/
 #                             AUTHENTICATION MODEL                             #
 ################################################################################
 
+signup_arguments = reqparse.RequestParser()
+signup_arguments.add_argument('email', type=str, required=True)
+signup_arguments.add_argument('verification_code', type=int, required=True)
 
 signup_model = api.model('users', {
     "email": fields.String(required=True, description="User's email"),
@@ -37,13 +39,24 @@ user_model = api.model('user', {
 
 user_profile_model = api.model('user', {
     "username": fields.String(required=False, description="User's username"),
-    "password": fields.String(required=False, description="User's password"),
+    "old_password": fields.String(required=False, description="User's old password"),
+    "new_password": fields.String(required=False, description="User's new password"),
     "email": fields.String(required=False, description="User's email"),
     "photo_url": fields.String(required=False, description="User's photo_url"),
 })
 
 modify_list_argument = reqparse.RequestParser()
 modify_list_argument.add_argument('u_id', type=str, required=True)
+
+resetpwd_arguments = reqparse.RequestParser()
+resetpwd_arguments.add_argument('email', type=str, required=True, help='Email is required')
+resetpwd_arguments.add_argument('verification_code', type=int, required=True)
+
+resetpwd_model = api.model('resetpwd', {
+    "email": fields.String(required=True, description="User's email"),
+    "password": fields.String(required=True, description="User's password"),
+})
+
 
 
 ################################################################################
@@ -54,6 +67,39 @@ modify_list_argument.add_argument('u_id', type=str, required=True)
 
 @api.route('/auth/signup', methods=['GET', 'POST'])
 class signup(Resource):
+
+    @api.doc(
+        description="Send a verification email to check if the email is valid",
+        responses={
+            200: 'Success, email sent',
+            400: 'Fail, email not sent'
+        }
+    )
+    @api.expect(signup_arguments)
+    def get(self):
+        args = signup_arguments.parse_args()
+        if db.session.query(exists().where(User.email == args['email'])).scalar():
+            return {'message': 'Email already exists'}, 400
+        else:
+            msg = Message(
+                subject = "Verification email", 
+                sender = "doubimovie@163.com",
+                recipients = [args['email']],
+                body = 
+                """
+                Hello,
+
+                This is a verification email to Sign up on DOUBI.
+                Your verification code is: 
+
+                {}
+                
+                Please enter this code in the Sign up page.
+                if you did not request a password reset, please ignore this email.
+                """.format(args['verification_code'])
+            )
+            mail.send(msg)
+            return {'message': 'Email sent'}, 200
 
     @api.doc(
         description="Sign up a new user",
@@ -73,6 +119,69 @@ class signup(Resource):
             db.session.add(User(email=email, username=payload['username'], password=payload['password']))
             db.session.commit()
             return {'message': 'User created'}, 201
+
+
+
+@api.route('/auth/resetpwd', methods=['GET', 'POST'])
+class resetpwd(Resource):
+
+    @api.doc(
+        description="Get user email and send a reset password verification email",
+        responses = {
+            200: 'Success, email sent',
+            404: 'Fail, user not found'
+        }
+    )
+    @api.expect(resetpwd_arguments, validate=True)
+    def get(self):
+        args = resetpwd_arguments.parse_args()
+
+        # check if user exists
+        if db.session.query(exists().where(User.email == args['email'])).scalar():
+            msg = Message(
+                subject='DOUBI Password Reset',
+                sender='doubimovie@163.com',
+                recipients=[args['email']],
+                body=
+                """
+                Hello,
+
+                This is a verification email to reset your password on DOUBI.
+                Your verification code is: 
+
+                {}
+                
+                Please enter this code in the reset password page.
+                if you did not request a password reset, please ignore this email.
+                """.format(args['verification_code'])
+            )
+            mail.send(msg)
+            return {'message': 'Email sent'}, 200
+        else:
+            return {'message': 'User not found'}, 404
+    
+    @api.doc(
+        description="Reset user password",
+        responses = {
+            200: 'Success, password reset',
+            404: 'Fail, user not found'
+        }
+    )
+    @api.expect(resetpwd_model, validate=True)
+    def post(self):
+        payload = json.loads(str(request.data, 'utf-8'))
+        email = payload['email']
+        password = payload['password']
+
+        # check if user exists
+        if db.session.query(exists().where(User.email == email)).scalar():
+            user = User.query.filter_by(email=email).first()
+            user.password = password
+            db.session.commit()
+            return {'message': 'Password reset'}, 200
+        else:
+            return {'message': 'User not found'}, 404
+
 
 
 
@@ -144,7 +253,8 @@ class user_info(Resource):
         description = 'Modify User Info by u_id',
         responses = {
             200: 'Success, user info modified',
-            401: 'Fail, user not found'
+            401: 'Fail, user not found',
+            403: 'Fail, wrong password'
         }
     )
     @api.expect(user_profile_model, validate=True)
@@ -154,8 +264,14 @@ class user_info(Resource):
         if user:
             if 'username' in payload:
                 user.username = payload['username']
-            if 'password' in payload:
-                user.password = payload['password']
+            if 'new_password' in payload:
+                # check if old password is correct
+                if user.password == payload['old_password']:
+                    user.password = payload['new_password']
+                else:
+                    return {
+                        'message': 'Wrong password'
+                    }, 403
             if 'email' in payload:
                 user.email = payload['email']
             if 'photo_url' in payload:

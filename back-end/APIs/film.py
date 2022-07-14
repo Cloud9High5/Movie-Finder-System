@@ -59,6 +59,8 @@ class film(Resource):
             return {'message': 'Film not found'}, 404
 
 
+# TODO - Add a route to get a list of film based on the method
+
 
 @api.route('/films/top/<int:number>', methods=['GET'])
 class top_rating(Resource):
@@ -93,5 +95,5 @@ class top_recent(Resource):
     )
     @api.marshal_list_with(film_model, code=200)
     def get(self, number):
-        result = db.session.query(Film).filter(Film.year >= (datetime.now().year - number)).order_by(Film.year.desc()).all()
+        result = db.session.query(Film).order_by(Film.year.desc()).limit(number).all()
         return result, 200
