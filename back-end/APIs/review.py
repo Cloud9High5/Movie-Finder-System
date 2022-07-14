@@ -1,7 +1,6 @@
 import json
 from flask import request
 from flask_restx import Resource, Namespace, fields, reqparse
-from numpy import outer
 from sqlalchemy import exists, func
 from extensions import db
 from Models.model import Review, User, Review_Like
