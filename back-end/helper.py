@@ -38,3 +38,7 @@ def register_extensions(app):
     app.config.update(mail_settings)
     mail.init_app(app)
 
+    from extensions import jwt
+    app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
+    jwt.init_app(app)
+

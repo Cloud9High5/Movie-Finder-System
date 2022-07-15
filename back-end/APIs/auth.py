@@ -3,6 +3,7 @@ from tabnanny import check
 from flask import request
 from flask_restx import Resource, Namespace, fields, reqparse
 from flask_mail import Message
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from sqlalchemy import exists
 from extensions import db, mail
 from Models.model import User
@@ -220,10 +221,12 @@ class login(Resource):
         if db.session.query(exists().where(User.email == email)).scalar():
             user = db.session.query(User).filter(User.email == email).first()
             if user.password == password:
+                access_token = create_access_token(identity=user.u_id)
                 return {
                     'message': 'login success',
                     'login_flag': 'True',
                     'u_id': user.u_id,
+                    'access_token': access_token
                     }, 200
             else:
                 return {
@@ -236,6 +239,20 @@ class login(Resource):
                 'login_flag': 'False'
                 }, 401
 
+
+@api.route('/auth/profile', methods=['GET', 'POST'])
+class profile(Resource):
+    
+    @jwt_required
+    def get(self):
+        u_id = get_jwt_identity()
+        user = User.query.filter_by(u_id=u_id).first()
+        return {
+            'u_id': user.u_id,
+            'username': user.username,
+            'email': user.email,
+            'photo_url': user.photo_url
+        }, 200
 
 
 @api.route('/auth/user/<string:u_id>', methods=['GET', 'PUT'])
@@ -253,6 +270,7 @@ class user_info(Resource):
         }
     )
     @api.marshal_with(user_model, code=200)
+    @jwt_required()
     def get(self, u_id):
         user = db.session.query(User).filter(User.u_id == u_id).first()
         if user:

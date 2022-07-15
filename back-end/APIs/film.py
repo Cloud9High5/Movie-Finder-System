@@ -77,7 +77,6 @@ class film(Resource):
         year = payload["year"]
         director = payload["director"]
         # check if film already exists
-        # FIXME: exists checking works for any one of three fields, but not for all
         film = Film.query.filter(Film.title == title, Film.year == year, Film.director == director).first()
         if film is not None:
             return {'message': 'Film already exists'}, 409
