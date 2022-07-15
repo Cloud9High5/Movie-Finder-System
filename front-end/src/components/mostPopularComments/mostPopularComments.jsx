@@ -84,13 +84,17 @@ function MostPopularComments () {
         )
     }
     // console.log(comments);
-    const likeComment = async (rid, uid) => {
+    const isNotLoggedIn = () => {
+        return localStorage.getItem('token') === '' || localStorage.getItem('token') === null;
+    }
+    const likeComment = async (rid) => {
+        if (isNotLoggedIn()) { return }
         const requestedInfo = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 method: 1,
-                u_id: uid,
+                u_id: localStorage.getItem('token'),
                 r_id: rid,
             }),
         };
@@ -119,11 +123,11 @@ function MostPopularComments () {
                             <Grid item xs={11}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <Link variant={'h6'} underline={'hover'} sx={{ color: 'cadetblue' }}
-                                          onClick={() => {path('../movie_detail/' + comment.movie_id)}}>
+                                          onClick={() => {path('../movie_detail/' + comment.f_id)}} sx={{ cursor: 'pointer' }}>
                                       {comment.title}
                                     </Link>
                                     <Typography variant={'p'}>{comment.like}
-                                        <Button size="small" onClick={() => likeComment(comment.r_id, comment.u_id)}
+                                        <Button size="small" onClick={() => likeComment(comment.r_id)}
                                                 sx={{ textTransform: 'none', minWidth: 0 }}>
                                             likes
                                         </Button>
@@ -138,7 +142,7 @@ function MostPopularComments () {
                                     </Box>
                                 </Box>
                                 <Typography variant={'p'} color={'gray'}>
-                                    Posted on: {comment.created_time}
+                                    Posted on: {comment.created_time.substring(0,19)}
                                 </Typography>
                                 <Box>
                                     <Typography variant={'p'}>
