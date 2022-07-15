@@ -113,12 +113,12 @@ class reviews(Resource):
             if args['recent'] is None:
                 return {'message': 'recent is required'}, 400
             else:
-                result = Review.query.filter_by(Review.created_time > datetime.now() - timedelta(weeks=args['recent']*4)).all()
+                result = Review.query.filter(Review.created_time > datetime.now() - timedelta(weeks=args['recent']*4)).order_by(Review.created_time.desc()).all()
         elif args['method'] == 'recent_top':
             if args['recent'] is None or args['top'] is None:
                 return {'message': 'recent and top are both required'}, 400
             else:
-                reviews = Review.query.filter_by(Review.created_time > datetime.now() - timedelta(weeks=args['recent']*4)).all()
+                reviews = Review.query.filter(Review.created_time > (datetime.now() - timedelta(weeks=args['recent']*4))).all()
                 result_list = [(x, len(x.likes.all())) for x in reviews]
                 result_list.sort(key=lambda x: x[1], reverse=True)
                 result = [x[0] for x in result_list[:args['top']]]

@@ -13,7 +13,7 @@ function MostPopularComments () {
     const path = useNavigate();
 
     // obtain comments from backend
-    React.useEffect(() => { // TODO: returns 500 error when method is "recent_top"
+    React.useEffect(() => {
         fetch('http://127.0.0.1:5000/review?method=recent_top&top=' + commentNum + '&recent=' + commentMonth).then(async (response) => {
             const data = await response.json();
             setRawComments([...data]);
@@ -119,7 +119,7 @@ function MostPopularComments () {
                             <Grid item xs={11}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <Link variant={'h6'} underline={'hover'} sx={{ color: 'cadetblue' }}
-                                          onClick={() => {path('../movie_detail/' + comment.movie_id)}}>
+                                          onClick={() => {path('../movie_detail/' + comment.f_id)}}>
                                       {comment.title}
                                     </Link>
                                     <Typography variant={'p'}>{comment.like}
