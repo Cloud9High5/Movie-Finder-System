@@ -13,7 +13,7 @@ function MostPopularComments () {
     const path = useNavigate();
 
     // obtain comments from backend
-    React.useEffect(() => {
+    React.useEffect(() => { // TODO: returns 500 error when method is "recent_top"
         fetch('http://127.0.0.1:5000/review?method=recent_top&top=' + commentNum + '&recent=' + commentMonth).then(async (response) => {
             const data = await response.json();
             setRawComments([...data]);
