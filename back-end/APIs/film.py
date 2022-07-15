@@ -78,8 +78,8 @@ class film(Resource):
         director = payload["director"]
         # check if film already exists
         # FIXME: exists checking works for any one of three fields, but not for all
-        if db.session.query(
-                exists().where(Film.title == title and Film.year == year and Film.director == director)).scalar():
+        film = Film.query.filter(Film.title == title, Film.year == year, Film.director == director).first()
+        if film is not None:
             return {'message': 'Film already exists'}, 409
         else:
             db.session.add(Film(title=title, year=year, run_time=payload['run_time'],
