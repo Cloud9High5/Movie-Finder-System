@@ -138,7 +138,7 @@ function MostPopularComments () {
                                     </Box>
                                 </Box>
                                 <Typography variant={'p'} color={'gray'}>
-                                    Posted on: {comment.created_time}
+                                    Posted on: {comment.created_time.substring(0,19)}
                                 </Typography>
                                 <Box>
                                     <Typography variant={'p'}>
