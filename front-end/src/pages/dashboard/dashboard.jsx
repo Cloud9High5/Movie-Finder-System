@@ -21,17 +21,10 @@ function Dashboard() {
 
   // generate a list of random mostPopularComments id
   React.useEffect(() => {
-    const ids = randomID();
-    // const tempInfo = [...movieInfo];
-    const tempInfo = [];
-    ids.map(async (id) => {
-      const response = await fetch('http://127.0.0.1:5000/films?id=' + id);
+    fetch('http://127.0.0.1:5000/films/random').then(async (response) => {
       const data = await response.json();
-      // console.log(tempInfo);
-      // console.log(data);
-      tempInfo.push(data);
-      setMovieInfo([...tempInfo]);
-    })
+      setMovieInfo(data);
+    });
   }, [])
 
   const randomID = () => {
@@ -47,29 +40,17 @@ function Dashboard() {
   }
 
   const changeDisplayMode = async (e) => {
-    // console.log('Display mode: ' + e.target.value);
     setDisplayMode(e.target.value);
-
+    let response;
     if (e.target.value === 'random') {
-      const ids = randomID();
-      // console.log(ids);
-      const tempInfo = [];
-      ids.map(async (id) => { // TODO update id generation method
-        const response = await fetch('http://127.0.0.1:5000/films?id=' + id);
-        const data = await response.json();
-        tempInfo.push(data);
-        setMovieInfo([...tempInfo]);
-      })
-
+      response = await fetch('http://127.0.0.1:5000/films/random');
     } else if (e.target.value === 'highest') {
-      const response = await fetch('http://127.0.0.1:5000/films/top/10');
-      const data = await response.json();
-      setMovieInfo(data);
-    } else if (e.target.value === 'latest') {// TODO update (backend fixing num of movies)
-      const response = await fetch('http://127.0.0.1:5000/films/recent/10');
-      const data = await response.json();
-      setMovieInfo(data);
+      response = await fetch('http://127.0.0.1:5000/films/top/10');
+    } else if (e.target.value === 'latest') {
+      response = await fetch('http://127.0.0.1:5000/films/recent/10');
     }
+    const data = await response.json();
+    setMovieInfo(data);
   }
 
 

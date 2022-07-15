@@ -48,11 +48,11 @@ function ProfileReview () {
     React.useEffect(() => {
         fetch("http://localhost:5000/review?method=u_id&u_id=" + uid).then(async (response) => {
             const data = await response.json();
-            console.log(data)
-            // for (const review of data) {
-            //     review['release_date'] = new Date(review['release_date'] * 1000).toString().substring(0, 24);
-            // }
-            setData(data);
+            console.log(data);
+            Array.isArray(data) ?
+                setData(data)
+            :
+                setData([])
         })
     }, [])
 

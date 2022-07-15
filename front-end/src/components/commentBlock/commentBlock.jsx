@@ -104,7 +104,6 @@ function CommentBlock({props}) {
     <Box sx={{marginTop: 3}}>
       <Typography variant={'h5'}>Comments:</Typography>
       <Divider/>
-      {/*{Array.isArray(props) ? props.map((movieDetail, idx) => {*/}
       {Array.isArray(props) ? comments.map((review, idx) => {
         return (
           <Box borderTop={'1px solid gainsboro'}
@@ -145,7 +144,7 @@ function CommentBlock({props}) {
                 <Box display={'flex'} alignItems={'flex-end'}>
                   <Typography variant={'p'} color={'gray'}>
                     {/*Posted on: {parseDateString(review.release_date)}*/}
-                    Posted on: {review.created_time}
+                    Posted on: {review.created_time.substring(0,19)}
                   </Typography>
                 </Box>
               </Grid>
