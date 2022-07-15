@@ -119,7 +119,7 @@ function MostPopularComments () {
                             <Grid item xs={11}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <Link variant={'h6'} underline={'hover'} sx={{ color: 'cadetblue' }}
-                                          onClick={() => {path('../movie_detail/' + comment.f_id)}}>
+                                          onClick={() => {path('../movie_detail/' + comment.f_id)}} sx={{ cursor: 'pointer' }}>
                                       {comment.title}
                                     </Link>
                                     <Typography variant={'p'}>{comment.like}
