@@ -64,7 +64,9 @@ resetpwd_model = api.model('resetpwd', {
 #                                    ROUTES                                    #
 ################################################################################
 
-
+          ############################################################
+          #                      SignUp & Login                      #
+          ############################################################
 
 @api.route('/auth/signup', methods=['GET', 'POST'])
 class signup(Resource):
@@ -239,6 +241,44 @@ class login(Resource):
                 'login_flag': 'False'
                 }, 401
 
+
+          ############################################################
+          #                         Guest API                        #
+          ############################################################
+
+@api.route('/user/<string:u_id>', methods=['GET'])
+class user_info(Resource):
+
+    ########################################
+    #             Get user info            #
+    ########################################
+    @api.doc(
+        description = 'Get User Info by u_id',
+        params={'u_id': 'User ID'},
+        responses = {
+            200: 'Success, user info returned',
+            401: 'Fail, user not found'
+        }
+    )
+    @api.marshal_with(user_model, code=200)
+    def get(self, u_id):
+        user = db.session.query(User).filter(User.u_id == u_id).first()
+        if user:
+            return {
+                'u_id': user.u_id,
+                'username': user.username,
+                'email': user.email,
+                'photo_url': user.photo_url,
+            }, 200
+        else:
+            return {
+                'message': 'User not found'
+            }, 401
+
+
+          ############################################################
+          #                          User API                        #
+          ############################################################
 
 @api.route('/auth/profile', methods=['GET', 'POST'])
 class profile(Resource):
