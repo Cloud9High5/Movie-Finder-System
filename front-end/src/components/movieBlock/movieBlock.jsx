@@ -57,12 +57,13 @@ function MovieBlock(props) {
     const requestInfo = {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
       },
       body: JSON.stringify({
         // movie_id: props.id,
         f_id: props.id,
-        u_id: localStorage.getItem('token'),
+        u_id: localStorage.getItem('uid'),
         rating: rate,
         content: commentRef.current.value
       }),
@@ -116,25 +117,6 @@ function MovieBlock(props) {
                 <Typography gutterBottom variant="h4" component="span">
                   Average rate: {props.rating}
                 </Typography>
-                {/*<React.Fragment>*/}
-                {/*    {Object.keys(rateNums).map((num, index) =>*/}
-                {/*        <Box component="fieldset" mb={3}*/}
-                {/*             borderColor="transparent"*/}
-                {/*             sx={{*/}
-                {/*                 display: 'flex',*/}
-                {/*                 flexDirection: 'row',*/}
-                {/*                 p: 1,*/}
-                {/*                 m: 1,*/}
-                {/*                 borderRadius: 1,*/}
-                {/*             }}*/}
-                {/*             key={index}*/}
-                {/*        >*/}
-                {/*            <Box><Rating name="read-only"*/}
-                {/*                         value={Object.entries(rateNums).length - index}*/}
-                {/*                         readOnly/></Box>*/}
-                {/*            <Box><Typography component="legend">{rateNums[num]}</Typography></Box>*/}
-                {/*        </Box>)}*/}
-                {/*</React.Fragment>*/}
               </Box>
               <Box sx={{p: 1}}>
                 <Stack direction="row">
