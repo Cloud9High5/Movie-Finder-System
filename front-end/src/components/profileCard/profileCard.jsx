@@ -12,9 +12,15 @@ function ProfileCard() {
   useEffect(() => {
     // const userID = localStorage.getItem('token');
     if (!profile && userID) {
-      fetch(`http://127.0.0.1:5000/auth/user/${userID}`).then(async (res) => {
+      const reqInfo = {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+      }
+      fetch(`http://127.0.0.1:5000/auth/user/${userID}`, reqInfo).then(async (res) => {
         if (res.status === 200) {
           const data = await res.json();
+          console.log(data)
           setProfile(data);
         }
       })
