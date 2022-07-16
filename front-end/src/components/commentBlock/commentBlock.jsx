@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import { Typography } from '@mui/material';
+import { Chip, Typography } from '@mui/material';
 import Avatar from "@material-ui/core/Avatar";
 import { Thumb } from "../../components";
 import Rating from '@mui/material/Rating';
@@ -31,35 +31,12 @@ const parseDateString = (date) => {
 function CommentBlock ({ props }) {
   const classes = useStyles();
   const path = useNavigate();
-
-  const reviewAction = async (review, action) => {
-    if (helpers.hasNoToken()) {
-      alert("Please login first");
-      return
-    }
-    const requestInfo = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + localStorage.getItem('token'),
-      },
-      body: JSON.stringify({
-        "method": action,
-        "r_id": review.r_id,
-      }),
-    };
-    // console.log(requestInfo)
-    const response = await fetch('http://127.0.0.1:5000/review/rating', requestInfo);
-    if (response.status === 200) {
-      setFlag(!flag);
-    } else {
-    }
-  }
-
   const [rawComments, setRawComments] = React.useState([]);  // comments with uid and movie_id
   const [comments, setComments] = React.useState([]);  // the combined comments dataset
   const [flag, setFlag] = React.useState(false);
   const mid = useParams()['movieID'];
+  const [likesDislikes, setLikesDislikes] = React.useState({});
+
 
   // obtain comments from backend
   React.useEffect(() => {
@@ -86,6 +63,43 @@ function CommentBlock ({ props }) {
       })
     ))
   }, [rawComments])
+  // like/dislike list
+  React.useEffect(() => {
+    if (helpers.hasNoToken()) { return }
+    const reqInfo = {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+      }
+    }
+    fetch('http://127.0.0.1:5000/review/likes_dislikes', reqInfo).then(async (response) => {
+      const data = await response.json();
+      setLikesDislikes({ ...data });
+    })
+  }, [flag])
+  // like / dislike actions
+  const reviewAction = async (review, action) => {
+    if (helpers.hasNoToken()) {
+      alert("Please login first");
+      return
+    }
+    const requestInfo = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+      },
+      body: JSON.stringify({
+        "method": action,
+        "r_id": review.r_id,
+      }),
+    };
+    const response = await fetch('http://127.0.0.1:5000/review/rating', requestInfo);
+    if (response.status === 200) {
+      setFlag(!flag);
+    }
+  }
+
 
   return (
     <Box sx={{ marginTop: 3 }}>
@@ -127,6 +141,14 @@ function CommentBlock ({ props }) {
                   </Box>
                   <Box display={'flex'} alignItems={'center'} onClick={() => reviewAction(review, 0)}>
                     <Thumb quantity={review.dislike} type={'down'}/>
+                  </Box>
+                  <Box sx={{ marginLeft: '20px' }}>
+                    {
+                      likesDislikes.likes.indexOf(review.r_id) !== -1 ? <Chip label={'You Liked'} color={'success'} size={'small'} variant={'outlined'} /> : <></>
+                    }
+                    {
+                      likesDislikes.dislikes.indexOf(review.r_id) !== -1 ? <Chip label={'You Dislike'} color={'error'} size={'small'} variant={'outlined'} /> : <></>
+                    }
                   </Box>
                 </Box>
                 <Box display={'flex'} alignItems={'flex-end'}>
