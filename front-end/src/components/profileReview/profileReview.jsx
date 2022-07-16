@@ -29,6 +29,7 @@ function ProfileReview () {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [data, setData] = React.useState([]);
+  const [flag, setFlag] = React.useState(true);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -46,7 +47,7 @@ function ProfileReview () {
   }
 
   React.useEffect(() => {
-    fetch("http://localhost:5000/review?method=u_id&u_id=" + uid).then(async (response) => {
+    fetch("http://localhost:5000/review?method=u_id&u_id=" + uid, {headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}}).then(async (response) => {
       const data = await response.json();
       console.log(data);
       Array.isArray(data) ?
@@ -54,7 +55,20 @@ function ProfileReview () {
         :
         setData([])
     })
-  }, [])
+  }, [flag])
+
+  const deleteReview = async (rid) => {
+    const reqInfo = {
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+      },
+    }
+    const response = await fetch('http://127.0.0.1:5000/review?r_id=' + rid, reqInfo);
+    if (response.status === 200) {setFlag(!flag)}
+    const data = await response.json();
+    console.log(data);
+  }
 
   return (
     <>
@@ -98,7 +112,7 @@ function ProfileReview () {
                         {
                           isSelf() ?
                             <Button variant={'outlined'} color={'warning'} endIcon={<RemoveCircleOutlineIcon/>}
-                                    sx={{ textTransform: 'none' }}>Delete</Button>
+                                    sx={{ textTransform: 'none' }} onClick={() => deleteReview(row.r_id)}>Delete</Button>
                             :
                             <>
                               <Button variant={'outlined'} color={'info'}
