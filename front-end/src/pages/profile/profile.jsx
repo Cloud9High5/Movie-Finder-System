@@ -6,8 +6,7 @@ import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
-import {ProfileCard} from "../../components/";
-import {ProfileReview} from "../../components/";
+import {ProfileCard, ProfileReview, FollowList, BlackList} from "../../components/";
 
 function TabPanel(props) {
   const {children, value, index, ...other} = props;
@@ -65,16 +64,20 @@ function Profile() {
           >
             <Tab label="PROFILE" {...a11yProps(0)} />
             <Tab label="FOLLOWS" {...a11yProps(1)} />
-            <Tab label="REVIEWS" {...a11yProps(2)} />
+            <Tab label="BLACKS" {...a11yProps(2)} />
+            <Tab label="REVIEWS" {...a11yProps(3)} />
           </Tabs>
           <Box style={{width: '100%'}}>
             <TabPanel value={value} index={0}>
               <ProfileCard/>
             </TabPanel>
             <TabPanel value={value} index={1}>
-              FOLLOWS
+              <FollowList/>
             </TabPanel>
             <TabPanel value={value} index={2}>
+              <BlackList/>
+            </TabPanel>
+            <TabPanel value={value} index={3}>
               <ProfileReview/>
             </TabPanel>
           </Box>
