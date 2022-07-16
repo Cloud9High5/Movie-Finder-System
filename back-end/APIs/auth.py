@@ -1,17 +1,21 @@
+from email import message
 import json
-from tabnanny import check
-from flask import request
+from re import U
+from flask import request, jsonify
 from flask_restx import Resource, Namespace, fields, reqparse
 from flask_mail import Message
+from flask_jwt_extended import create_access_token, jwt_required, current_user
 from sqlalchemy import exists
-from extensions import db, mail
+from extensions import db, mail, jwt
 from Models.model import User
 
 api = Namespace("auth", description="Authentication related operations", path="/")
 
+
 ################################################################################
 #                             AUTHENTICATION MODEL                             #
 ################################################################################
+
 
 signup_arguments = reqparse.RequestParser()
 signup_arguments.add_argument('email', type=str, required=True)
@@ -35,6 +39,11 @@ user_model = api.model('user', {
     "username": fields.String(required=True, description="User's username"),
     "email": fields.String(required=True, description="User's email"),
     "photo_url": fields.String(required=True, description="User's photo_url"),
+    "is_admin": fields.Boolean(required=True, description="whether the user is admin"),
+    "is_blocked": fields.Boolean(required=True, description="whether the user is blocked by admin"),
+    "is_self": fields.Boolean(required=True, description="whether the user is the current user"),
+    "followed": fields.Boolean(required=False, description="whether the user is followed by current user"),
+    "blocked": fields.Boolean(required=False, description="whether the user is blocked by current user"),
 })
 
 user_profile_model = api.model('user', {
@@ -44,9 +53,6 @@ user_profile_model = api.model('user', {
     "email": fields.String(required=False, description="User's email"),
     "photo_url": fields.String(required=False, description="User's photo_url"),
 })
-
-modify_list_argument = reqparse.RequestParser()
-modify_list_argument.add_argument('target_id', type=str, required=True)
 
 resetpwd_arguments = reqparse.RequestParser()
 resetpwd_arguments.add_argument('email', type=str, required=True, help='Email is required')
@@ -58,11 +64,14 @@ resetpwd_model = api.model('resetpwd', {
 })
 
 
-
 ################################################################################
 #                                    ROUTES                                    #
 ################################################################################
 
+
+          ############################################################
+          #                      SignUp & Login                      #
+          ############################################################
 
 
 @api.route('/auth/signup', methods=['GET', 'POST'])
@@ -81,9 +90,13 @@ class signup(Resource):
     @api.expect(signup_arguments)
     def get(self):
         args = signup_arguments.parse_args()
+        
+        # check if the email is valid (not in the database)
         if db.session.query(exists().where(User.email == args['email'])).scalar():
+            # email already exists, not valid
             return {'message': 'Email already exists'}, 400
         else:
+            # email not in the database, valid
             msg = Message(
                 subject = "Verification email", 
                 sender = "doubimovie@163.com",
@@ -220,23 +233,20 @@ class login(Resource):
         if db.session.query(exists().where(User.email == email)).scalar():
             user = db.session.query(User).filter(User.email == email).first()
             if user.password == password:
+                access_token = create_access_token(identity=user)
                 return {
-                    'message': 'login success',
-                    'login_flag': 'True',
-                    'u_id': user.u_id,
+                    'message': 'Logged in as {}'.format(user.username),
+                    'access_token': access_token
                     }, 200
             else:
-                return {
-                    'message': 'Wrong password',
-                    'login_flag': 'False'
-                    }, 403
+                return {'message': 'Wrong password'}, 403
         else:
-            return {
-                'message': 'User not found',
-                'login_flag': 'False'
-                }, 401
+            return {'message': 'User not found'}, 401
 
 
+          ############################################################
+          #                       User Profile                       #
+          ############################################################
 
 @api.route('/auth/user/<string:u_id>', methods=['GET', 'PUT'])
 class user_info(Resource):
@@ -253,20 +263,44 @@ class user_info(Resource):
         }
     )
     @api.marshal_with(user_model, code=200)
+    @jwt_required(optional=True)
     def get(self, u_id):
-        user = db.session.query(User).filter(User.u_id == u_id).first()
-        if user:
-            return {
-                'u_id': user.u_id,
-                'username': user.username,
-                'email': user.email,
-                'photo_url': user.photo_url,
-            }, 200
-        else:
-            return {
-                'message': 'User not found'
-            }, 401
+        target_user = User.query.filter_by(u_id=u_id).first()
 
+        if not target_user:
+            # could not find user in database, return fail message
+            return {'message': 'User not found'}, 401
+        else:
+            # user found, collect basic info
+            result = {
+                'u_id': target_user.u_id,
+                'email': target_user.email,
+                'username': target_user.username,
+                'photo_url': target_user.photo_url,
+                'is_admin': target_user.is_admin,
+                'is_blocked': target_user.is_blocked,
+                'is_self': False
+            }
+            
+            if not current_user:
+                # access from unauthorized user, return basic info
+                return result, 200
+            else:
+                # access from authorized user
+                if u_id == current_user.u_id:
+                    # access his/her own profile, return basic info
+                    result['is_self'] = True
+                    return result, 200
+                else:
+                    # access other user's profile, return more info
+                    result['followed'] = True if target_user in current_user.followed else False
+                    result['blocked'] = True if target_user in current_user.blocked else False
+                    return result, 200
+
+
+    ########################################
+    #            Update User Info          #
+    ########################################
     @api.doc(
         description = 'Modify User Info by u_id',
         responses = {
@@ -275,15 +309,12 @@ class user_info(Resource):
             403: 'Fail, wrong password'
         }
     )
-
-    ########################################
-    #            Update User Info          #
-    ########################################
     @api.expect(user_profile_model, validate=True)
+    @jwt_required()
     def put(self, u_id):
         payload = json.loads(str(request.data, 'utf-8'))
-        user = db.session.query(User).filter(User.u_id == u_id).first()
-        if user:
+        user = User.query.filter_by(u_id=u_id).first()
+        if user == current_user:
             if 'username' in payload:
                 user.username = payload['username']
             if 'new_password' in payload:
@@ -300,7 +331,7 @@ class user_info(Resource):
                 user.photo_url = payload['photo_url']
             db.session.commit()
             return {
-                'message': 'User info modified'
+                'message': '{} User info modified'.format(user.username)
             }, 200
         else:
             return {
@@ -323,14 +354,21 @@ class following_list(Resource):
     )
     @api.marshal_list_with(user_model, code=200)
     def get(self, u_id):
-        user = db.session.query(User).filter(User.u_id == u_id).first()
-        if user:
-            result = user.followed.all()
-            if result != []:
-                return result, 200
+        target_user = db.session.query(User).filter(User.u_id == u_id).first()
+        if target_user:
+            users = target_user.followed.all()
+            if users != []:
+                return [{
+                    'u_id': user.u_id,
+                    'email': user.email,
+                    'username': user.username,
+                    'photo_url': user.photo_url,
+                    'is_admin': user.is_admin,
+                    'is_blocked': user.is_blocked
+                    } for user in users], 200
             else:
                 return {
-                    'message': 'Empty list'
+                    'message': "{}'s following list is empty".format(target_user.username)
                 }, 401
         else:
             return {
@@ -352,29 +390,27 @@ class following_list(Resource):
             403: 'Fail, user already in following list',
         }
     )
-    @api.expect(modify_list_argument, validate=True)
+    @jwt_required()
     def post(self, u_id):
-        follow_id = modify_list_argument.parse_args()['target_id']
-        user = db.session.query(User).filter(User.u_id == u_id).first()
-        follow_user = db.session.query(User).filter(User.u_id == follow_id).first()
+        target_user = User.query.filter_by(u_id=u_id).first()
 
-        if u_id == follow_id:
+        if current_user == target_user:
             return {
                 'message': 'Cannot follow yourself'
             }, 403
 
-        if user and follow_user:
-            if follow_user in user.followed.all():
-                user.followed.remove(follow_user)
+        if target_user and current_user:
+            if target_user in current_user.followed.all():
+                current_user.followed.remove(target_user)
                 db.session.commit()
                 return {
-                    'message': 'User removed from following list'
+                    'message': "{} is removed from {}'s following list".format(target_user.username, current_user.username)
                 }, 200
             else:
-                user.followed.append(follow_user)
+                current_user.followed.append(target_user)
                 db.session.commit()
                 return {
-                    'message': 'User added to following list'
+                    'message': "{} is added to {}'s following list".format(target_user.username, current_user.username)
                 }, 200
         else:
             return {
@@ -398,14 +434,22 @@ class black_list(Resource):
     )
     @api.marshal_list_with(user_model, code=200)
     def get(self, u_id):
-        user = db.session.query(User).filter(User.u_id == u_id).first()
-        if user:
-            result = user.blocked.all()
+        target_user = User.query.filter_by(u_id=u_id).first()
+        if target_user:
+            result = target_user.blocked.all()
+            result = [{
+                'u_id': user.u_id,
+                'email': user.email,
+                'username': user.username,
+                'photo_url': user.photo_url,
+                'is_admin': user.is_admin,
+                'is_blocked': user.is_blocked
+            } for user in result]
             if result != []:
                 return result, 200
             else:
                 return {
-                    'message': 'Empty list'
+                    'message': "{}'s black list is empty".format(target_user.username)
                 }, 401
 
     ########################################
@@ -422,29 +466,27 @@ class black_list(Resource):
             403: 'Fail, user already in black list',
         }
     )
-    @api.expect(modify_list_argument, validate=True)
+    @jwt_required()
     def post(self, u_id):
-        black_id = modify_list_argument.parse_args()['target_id']
-        user = db.session.query(User).filter(User.u_id == u_id).first()
-        black_user = db.session.query(User).filter(User.u_id == black_id).first()
+        target_user = User.query.filter_by(u_id=u_id).first()
 
-        if u_id == black_id:
+        if target_user == current_user:
             return {
                 'message': 'Cannot black yourself'
             }, 403
-        
-        if user and black_user:
-            if black_user in user.blocked.all():
-                user.blocked.remove(black_user)
+
+        if target_user and current_user:
+            if target_user in current_user.blocked.all():
+                current_user.blocked.remove(target_user)
                 db.session.commit()
                 return {
-                    'message': 'User removed from black list'
+                    'message': "{} is removed from {}'s black list".format(target_user.username, current_user.username)
                 }, 200
             else:
-                user.blocked.append(black_user)
+                current_user.blocked.append(target_user)
                 db.session.commit()
                 return {
-                    'message': 'User added to black list'
+                    'message': "{} is added to {}'s black list".format(target_user.username, current_user.username)
                 }, 200
         else:
             return {
