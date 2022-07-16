@@ -47,9 +47,10 @@ function CommentBlock ({ props }) {
       },
     }
     fetch('http://127.0.0.1:5000/review?method=f_id&f_id=' + mid, reqInfo).then(async (response) => {
-      const data = await response.json();
-      setRawComments([...data]);
-      // console.log('raw comments: ', JSON.stringify(data));
+      if (response.status === 200) {
+        const data = await response.json();
+        setRawComments([...data]);
+      }
     })
   }, [flag, mid])
   // obtain username from backend

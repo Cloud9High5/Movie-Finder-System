@@ -26,8 +26,9 @@ function MovieDetail () {
               'Authorization': helpers.hasNoToken() ? '' : 'Bearer ' + localStorage.getItem('token'),
             },
           }
-            const getMovieInfo = await fetch('http://127.0.0.1:5000/films?f_id=' + movieId);
+            const getMovieInfo = await fetch('http://127.0.0.1:5000/films?f_id=' + movieId, reqInfo);
             const movieInfo = await getMovieInfo.json();
+            console.log(movieInfo)
             const getMovieReview = await fetch('http://127.0.0.1:5000/review?method=f_id&f_id=' + movieId, reqInfo);
             const movieReview = await getMovieReview.json();
             setMovie_info(movieInfo);
@@ -51,6 +52,7 @@ function MovieDetail () {
                     overview={movie_info.overview}
                     director={movie_info.director}
                     poster={movie_info.url_poster}
+                    rating_distribution={movie_info.rating_distribution}
                 />
                 {movie_review && <CommentBlock props={movie_review}/>}
             </Container>
