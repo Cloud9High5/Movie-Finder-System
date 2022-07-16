@@ -40,6 +40,7 @@ export default function Header() {
   const path = useNavigate();
   const [userInfo, setUserInfo] = React.useState({});
   const [token, setToken] = React.useState(localStorage.getItem('token'));
+  const [uid, setUid] = React.useState(localStorage.getItem('uid'));
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const from = useLocation().pathname;
@@ -79,7 +80,7 @@ export default function Header() {
   }
   
   React.useEffect(() => {
-    fetch('http://127.0.0.1:5000/auth/user/' + token).then(async (response) => {
+    fetch('http://127.0.0.1:5000/auth/user/' + uid).then(async (response) => {
       if (response.status === 200) {
         const data = await response.json();
         setUserInfo({...data});

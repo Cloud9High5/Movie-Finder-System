@@ -26,9 +26,12 @@ const columns = [
 
 function ProfileReview () {
   const uid = useParams().uid;
+  const [targetInfo, setTargetInfo] = React.useState({});
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [data, setData] = React.useState([]);
+  const [flag, setFlag] = React.useState(true);
+  const [likesDislikes, setLikesDislikes] = React.useState({});
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -41,24 +44,79 @@ function ProfileReview () {
 
   // whether this page displays the user's own info
   const isSelf = () => {
-    const self = localStorage.getItem('uid');
-    return self === uid;
+    return targetInfo.is_self;
   }
 
+  const isNotLoggedIn = () => {
+    return localStorage.getItem('token') === '' || localStorage.getItem('token') === null;
+  }
+
+  // get all review of target user
   React.useEffect(() => {
-    fetch("http://localhost:5000/review?method=u_id&u_id=" + uid).then(async (response) => {
+    fetch("http://localhost:5000/review?method=u_id&u_id=" + uid, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }).then(async (response) => {
       const data = await response.json();
-      console.log(data);
       Array.isArray(data) ?
         setData(data)
         :
         setData([])
     })
+  }, [flag])
+
+  // update like / dislike list
+  React.useEffect(() => {
+    const reqInfo = {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+      }
+    }
+    fetch('http://127.0.0.1:5000/review/likes_dislikes', reqInfo).then(async (response) => {
+      const data = await response.json();
+      setLikesDislikes({ ...data });
+    })
+  }, [flag])
+
+  React.useEffect(() => {
+    fetch(`http://127.0.0.1:5000/auth/user/${uid}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }).then(async (response) => {
+      const data = await response.json();
+      setTargetInfo({...data});
+    })
   }, [])
+
+  const deleteReview = async (rid) => {
+    const reqInfo = {
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+      },
+    }
+    const response = await fetch('http://127.0.0.1:5000/review?r_id=' + rid, reqInfo);
+    if (response.status === 200) {
+      setFlag(!flag)
+    }
+  }
+
+  const reviewAction = async (rid, action) => {
+    if (isNotLoggedIn()) {
+      return
+    }
+    const requestedInfo = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+      body: JSON.stringify({
+        method: action,
+        r_id: rid,
+      }),
+    };
+    const response = await fetch('http://127.0.0.1:5000/review/rating', requestedInfo);
+    if (response.status === 200) {
+      setFlag(!flag);  // force refreshing the comment block
+    }
+  }
 
   return (
     <>
-      <h1>ProfileReview</h1>
+      <h1>{isSelf() ? 'Your' : targetInfo.username + '\'s'} Review</h1>
 
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer sx={{ maxHeight: 640 }}>
@@ -98,14 +156,30 @@ function ProfileReview () {
                         {
                           isSelf() ?
                             <Button variant={'outlined'} color={'warning'} endIcon={<RemoveCircleOutlineIcon/>}
-                                    sx={{ textTransform: 'none' }}>Delete</Button>
+                                    sx={{ textTransform: 'none' }}
+                                    onClick={() => deleteReview(row.r_id)}>Delete</Button>
                             :
                             <>
-                              <Button variant={'outlined'} color={'info'}
-                                      endIcon={<ThumbUpIcon sx={{ marginLeft: '12px' }}/>}
-                                      sx={{ width: '80px', marginBottom: '5px', textTransform: 'none' }}>Like</Button>
-                              <Button variant={'outlined'} color={'error'} endIcon={<ThumbDownAltIcon/>}
-                                      sx={{ width: '80px', marginTop: '5px', textTransform: 'none' }}>Dislike</Button>
+                              <Button
+                                variant={likesDislikes.likes.indexOf(row.r_id) === -1 ? 'outlined' : 'contained'}
+                                color={'info'}
+                                endIcon={<ThumbUpIcon sx={{ marginLeft: '12px' }}/>}
+                                onClick={() => reviewAction(row.r_id, 1)}
+                                sx={{ width: '80px', marginBottom: '5px', textTransform: 'none' }}
+                                disabled={likesDislikes.dislikes.indexOf(row.r_id) !== -1}
+                              >
+                                {likesDislikes.likes.indexOf(row.r_id) === -1 ? 'Like' : 'Liked'}
+                              </Button>
+                              <Button
+                                variant={likesDislikes.dislikes.indexOf(row.r_id) === -1 ? 'outlined' : 'contained'}
+                                color={'error'}
+                                endIcon={<ThumbDownAltIcon/>}
+                                onClick={() => reviewAction(row.r_id, 0)}
+                                sx={{ width: '80px', marginTop: '5px', textTransform: 'none' }}
+                                disabled={likesDislikes.likes.indexOf(row.r_id) !== -1}
+                              >
+                                {likesDislikes.dislikes.indexOf(row.r_id) === -1 ? 'Dislike' : 'Disliked'}
+                              </Button>
                             </>
                         }
                       </TableCell>
