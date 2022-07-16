@@ -84,13 +84,17 @@ function MostPopularComments () {
         )
     }
     // console.log(comments);
-    const likeComment = async (rid, uid) => {
+    const isNotLoggedIn = () => {
+        return localStorage.getItem('token') === '' || localStorage.getItem('token') === null;
+    }
+    const likeComment = async (rid) => {
+        if (isNotLoggedIn()) { return }
         const requestedInfo = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 method: 1,
-                u_id: uid,
+                u_id: localStorage.getItem('token'),
                 r_id: rid,
             }),
         };
@@ -123,7 +127,7 @@ function MostPopularComments () {
                                       {comment.title}
                                     </Link>
                                     <Typography variant={'p'}>{comment.like}
-                                        <Button size="small" onClick={() => likeComment(comment.r_id, comment.u_id)}
+                                        <Button size="small" onClick={() => likeComment(comment.r_id)}
                                                 sx={{ textTransform: 'none', minWidth: 0 }}>
                                             likes
                                         </Button>

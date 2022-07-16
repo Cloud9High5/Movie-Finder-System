@@ -1,10 +1,10 @@
 import json
 from flask import request
+from flask_jwt_extended import current_user, jwt_required
 from flask_restx import Resource, Namespace, fields, reqparse
 from sqlalchemy import exists, func
 from extensions import db
-from Models.model import Film
-from datetime import datetime
+from Models.model import Film, Review
 
 api = Namespace("film", description="Authentication related operations", path="/")
 
@@ -22,6 +22,8 @@ film_model = api.model('film', {
     "title": fields.String(required=True, description="Film title"),
     "year": fields.Integer(required=True, description="Film released year"),
     "run_time": fields.String(required=True, description="Film run time"),
+    "rating": fields.Float(required=True, description="Film rating"),
+    "rating_distribution": fields.Raw(required=True, description="Film rating distribution"),
     "rating_imdb": fields.Float(required=True, description="Film rating on IMDB"),
     "overview": fields.String(required=True, description="Film overview"),
     "director": fields.String(required=True, description="Film director"),
@@ -62,31 +64,64 @@ class film(Resource):
     )
     @api.marshal_with(film_model, code=200)
     @api.expect(film_arguments)
+    @jwt_required(optional=True)
     def get(self):
         args = film_arguments.parse_args()
         if db.session.query(exists().where(Film.f_id == args['f_id'])).scalar():
             film = Film.query.filter_by(f_id=args['f_id']).first()
-            return film, 200
+            
+            reviews = film.reviews.all()
+            # compute average rating for review on DOUBI
+            if current_user:
+                blocked_id = [x.u_id for x in current_user.blocked.all()]
+                reviews = [x for x in reviews if x.u_id not in blocked_id]
+
+            rating = 0 if reviews == [] else format(sum(review.rating for review in reviews) / len(reviews), '.1f')
+            
+            rating_distribution = {x: 0 for x in range(0, 5)}
+
+            for review in reviews:
+                rating_distribution[review.rating] = rating_distribution.get(review.rating, 0) + 1
+
+            result = {
+                "f_id": film.f_id,
+                "title": film.title,
+                "year": film.year,
+                "run_time": film.run_time,
+                "rating": rating,
+                "rating_distribution": rating_distribution,
+                "rating_imdb": film.rating_imdb,
+                "overview": film.overview,
+                "director": film.director,
+                "url_poster": film.url_poster
+            }
+
+            return result, 200
         else:
             return {'message': 'Film not found'}, 404
 
     @api.expect(film_create_model, validate=True)
+    @jwt_required()
     def post(self):
-        payload = json.loads(str(request.data, 'utf-8'))  # turn request body into python dictionary
-        title = payload["title"]
-        year = payload["year"]
-        director = payload["director"]
-        # check if film already exists
-        # FIXME: exists checking works for any one of three fields, but not for all
-        if db.session.query(
-                exists().where(Film.title == title and Film.year == year and Film.director == director)).scalar():
-            return {'message': 'Film already exists'}, 409
+
+        # check if current user is admin
+        if current_user.is_admin:
+            payload = json.loads(str(request.data, 'utf-8'))  # turn request body into python dictionary
+            title = payload["title"]
+            year = payload["year"]
+            director = payload["director"]
+            # check if film already exists
+            film = Film.query.filter(Film.title == title, Film.year == year, Film.director == director).first()
+            if film is not None:
+                return {'message': 'Film already exists'}, 409
+            else:
+                db.session.add(Film(title=title, year=year, run_time=payload['run_time'],
+                                    rating_imdb=payload['rating_imdb'], overview=payload['overview'], director=director,
+                                    url_poster=payload['url_poster']))
+                db.session.commit()
+                return {'message': 'Film created'}, 201
         else:
-            db.session.add(Film(title=title, year=year, run_time=payload['run_time'],
-                                rating_imdb=payload['rating_imdb'], overview=payload['overview'], director=director,
-                                url_poster=payload['url_poster']))
-            db.session.commit()
-            return {'message': 'Film created'}, 201
+            return {'message': 'Film can only be created by admin'}
 
 
 @api.route('/films/random', methods=['GET'])
