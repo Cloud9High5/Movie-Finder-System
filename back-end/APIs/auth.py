@@ -4,7 +4,7 @@ from re import U
 from flask import request, jsonify
 from flask_restx import Resource, Namespace, fields, reqparse
 from flask_mail import Message
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, current_user
+from flask_jwt_extended import create_access_token, jwt_required, current_user
 from sqlalchemy import exists
 from extensions import db, mail, jwt
 from Models.model import User
@@ -282,12 +282,12 @@ class user_info(Resource):
                 'is_self': False
             }
             
-            if not get_jwt_identity():
+            if not current_user:
                 # access from unauthorized user, return basic info
                 return result, 200
             else:
                 # access from authorized user
-                if u_id == get_jwt_identity():
+                if u_id == current_user.u_id:
                     # access his/her own profile, return basic info
                     result['is_self'] = True
                     return result, 200
