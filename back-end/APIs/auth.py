@@ -236,7 +236,8 @@ class login(Resource):
                 access_token = create_access_token(identity=user)
                 return {
                     'message': 'Logged in as {}'.format(user.username),
-                    'access_token': access_token
+                    'access_token': access_token,
+                    'u_id': user.u_id
                     }, 200
             else:
                 return {'message': 'Wrong password'}, 403
