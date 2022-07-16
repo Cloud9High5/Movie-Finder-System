@@ -7,6 +7,9 @@ def create_app():
     app = Flask(__name__)
     CORS(app)
 
+    app.config['HOST'] = '127.0.0.1'
+    app.config['PORT'] = 5000
+
     register_extensions(app)
     register_blueprints(app)
 
