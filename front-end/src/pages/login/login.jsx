@@ -92,7 +92,8 @@ function Login() {
     const data = await response.json();
     if (response.status === 200) {
       console.log(data);
-      localStorage.setItem('token', data.u_id);  // use uid as token
+      localStorage.setItem('token', data.access_token);  // use uid as token
+      localStorage.setItem('uid', data.u_id);  // use uid as token
       localStorage.setItem('email', states.email);  // might be used later
       if (from === undefined) {
         path('/mostPopularComments') // from sign up page to login, go to dashboard page

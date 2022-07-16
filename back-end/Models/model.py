@@ -1,7 +1,17 @@
 from datetime import datetime
-from extensions import db
+from extensions import db, jwt
 from .helper import u_id_generator, f_id_generator, r_id_generator
 from sqlalchemy import Table
+
+@jwt.user_identity_loader
+def user_identity_lookup(user):
+    return user.u_id
+
+
+@jwt.user_lookup_loader
+def user_lookup_callback(_jwt_header, jwt_data):
+    identity = jwt_data["sub"]
+    return User.query.filter_by(u_id=identity).one_or_none()
 
 followers = Table('followers', db.metadata,
     db.Column('followed_id', db.String(32), db.ForeignKey('user.u_id')),
