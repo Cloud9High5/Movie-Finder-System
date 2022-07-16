@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
+import datetime
 
 def create_app():
     print("Creating app...")
@@ -39,6 +40,7 @@ def register_extensions(app):
     mail.init_app(app)
 
     from extensions import jwt
-    app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
+    app.config['JWT_SECRET_KEY'] = 'AhDuiDuiDui'
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=1)
     jwt.init_app(app)
 
