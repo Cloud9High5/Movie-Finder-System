@@ -33,7 +33,6 @@ function ResetPassword () {
     const [genCode, setGenCode] = React.useState('');
     const [codeValid, setCodeValid] = React.useState(false);
     const [states, setStates] = React.useState({
-            email: '',
             password: '',
             c_password: '',
             showPassword: false,
@@ -41,9 +40,7 @@ function ResetPassword () {
             passwordsAreSame: false,
         });
 
-    const sendEmail = () => {
-        setDisableField(true);
-        setCodeDisabled(false);
+    const sendEmail = async () => {
         let temp = '';
         for (let i = 0; i < 6; i++) {
             const num = Math.floor(Math.random() * 10);
@@ -51,6 +48,14 @@ function ResetPassword () {
         }
         console.log('code: ' + temp)
         setGenCode(temp);
+        const response = await fetch("http://127.0.0.1:5000/auth/resetpwd?email=" + email + "&verification_code=" + temp);
+        if (response.status === 200) {
+            setDisableField(true);
+            setCodeDisabled(false);
+        } else {
+            setModalMsg("User not found, please register an account first");
+            setVisibility(true);
+        }
     }
 
     const validateEmail = () => {
@@ -84,8 +89,7 @@ function ResetPassword () {
             setModalMsg('Your verification code is incorrect!');
             setVisibility(true);
         } else {
-            setModalMsg('Sending reset request!');
-            setVisibility(true);
+            path('/login')
         }
     }
 
