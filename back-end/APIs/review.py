@@ -302,9 +302,9 @@ class like_list(Resource):
     #            like record               #
     ########################################
     @api.doc(
-        discription = "return a list of r_id which current user liked and disliked",
+        description = "return a list of r_id which current user liked and disliked",
         responses={
-            200, 'Success, list of liked and disliked reviews'
+            200: 'Success, list of liked and disliked reviews'
         }
     )
     @jwt_required()
