@@ -116,7 +116,7 @@ function Login() {
       <Typography variant="subtitle2" display="block" gutterBottom>
         Login to the DOUBI platform
       </Typography>
-      <Link variant="caption" display="block" onClick={toPreviousPage} gutterBottom>
+      <Link variant="caption" display="block" onClick={toPreviousPage} href={'#'} gutterBottom>
         ← Back to previous page
       </Link>
       <div className={classes.loginForm}>
@@ -167,7 +167,7 @@ function Login() {
             Don&apos;t have an account? &nbsp;&nbsp;
             <Link variant="body2" onClick={(e) => {
               path('/signup')
-            }}>
+            }} href={'#'}>
               {'Sign Up Now'}
             </Link>
           </div>
@@ -175,7 +175,7 @@ function Login() {
             Forgot password?&nbsp;&nbsp;
             <Link variant="body2" onClick={(e) => {
               path('/resetPassword')
-            }}>
+            }} href={'#'}>
               {'Reset Now'}
             </Link>
           </div>

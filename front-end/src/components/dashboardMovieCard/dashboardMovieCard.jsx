@@ -37,9 +37,10 @@ function DashboardMovieCard (props) {
                     </ListItemAvatar>
                     <ListItemText
                         primary={hotComment['username']}
-                        secondary={
-                            hotComment.content
-                        }/>
+                        secondary={hotComment.content}
+                        onClick={() => path('/profile/' + hotComment.u_id)}
+                        sx={{ cursor: 'pointer' }}
+                    />
                 </ListItem>
             )
         });

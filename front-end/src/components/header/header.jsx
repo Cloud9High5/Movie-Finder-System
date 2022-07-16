@@ -89,9 +89,20 @@ export default function Header() {
       }
     })
   }, [token])
-  
-  // console.log(open);
-  
+
+  // TODO: return is_active to decide whether the user can do actions
+  // React.useEffect(() => {
+  //   fetch('http://127.0.0.1:5000/auth/user/' + uid).then(async (response) => {
+  //       const data = await response.json();
+  //       console.log(data)
+  //       if (data['msg'] === 'Token has expired') {
+  //         alert('Token expired, please login again.');
+  //         // userLogout();
+  //       }
+  //   })
+  // }, [])
+
+
   return (
     <React.Fragment>
       <Toolbar className={classes.toolbar} sx={{maxWidth: 'lg'}}>

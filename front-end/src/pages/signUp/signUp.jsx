@@ -141,7 +141,7 @@ function SignUp() {
       <Typography variant="subtitle2" display="block" gutterBottom>
         Register on the DOUBI platform
       </Typography>
-      <Link variant="caption" display="block" onClick={toPreviousPage} gutterBottom>
+      <Link variant="caption" display="block" onClick={toPreviousPage} href={'#'} gutterBottom>
         ← Back to previous page
       </Link>
       <Box className={classes.box_1}>
@@ -224,7 +224,7 @@ function SignUp() {
             Sign Up
           </Button>
           Already have an account?
-          <Link variant="body2" onClick={toLogin}>
+          <Link variant="body2" onClick={toLogin} href={'#'}>
             {'Login now'}
           </Link>
         </Box>
