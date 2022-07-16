@@ -294,3 +294,4 @@ class rating_review(Resource):
                     return {'message': 'review undisliked'}, 200
         
                     
+# TODO: return all likes and dislikes for a user
