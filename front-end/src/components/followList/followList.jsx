@@ -1,35 +1,56 @@
-import Box from "@mui/material/Box";
-import {Typography} from '@mui/material';
-import Avatar from "@material-ui/core/Avatar";
-import {Thumb} from "../../components";
-import Rating from '@mui/material/Rating';
-import {Divider} from "@material-ui/core";
-import Grid from '@mui/material/Grid';
-import {makeStyles} from "@material-ui/core/styles";
-import {lightGreen} from "@material-ui/core/colors";
 import React from 'react';
 import {useParams} from "react-router-dom";
+import {DataGrid} from "@mui/x-data-grid";
 
 
 function FollowList() {
-  const token = localStorage.getItem('token');
-  const userId = useParams().uid;
+  const userID = useParams().uid;
+  const [followList, setFollowList] = React.useState([]);
+  
+  const columns = [
+    {field: 'id', headerName: 'ID', width: 70},
+    {field: 'photo', headerName: 'Avatar', width: 70},
+    {field: 'name', headerName: 'Name', width: 130},
+    {field: 'email', headerName: 'Last name', width: 130},
+  ];
   
   React.useEffect(() => {
-    async function fetchFollowList() {
-      const response = await fetch('http://127.0.0.1:5000/auth/user/' + userId + '/following_list');
-      const data = await response.json();
-      console.log(data)
+    const reqInfo = {
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
     }
-    
-    fetchFollowList();
+    fetch(`http://127.0.0.1:5000/auth/user/${userID}/following_list`, reqInfo).then(async (res) => {
+      if (res.status === 200) {
+        const tempData = await res.json();
+        console.log(tempData)
+        const data = []
+        for (let i = 0; i < tempData.length; i++) {
+          const temp = {
+            id: i,
+            photo: tempData[i].photo_url,
+            name: tempData[i].username,
+            email: tempData[i].email,
+          }
+          data.push(temp)
+        }
+        setFollowList(data);
+      }
+    })
   }, []);
   
   return (
-    <Box sx={{marginTop: 3}}>
-      {"Follow list"}
-    </Box>
-  
+    <div style={{height: 400, width: '100%'}}>
+      {Array.isArray(followList) ?
+        <DataGrid
+          rows={followList}
+          columns={columns}
+          pageSize={10}
+          rowsPerPageOptions={[10]}
+          checkboxSelection
+        /> : <div>You have a empty following list</div>}
+    
+    </div>
   )
 }
 

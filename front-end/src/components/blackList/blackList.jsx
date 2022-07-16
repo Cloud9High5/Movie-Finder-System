@@ -1,36 +1,59 @@
-import Box from "@mui/material/Box";
-import {Typography} from '@mui/material';
-import Avatar from "@material-ui/core/Avatar";
-import {Thumb} from "../../components";
-import Rating from '@mui/material/Rating';
-import {Divider} from "@material-ui/core";
-import Grid from '@mui/material/Grid';
-import {makeStyles} from "@material-ui/core/styles";
-import {lightGreen} from "@material-ui/core/colors";
+import {DataGrid} from '@mui/x-data-grid';
 import React from 'react';
 import {useParams} from "react-router-dom";
 
 
-function Blacklist() {
-  const token = localStorage.getItem('token');
-  const userId = useParams().uid;
+function BlackList() {
+  const userID = useParams().uid;
+  const [blackList, setBlackList] = React.useState([]);
+  
+  const columns = [
+    {field: 'id', headerName: 'ID', width: 70},
+    {field: 'photo', headerName: 'Avatar', width: 70},
+    {field: 'name', headerName: 'Name', width: 130},
+    {field: 'email', headerName: 'Last name', width: 130},
+  ];
   
   React.useEffect(() => {
-    async function fetchBlackList() {
-      const response = await fetch('http://127.0.0.1:5000/auth/user/' + userId + '/black_list');
-      const data = await response.json();
-      console.log(data)
+    const reqInfo = {
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
     }
     
-    fetchBlackList();
-  }, []);
+    fetch(`http://127.0.0.1:5000/auth/user/${userID}/black_list`, reqInfo).then(async (res) => {
+      if (res.status === 200) {
+        const tempData = await res.json();
+        console.log(tempData)
+        const data = []
+        for (let i = 0; i < tempData.length; i++) {
+          const temp = {
+            id: i,
+            photo: tempData[i].photo_url,
+            name: tempData[i].username,
+            email: tempData[i].email,
+          }
+          data.push(temp)
+        }
+        setBlackList(data);
+      }
+    })
+    
+  }, [userID]);
   
   return (
-    <Box sx={{marginTop: 3}}>
-      {"Black list"}
-    </Box>
-  
+    <div style={{height: 400, width: '100%'}}>
+      {Array.isArray(blackList) ?
+        <DataGrid
+          rows={blackList}
+          columns={columns}
+          pageSize={10}
+          rowsPerPageOptions={[10]}
+          checkboxSelection
+        /> : <div>Your have a empty black list</div>}
+    
+    </div>
   )
 }
 
-export default Blacklist;
+export default BlackList;
