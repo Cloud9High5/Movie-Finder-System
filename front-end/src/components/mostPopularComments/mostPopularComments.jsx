@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Button, Grid, Link, MenuItem, Select, Typography } from '@mui/material';
 import Rating from '@mui/material/Rating';
 import { useNavigate } from "react-router-dom";
+import * as helpers from "../../helpers";
 
 function MostPopularComments () {
     const [rawComments, setRawComments] = React.useState([]);  // comments with uid and movie_id
@@ -14,7 +15,12 @@ function MostPopularComments () {
 
     // obtain comments from backend
     React.useEffect(() => {
-        fetch('http://127.0.0.1:5000/review?method=recent_top&top=' + commentNum + '&recent=' + commentMonth).then(async (response) => {
+        const reqInfo = {
+            headers: {
+                'Authorization': helpers.hasNoToken() ? '' : 'Bearer ' + localStorage.getItem('token'),
+            },
+        }
+        fetch('http://127.0.0.1:5000/review?method=recent_top&top=' + commentNum + '&recent=' + commentMonth, reqInfo).then(async (response) => {
             const data = await response.json();
             setRawComments([...data]);
         })
@@ -134,7 +140,7 @@ function MostPopularComments () {
                                     </Typography>
                                 </Box>
                                 <Box display={'flex'} alignItems={'center'}>
-                                    <Typography variant={'p'} color={'gray'}>
+                                    <Typography variant={'p'} color={'gray'} onClick={() => {path('/profile/' + comment.u_id)}} sx={{ cursor: 'pointer' }}>
                                         {comment.username}
                                     </Typography>
                                     <Box marginLeft={'10px'}>

@@ -1,14 +1,15 @@
 import Box from "@mui/material/Box";
-import {Typography} from '@mui/material';
+import { Typography } from '@mui/material';
 import Avatar from "@material-ui/core/Avatar";
-import {Thumb} from "../../components";
+import { Thumb } from "../../components";
 import Rating from '@mui/material/Rating';
-import {Divider} from "@material-ui/core";
+import { Divider } from "@material-ui/core";
 import Grid from '@mui/material/Grid';
-import {makeStyles} from "@material-ui/core/styles";
-import {lightGreen} from "@material-ui/core/colors";
+import { makeStyles } from "@material-ui/core/styles";
+import { lightGreen } from "@material-ui/core/colors";
 import React from 'react';
-import {useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import * as helpers from "../../helpers";
 
 const useStyles = makeStyles(theme => ({
   textBar: {
@@ -27,9 +28,11 @@ const parseDateString = (date) => {
 }
 
 
-function CommentBlock({props}) {
+function CommentBlock ({ props }) {
   const classes = useStyles();
   const token = localStorage.getItem('token');
+  const path = useNavigate();
+
   const likeComment = async (review) => {
     const requestInfo = {
       method: 'POST',
@@ -74,15 +77,22 @@ function CommentBlock({props}) {
     }
     setFlag(!flag);
   }
-  
+
   const [rawComments, setRawComments] = React.useState([]);  // comments with uid and movie_id
   // const [tempComments, setTempComments] = React.useState([]);  // comments with username and mostPopularComments id
   const [comments, setComments] = React.useState([]);  // the combined comments dataset
   const [flag, setFlag] = React.useState(false);
   const mid = useParams()['movieID'];
+
   // obtain comments from backend
   React.useEffect(() => {
-    fetch('http://127.0.0.1:5000/review?method=f_id&f_id=' + mid).then(async (response) => {
+    const reqInfo = {
+      method: 'GET',
+      headers: {
+        'Authorization': helpers.hasNoToken() ? '' : 'Bearer ' + localStorage.getItem('token'),
+      },
+    }
+    fetch('http://127.0.0.1:5000/review?method=f_id&f_id=' + mid, reqInfo).then(async (response) => {
       const data = await response.json();
       setRawComments([...data]);
       // console.log('raw comments: ', JSON.stringify(data));
@@ -99,9 +109,9 @@ function CommentBlock({props}) {
       })
     ))
   }, [rawComments])
-  
+
   return (
-    <Box sx={{marginTop: 3}}>
+    <Box sx={{ marginTop: 3 }}>
       <Typography variant={'h5'}>Comments:</Typography>
       <Divider/>
       {Array.isArray(props) ? comments.map((review, idx) => {
@@ -118,7 +128,8 @@ function CommentBlock({props}) {
                     U
                   </Avatar>
                   <Box marginLeft={'10px'}>
-                    <Typography variant={'p'} color={'gray'}>
+                    <Typography variant={'p'} color={'gray'} onClick={() => path('/profile/' + review.u_id)}
+                                sx={{ cursor: 'pointer' }}>
                       {review.username}
                     </Typography>
                   </Box>
@@ -143,8 +154,7 @@ function CommentBlock({props}) {
                 </Box>
                 <Box display={'flex'} alignItems={'flex-end'}>
                   <Typography variant={'p'} color={'gray'}>
-                    {/*Posted on: {parseDateString(review.release_date)}*/}
-                    Posted on: {review.created_time.substring(0,19)}
+                    Posted on: {review.created_time.substring(0, 19)}
                   </Typography>
                 </Box>
               </Grid>
