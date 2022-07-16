@@ -103,20 +103,25 @@ class film(Resource):
     @api.expect(film_create_model, validate=True)
     @jwt_required()
     def post(self):
-        payload = json.loads(str(request.data, 'utf-8'))  # turn request body into python dictionary
-        title = payload["title"]
-        year = payload["year"]
-        director = payload["director"]
-        # check if film already exists
-        film = Film.query.filter(Film.title == title, Film.year == year, Film.director == director).first()
-        if film is not None:
-            return {'message': 'Film already exists'}, 409
+
+        # check if current user is admin
+        if current_user.is_admin:
+            payload = json.loads(str(request.data, 'utf-8'))  # turn request body into python dictionary
+            title = payload["title"]
+            year = payload["year"]
+            director = payload["director"]
+            # check if film already exists
+            film = Film.query.filter(Film.title == title, Film.year == year, Film.director == director).first()
+            if film is not None:
+                return {'message': 'Film already exists'}, 409
+            else:
+                db.session.add(Film(title=title, year=year, run_time=payload['run_time'],
+                                    rating_imdb=payload['rating_imdb'], overview=payload['overview'], director=director,
+                                    url_poster=payload['url_poster']))
+                db.session.commit()
+                return {'message': 'Film created'}, 201
         else:
-            db.session.add(Film(title=title, year=year, run_time=payload['run_time'],
-                                rating_imdb=payload['rating_imdb'], overview=payload['overview'], director=director,
-                                url_poster=payload['url_poster']))
-            db.session.commit()
-            return {'message': 'Film created'}, 201
+            return {'message': 'Film can only be created by admin'}
 
 
 @api.route('/films/random', methods=['GET'])
