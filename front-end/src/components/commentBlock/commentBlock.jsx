@@ -143,10 +143,10 @@ function CommentBlock ({ props }) {
                     <Thumb quantity={review.dislike} type={'down'}/>
                   </Box>
                   <Box sx={{ marginLeft: '20px' }}>
-                    {
+                    {!helpers.hasNoToken() &&
                       likesDislikes.likes.indexOf(review.r_id) !== -1 ? <Chip label={'You Liked'} color={'success'} size={'small'} variant={'outlined'} /> : <></>
                     }
-                    {
+                    {!helpers.hasNoToken() &&
                       likesDislikes.dislikes.indexOf(review.r_id) !== -1 ? <Chip label={'You Dislike'} color={'error'} size={'small'} variant={'outlined'} /> : <></>
                     }
                   </Box>
