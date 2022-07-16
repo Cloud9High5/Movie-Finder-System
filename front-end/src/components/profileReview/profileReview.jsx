@@ -26,11 +26,12 @@ const columns = [
 
 function ProfileReview () {
   const uid = useParams().uid;
+  const [targetInfo, setTargetInfo] = React.useState({});
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [data, setData] = React.useState([]);
   const [flag, setFlag] = React.useState(true);
-  const [likesDislikes ,setLikesDislikes] = React.useState({});
+  const [likesDislikes, setLikesDislikes] = React.useState({});
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -43,8 +44,7 @@ function ProfileReview () {
 
   // whether this page displays the user's own info
   const isSelf = () => {
-    const self = localStorage.getItem('uid');
-    return self === uid;
+    return targetInfo.is_self;
   }
 
   const isNotLoggedIn = () => {
@@ -72,9 +72,16 @@ function ProfileReview () {
     }
     fetch('http://127.0.0.1:5000/review/likes_dislikes', reqInfo).then(async (response) => {
       const data = await response.json();
-      setLikesDislikes({...data});
+      setLikesDislikes({ ...data });
     })
   }, [flag])
+
+  React.useEffect(() => {
+    fetch(`http://127.0.0.1:5000/auth/user/${uid}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }).then(async (response) => {
+      const data = await response.json();
+      setTargetInfo({...data});
+    })
+  }, [])
 
   const deleteReview = async (rid) => {
     const reqInfo = {
@@ -90,7 +97,9 @@ function ProfileReview () {
   }
 
   const reviewAction = async (rid, action) => {
-    if (isNotLoggedIn()) { return }
+    if (isNotLoggedIn()) {
+      return
+    }
     const requestedInfo = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
@@ -107,7 +116,7 @@ function ProfileReview () {
 
   return (
     <>
-      <h1>ProfileReview</h1>
+      <h1>{isSelf() ? 'Your' : targetInfo.username + '\'s'} Review</h1>
 
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer sx={{ maxHeight: 640 }}>
@@ -151,21 +160,23 @@ function ProfileReview () {
                                     onClick={() => deleteReview(row.r_id)}>Delete</Button>
                             :
                             <>
-                              <Button variant={likesDislikes.likes.indexOf(row.r_id) === -1 ? 'outlined' : 'contained'}
-                                      color={'info'}
-                                      endIcon={<ThumbUpIcon sx={{ marginLeft: '12px' }}/>}
-                                      onClick={() => reviewAction(row.r_id, 1)}
-                                      sx={{ width: '80px', marginBottom: '5px', textTransform: 'none' }}
-                                      disabled={likesDislikes.dislikes.indexOf(row.r_id) !== -1}
+                              <Button
+                                variant={likesDislikes.likes.indexOf(row.r_id) === -1 ? 'outlined' : 'contained'}
+                                color={'info'}
+                                endIcon={<ThumbUpIcon sx={{ marginLeft: '12px' }}/>}
+                                onClick={() => reviewAction(row.r_id, 1)}
+                                sx={{ width: '80px', marginBottom: '5px', textTransform: 'none' }}
+                                disabled={likesDislikes.dislikes.indexOf(row.r_id) !== -1}
                               >
                                 {likesDislikes.likes.indexOf(row.r_id) === -1 ? 'Like' : 'Liked'}
                               </Button>
-                              <Button variant={likesDislikes.dislikes.indexOf(row.r_id) === -1 ? 'outlined' : 'contained'}
-                                      color={'error'}
-                                      endIcon={<ThumbDownAltIcon/>}
-                                      onClick={() => reviewAction(row.r_id, 0)}
-                                      sx={{ width: '80px', marginTop: '5px', textTransform: 'none' }}
-                                      disabled={likesDislikes.likes.indexOf(row.r_id) !== -1}
+                              <Button
+                                variant={likesDislikes.dislikes.indexOf(row.r_id) === -1 ? 'outlined' : 'contained'}
+                                color={'error'}
+                                endIcon={<ThumbDownAltIcon/>}
+                                onClick={() => reviewAction(row.r_id, 0)}
+                                sx={{ width: '80px', marginTop: '5px', textTransform: 'none' }}
+                                disabled={likesDislikes.likes.indexOf(row.r_id) !== -1}
                               >
                                 {likesDislikes.dislikes.indexOf(row.r_id) === -1 ? 'Dislike' : 'Disliked'}
                               </Button>
