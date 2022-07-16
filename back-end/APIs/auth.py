@@ -11,21 +11,6 @@ from Models.model import User
 
 api = Namespace("auth", description="Authentication related operations", path="/")
 
-################################################################################
-#                                  JWT SETTING                                 #
-################################################################################
-
-
-@jwt.user_identity_loader
-def user_identity_lookup(user):
-    return user.u_id
-
-
-@jwt.user_lookup_loader
-def user_lookup_callback(_jwt_header, jwt_data):
-    identity = jwt_data["sub"]
-    return User.query.filter_by(u_id=identity).one_or_none()
-
 
 ################################################################################
 #                             AUTHENTICATION MODEL                             #
