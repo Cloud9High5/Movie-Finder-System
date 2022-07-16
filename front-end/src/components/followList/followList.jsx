@@ -1,18 +1,22 @@
 import React from 'react';
 import {useParams} from "react-router-dom";
-import {DataGrid} from "@mui/x-data-grid";
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import Button from "@mui/material/Button";
 
+function createData(photo, name, email) {
+  return {photo, name, email};
+}
 
 function FollowList() {
   const userID = useParams().uid;
   const [followList, setFollowList] = React.useState([]);
   
-  const columns = [
-    {field: 'id', headerName: 'ID', width: 70},
-    {field: 'photo', headerName: 'Avatar', width: 70},
-    {field: 'name', headerName: 'Name', width: 130},
-    {field: 'email', headerName: 'Last name', width: 130},
-  ];
   
   React.useEffect(() => {
     const reqInfo = {
@@ -26,13 +30,7 @@ function FollowList() {
         console.log(tempData)
         const data = []
         for (let i = 0; i < tempData.length; i++) {
-          const temp = {
-            id: i,
-            photo: tempData[i].photo_url,
-            name: tempData[i].username,
-            email: tempData[i].email,
-          }
-          data.push(temp)
+          data.push(createData(tempData[i].photo_url, tempData[i].username, tempData[i].email))
         }
         setFollowList(data);
       }
@@ -41,14 +39,33 @@ function FollowList() {
   
   return (
     <div style={{height: 400, width: '100%'}}>
-      {Array.isArray(followList) ?
-        <DataGrid
-          rows={followList}
-          columns={columns}
-          pageSize={10}
-          rowsPerPageOptions={[10]}
-          checkboxSelection
-        /> : <div>You have a empty following list</div>}
+      {Array.isArray(followList) ? <TableContainer component={Paper}>
+        <Table sx={{minWidth: 650}} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Photo</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {followList.map((row) => (
+              <TableRow
+                key={row.name}
+                sx={{'&:last-child td, &:last-child th': {border: 0}}}
+              >
+                <TableCell>{row.photo}</TableCell>
+                <TableCell>{row.name}</TableCell>
+                <TableCell>{row.email}</TableCell>
+                <TableCell>
+                  <Button variant="contained">Unfollow</Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer> : <div>You have a empty following list</div>}
     
     </div>
   )

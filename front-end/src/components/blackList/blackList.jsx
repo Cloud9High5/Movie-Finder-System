@@ -1,18 +1,26 @@
-import {DataGrid} from '@mui/x-data-grid';
 import React from 'react';
 import {useParams} from "react-router-dom";
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import Button from "@mui/material/Button";
 
+function createData(photo, name, email) {
+  return {photo, name, email};
+}
+
+function isSelf(userID) {
+  return userID === localStorage.getItem('uid');
+}
 
 function BlackList() {
   const userID = useParams().uid;
   const [blackList, setBlackList] = React.useState([]);
   
-  const columns = [
-    {field: 'id', headerName: 'ID', width: 70},
-    {field: 'photo', headerName: 'Avatar', width: 70},
-    {field: 'name', headerName: 'Name', width: 130},
-    {field: 'email', headerName: 'Last name', width: 130},
-  ];
   
   React.useEffect(() => {
     const reqInfo = {
@@ -27,13 +35,7 @@ function BlackList() {
         console.log(tempData)
         const data = []
         for (let i = 0; i < tempData.length; i++) {
-          const temp = {
-            id: i,
-            photo: tempData[i].photo_url,
-            name: tempData[i].username,
-            email: tempData[i].email,
-          }
-          data.push(temp)
+          data.push(createData(tempData[i].photo_url, tempData[i].username, tempData[i].email))
         }
         setBlackList(data);
       }
@@ -43,14 +45,33 @@ function BlackList() {
   
   return (
     <div style={{height: 400, width: '100%'}}>
-      {Array.isArray(blackList) ?
-        <DataGrid
-          rows={blackList}
-          columns={columns}
-          pageSize={10}
-          rowsPerPageOptions={[10]}
-          checkboxSelection
-        /> : <div>Your have a empty black list</div>}
+      {Array.isArray(blackList) ? <TableContainer component={Paper}>
+        <Table sx={{minWidth: 650}} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Photo</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Email</TableCell>
+              {isSelf(userID) ? <TableCell></TableCell> : null}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {blackList.map((row) => (
+              <TableRow
+                key={row.name}
+                sx={{'&:last-child td, &:last-child th': {border: 0}}}
+              >
+                <TableCell>{row.photo}</TableCell>
+                <TableCell>{row.name}</TableCell>
+                <TableCell>{row.email}</TableCell>
+                {isSelf(userID) ? <TableCell>
+                  <Button variant="contained">Unblack</Button>
+                </TableCell> : null}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer> : <div>You have a empty black list</div>}
     
     </div>
   )
