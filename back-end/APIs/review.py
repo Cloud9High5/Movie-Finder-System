@@ -1,4 +1,5 @@
 import json
+from urllib import response
 from winreg import DisableReflectionKey
 from flask import request
 from flask_restx import Resource, Namespace, fields, reqparse
@@ -294,3 +295,20 @@ class rating_review(Resource):
                     return {'message': 'review undisliked'}, 200
         
                     
+@api.route('/review/likes_dislikes', methods=['GET'])
+class like_list(Resource):
+
+    ########################################
+    #            like record               #
+    ########################################
+    @api.doc(
+        discription = "return a list of r_id which current user liked and disliked",
+        responses={
+            200, 'Success, list of liked and disliked reviews'
+        }
+    )
+    @jwt_required()
+    def get(self):
+        likes = current_user.review_likes.all()
+        dislikes = current_user.review_dislikes.all()
+        return {'likes': [like.r_id for like in likes], 'dislikes': [dislike.r_id for dislike in dislikes]}, 200
