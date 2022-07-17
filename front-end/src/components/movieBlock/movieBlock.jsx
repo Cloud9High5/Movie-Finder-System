@@ -9,7 +9,7 @@ import Typography from "@material-ui/core/Typography";
 import Stack from '@mui/material/Stack';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
-import { Rating } from "@mui/material";
+import { LinearProgress, Rating } from "@mui/material";
 import PropTypes from "prop-types";
 import Divider from '@mui/material/Divider';
 import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
@@ -131,67 +131,80 @@ function MovieBlock (props) {
               </CardContent>
             </Card>
             <Stack direction="row" spacing={2}>
-              <Box sx={{ p: 1 }}>
-                <Typography gutterBottom variant="h4" component="span">
-                  Average rate: {props.rating}
-                </Typography>
-              </Box>
-              <Box sx={{ p: 1 }}>
-                <Stack direction="row">
-                  <Button variant="outlined"
-                          size="large"
-                          onClick={handleOpen}
-                          startIcon={<AutoFixHighOutlinedIcon/>}>
-                    Rate the movie!
-                  </Button>
-                  <Modal
-                    open={visibility}
-                    onClose={handleClose}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                  >
-                    <Box sx={style}
-                         display="flex"
-                         justifyContent="flex-start"
-                         flexDirection={'column'}
-                         alignItems="flex-start">
-                      <Typography id="modal-modal-title" variant="h5" component="h2">
-                        Rate for this movie
-                      </Typography>
-                      <Box display={'flex'}>
-                        <Rating
-                          name="simple-controlled"
-                          value={rate}
-                          size="large"
-                          onChange={(event, newValue) => {
-                            newValue === null ?
-                            setRate(0)
-                              : setRate(newValue)
-                          }}
-                          onChangeActive={(event, newHover) => {
-                            setHover(newHover);
-                          }}
-                        />
-                        <div style={{ fontSize: '20px', marginLeft: '10px' }}>  {labels[hover !== -1 ? hover : rate]} </div>
+              <Box display={'flex'}>
+                <Box sx={{ p: 1 }}>
+                  <Typography gutterBottom variant="h5" component="span">
+                    IMDB Rating: {props.rating}
+                  </Typography>
+                </Box>
+                <Box sx={{ p: 1 }}>
+                  <Stack direction="row">
+                    <Button variant="outlined"
+                            size="large"
+                            onClick={handleOpen}
+                            startIcon={<AutoFixHighOutlinedIcon/>}>
+                      Rate the movie!
+                    </Button>
+                    <Modal
+                      open={visibility}
+                      onClose={handleClose}
+                      aria-labelledby="modal-modal-title"
+                      aria-describedby="modal-modal-description"
+                    >
+                      <Box sx={style}
+                           display="flex"
+                           justifyContent="flex-start"
+                           flexDirection={'column'}
+                           alignItems="flex-start">
+                        <Typography id="modal-modal-title" variant="h5" component="h2">
+                          Rate for this movie
+                        </Typography>
+                        <Box display={'flex'}>
+                          <Rating
+                            name="simple-controlled"
+                            value={rate}
+                            size="large"
+                            onChange={(event, newValue) => {
+                              newValue === null ?
+                                setRate(0)
+                                : setRate(newValue)
+                            }}
+                            onChangeActive={(event, newHover) => {
+                              setHover(newHover);
+                            }}
+                          />
+                          <div style={{
+                            fontSize: '20px',
+                            marginLeft: '10px'
+                          }}>  {labels[hover !== -1 ? hover : rate]} </div>
+                        </Box>
+                        <TextField sx={{ marginTop: 2 }}
+                                   fullWidth
+                                   id="outlined-basic"
+                                   label="Leave a comment..."
+                                   variant={"outlined"}
+                                   multiline
+                                   inputRef={commentRef}
+                                   required={true}
+                                   rows={6}/>
+                        <Button sx={{ marginTop: 2 }}
+                                variant="contained"
+                                onClick={rateMovie}
+                        >Post</Button>
                       </Box>
-                      <TextField sx={{ marginTop: 2 }}
-                                 fullWidth
-                                 id="outlined-basic"
-                                 label="Leave a comment..."
-                                 variant={"outlined"}
-                                 multiline
-                                 inputRef={commentRef}
-                                 required={true}
-                                 rows={6}/>
-                      <Button sx={{ marginTop: 2 }}
-                              variant="contained"
-                              onClick={rateMovie}
-                      >Post</Button>
-                    </Box>
-                  </Modal>
-                </Stack>
+                    </Modal>
+                  </Stack>
+                </Box>
               </Box>
             </Stack>
+            <Box display={'flex'} flexDirection={'column'}>
+              <Box display={'flex'} alignItems={'center'}> 5 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={10} sx={{ width: '65%', height: 10 }}/> </Box>
+              <Box display={'flex'} alignItems={'center'}> 4 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={10} sx={{ width: '65%', height: 10 }}/> </Box>
+              <Box display={'flex'} alignItems={'center'}> 3 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={10} sx={{ width: '65%', height: 10 }}/> </Box>
+              <Box display={'flex'} alignItems={'center'}> 2 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={10} sx={{ width: '65%', height: 10 }}/> </Box>
+              <Box display={'flex'} alignItems={'center'}> 1 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={10} sx={{ width: '65%', height: 10 }}/> </Box>
+              <Box display={'flex'} alignItems={'center'}> 0 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={10} sx={{ width: '65%', height: 10 }}/> </Box>
+            </Box>
           </Grid>
         </Grid>
       </Box>
