@@ -353,7 +353,7 @@ class following_list(Resource):
             401: 'Fail, Empty list',
         }
     )
-    @api.marshal_list_with(user_model, code=200)
+    # @api.marshal_list_with(user_model, code=200)
     def get(self, u_id):
         target_user = db.session.query(User).filter(User.u_id == u_id).first()
         if target_user:
@@ -368,9 +368,7 @@ class following_list(Resource):
                     'is_blocked': user.is_blocked
                     } for user in users], 200
             else:
-                return {
-                    'message': "{}'s following list is empty".format(target_user.username)
-                }, 401
+                return {}, 200
         else:
             return {
                 'message': 'User not found'
@@ -433,7 +431,7 @@ class black_list(Resource):
             401: 'Fail, Empty list',
         }
     )
-    @api.marshal_list_with(user_model, code=200)
+    # @api.marshal_list_with(user_model, code=200)
     def get(self, u_id):
         target_user = User.query.filter_by(u_id=u_id).first()
         if target_user:
@@ -449,9 +447,7 @@ class black_list(Resource):
             if result != []:
                 return result, 200
             else:
-                return {
-                    'message': "{}'s black list is empty".format(target_user.username)
-                }, 401
+                return {}, 401
 
     ########################################
     #       Add & Remove black list        #
