@@ -9,13 +9,36 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Button from "@mui/material/Button";
 
-function createData(photo, name, email) {
-  return {photo, name, email};
+function createData(uid, photo, name, email) {
+  return {uid, photo, name, email};
+}
+
+function isSelf(userID) {
+  return userID === localStorage.getItem('uid');
 }
 
 function FollowList() {
   const userID = useParams().uid;
   const [followList, setFollowList] = React.useState([]);
+  
+  const unfollow = async (uid) => {
+
+    const requestInfo = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+      },
+    };
+    const response = await fetch(`http://127.0.0.1:5000/auth/user/${uid}/following_list`, requestInfo);
+    if (response.status === 200) {
+      window.location.reload();
+    } else {
+      alert("Please login first")
+      window.location.reload();
+
+    }
+  }
   
   
   React.useEffect(() => {
@@ -31,7 +54,7 @@ function FollowList() {
         console.log(tempData)
         const data = []
         for (let i = 0; i < tempData.length; i++) {
-          data.push(createData(tempData[i].photo_url, tempData[i].username, tempData[i].email))
+          data.push(createData(tempData[i].u_id,tempData[i].photo_url, tempData[i].username, tempData[i].email))
         }
         setFollowList(data);
       }
@@ -47,7 +70,7 @@ function FollowList() {
               <TableCell>Photo</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Email</TableCell>
-              <TableCell></TableCell>
+              {isSelf(userID) ? <TableCell></TableCell> : null}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -59,9 +82,10 @@ function FollowList() {
                 <TableCell>{row.photo}</TableCell>
                 <TableCell>{row.name}</TableCell>
                 <TableCell>{row.email}</TableCell>
-                <TableCell>
-                  <Button variant="contained">Unfollow</Button>
-                </TableCell>
+                {isSelf(userID) ? <TableCell>
+                  <Button variant="contained" onClick={() => unfollow(row.uid)}>Unfollow</Button>
+                </TableCell> : null}
+                
               </TableRow>
             ))}
           </TableBody>
