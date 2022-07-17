@@ -368,7 +368,7 @@ class following_list(Resource):
                     'is_blocked': user.is_blocked
                     } for user in users], 200
             else:
-                return {}, 200
+                return [], 200
         else:
             return {
                 'message': 'User not found'
@@ -447,7 +447,7 @@ class black_list(Resource):
             if result != []:
                 return result, 200
             else:
-                return {}, 401
+                return [], 200
 
     ########################################
     #       Add & Remove black list        #
