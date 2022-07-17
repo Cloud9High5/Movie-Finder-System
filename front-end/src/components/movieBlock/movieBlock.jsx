@@ -110,7 +110,7 @@ function MovieBlock (props) {
       let sum = 0;
       for (const key in data.rating_distribution) {sum += data.rating_distribution[key]}
       for (const [key, value] of Object.entries(data.rating_distribution)) {
-        temp[key] = value === 0 ? 0 : value / sum * 100;
+        temp[key] = value === 0 ? 0 : parseInt((value / sum * 100).toFixed());
       }
       setRatePercentage({ ...temp });
     })
