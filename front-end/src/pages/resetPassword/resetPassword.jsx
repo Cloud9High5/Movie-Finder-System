@@ -123,7 +123,7 @@ function ResetPassword () {
             <Typography variant="subtitle2" display="block" gutterBottom>
                 Reset your account password using your code
             </Typography>
-            <Link variant="caption" display="block" onClick={() => path(-1)} gutterBottom>
+            <Link variant="caption" display="block" onClick={() => path(-1)} href={'#'} gutterBottom>
                 ← Back to previous page
             </Link>
             <TextField

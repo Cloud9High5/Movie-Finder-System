@@ -6,8 +6,9 @@ import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
-import {ProfileCard} from "../../components/";
-import {ProfileReview} from "../../components/";
+import {ProfileCard, ProfileReview, FollowList, BlackList} from "../../components/";
+import { useParams } from "react-router-dom";
+import * as helpers from "../../helpers";
 
 function TabPanel(props) {
   const {children, value, index, ...other} = props;
@@ -44,16 +45,31 @@ function a11yProps(index) {
 
 function Profile() {
   const [value, setValue] = React.useState(0);
+  const uid = useParams().uid;
+  const [userInfo, setUserInfo] = React.useState({});
 
+  React.useEffect(() => {
+    const reqInfo = {
+      headers: {
+        'Authorization': helpers.hasNoToken() ? '' : 'Bearer ' + localStorage.getItem('token'),
+      },
+    }
+    fetch('http://localhost:5000/auth/user/' + uid, reqInfo).then(async (response) => {
+      const data = await response.json();
+      setUserInfo(data);
+      console.log(data)
+    })
+  }, [])
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
   return (
     <Container>
       <Header/>
       <Box>
         <Box
-          sx={{flexGrow: 1, bgcolor: 'background.paper', display: 'flex', height: 224}}
+          sx={{flexGrow: 1, bgcolor: 'background.paper', display: 'flex', height: 400}}
         >
           <Tabs
             orientation="vertical"
@@ -63,18 +79,22 @@ function Profile() {
             aria-label="Vertical tabs example"
             sx={{borderRight: 1, borderColor: 'divider'}}
           >
-            <Tab label="PROFILE" {...a11yProps(0)} />
-            <Tab label="FOLLOWS" {...a11yProps(1)} />
-            <Tab label="REVIEWS" {...a11yProps(2)} />
+            <Tab label="Profile" {...a11yProps(0)} sx={{textTransform: 'none'}} style={{fontSize: "large"}}/>
+            <Tab label="My Follows" {...a11yProps(1)} style={{fontSize: "large"}} sx={userInfo.is_self ? {display: 'inline-flex', textTransform: 'none'} : {display: 'none'}}/>
+            <Tab label="My Blacklist" {...a11yProps(2)} style={{fontSize: "large"}} sx={userInfo.is_self ? {display: 'inline-flex', textTransform: 'none'} : {display: 'none'}}/>
+            <Tab label="Reviews" {...a11yProps(3)} sx={{textTransform: 'none'}} style={{fontSize: "large"}}/>
           </Tabs>
           <Box style={{width: '100%'}}>
             <TabPanel value={value} index={0}>
               <ProfileCard/>
             </TabPanel>
             <TabPanel value={value} index={1}>
-              FOLLOWS
+              <FollowList/>
             </TabPanel>
             <TabPanel value={value} index={2}>
+              <BlackList/>
+            </TabPanel>
+            <TabPanel value={value} index={3}>
               <ProfileReview/>
             </TabPanel>
           </Box>

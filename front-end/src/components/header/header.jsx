@@ -40,6 +40,7 @@ export default function Header() {
   const path = useNavigate();
   const [userInfo, setUserInfo] = React.useState({});
   const [token, setToken] = React.useState(localStorage.getItem('token'));
+  const [uid, setUid] = React.useState(localStorage.getItem('uid'));
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const from = useLocation().pathname;
@@ -79,7 +80,7 @@ export default function Header() {
   }
   
   React.useEffect(() => {
-    fetch('http://127.0.0.1:5000/auth/user/' + token).then(async (response) => {
+    fetch('http://127.0.0.1:5000/auth/user/' + uid).then(async (response) => {
       if (response.status === 200) {
         const data = await response.json();
         setUserInfo({...data});
@@ -88,9 +89,20 @@ export default function Header() {
       }
     })
   }, [token])
-  
-  // console.log(open);
-  
+
+  // TODO: return is_active to decide whether the user can do actions
+  // React.useEffect(() => {
+  //   fetch('http://127.0.0.1:5000/auth/user/' + uid).then(async (response) => {
+  //       const data = await response.json();
+  //       console.log(data)
+  //       if (data['msg'] === 'Token has expired') {
+  //         alert('Token expired, please login again.');
+  //         // userLogout();
+  //       }
+  //   })
+  // }, [])
+
+
   return (
     <React.Fragment>
       <Toolbar className={classes.toolbar} sx={{maxWidth: 'lg'}}>
@@ -133,7 +145,7 @@ export default function Header() {
                                   onClose={handleClose}
                                 >
                                     <MenuItem onClick={() => {
-                                      navigate("/profile/" + localStorage.getItem('token'));
+                                      navigate("/profile/" + localStorage.getItem('uid'));
                                       handleClose()
   
                                     }

@@ -2,6 +2,7 @@ import {Box, Grid, Typography, Button, TextField} from '@mui/material';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import { useState, useEffect } from 'react';
 import { useParams } from "react-router-dom";
+import * as helpers from "../../helpers";
 
 
 function ProfileCard() {
@@ -9,23 +10,23 @@ function ProfileCard() {
   const [profile, setProfile] = useState(null);
   const userID = useParams().uid;
 
+  // get user info
   useEffect(() => {
-    // const userID = localStorage.getItem('token');
+    const reqInfo = {
+      headers: {
+        'Authorization': helpers.hasNoToken() ? '' : 'Bearer ' + localStorage.getItem('token'),
+      },
+    }
     if (!profile && userID) {
-      fetch(`http://127.0.0.1:5000/auth/user/${userID}`).then(async (res) => {
+      fetch(`http://127.0.0.1:5000/auth/user/${userID}`, reqInfo).then(async (res) => {
         if (res.status === 200) {
           const data = await res.json();
+          console.log(data)
           setProfile(data);
         }
       })
     }
   }, []);
-
-  // whether this page displays the user's own info
-  const isSelf = () => {
-    const self = localStorage.getItem('token');
-    return self === userID;
-  }
 
   if (!profile) {
     return <Typography component={'span'} variant={'h4'}>Cannot fetch information of this user!</Typography>
