@@ -76,3 +76,22 @@ What is planned for the next period (e.g., next week)
 1.	Fixing bugs that Rachid pointed out
 2.	Start working on sprint 2
 
+Week 6
+
+what was planned for the period since the last work diary entry
+1.	Finish sprint 2
+2.	Fixing discovered bugs
+What was finished
+1.	Reset password page 
+2.	User’s own profile review page
+3.	Other users’ review page
+What were the main technical and non-technical obstacles and how they were overcome (or what was tried and did not work)
+N/A
+What was not finished, why this happened, how this affects the overall project progress and what adjustments (if any) are needed so the success of the project is not endangered
+N/A 
+What is planned for the next period (e.g., next week)
+1.	Fixing bugs
+2.	Designing webpages that sprint3 should do
+3.	Test frontend webpages
+
+
