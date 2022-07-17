@@ -15,6 +15,7 @@ import Divider from '@mui/material/Divider';
 import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
 import Button from '@mui/material/Button';
 import TextField from "@mui/material/TextField";
+import * as helpers from "../../helpers";
 
 
 const useStyles = makeStyles({
@@ -38,6 +39,8 @@ function MovieBlock (props) {
   const commentRef = useRef('');
   const handleOpen = () => setVisibility(true);
   const handleClose = () => setVisibility(false);
+  const [info, setInfo] = React.useState({rating: 0});
+  const [ratePercentage, setRatePercentage] = React.useState({0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0});
 
   const style = {
     position: 'absolute',
@@ -94,27 +97,46 @@ function MovieBlock (props) {
     }
   }
 
-  // TODO: display rate distribution later
-  console.log(props)
+  React.useEffect(() => {
+    const temp = {...ratePercentage};
+    const reqInfo = {
+      headers: {
+        'Authorization': helpers.hasNoToken() ? '' : 'Bearer ' + localStorage.getItem('token'),
+      },
+    }
+    fetch('http://127.0.0.1:5000/films?f_id=' + props.id, reqInfo).then(async (info) => {
+      const data = await info.json();
+      setInfo(data);
+      let sum = 0;
+      for (const key in data.rating_distribution) {sum += data.rating_distribution[key]}
+      for (const [key, value] of Object.entries(data.rating_distribution)) {
+        temp[key] = value === 0 ? 0 : value / sum * 100;
+      }
+      setRatePercentage({ ...temp });
+    })
+  }, [])
 
   return (
     <React.Fragment>
       <Box sx={{ flexGrow: 1 }}>
         <Grid container rowSpacing={2} columnSpacing={3}>
           <Grid item xs={12}>
-            <Typography variant="h3" component={"span"}>{props.title}</Typography>
+            <Typography variant="h3" component={"span"}>{info.title}</Typography>
           </Grid>
           <Grid item xs={3}>
             <Card sx={{ minWidth: 200 }}>
               <CardMedia
                 component="img"
                 className={classes.Media}
-                image={props.poster}
-                alt={props.title}
+                image={info.url_poster}
+                alt={'poster of ' + info.title}
               />
               <CardContent>
-                <Typography gutterBottom variant="body2" component="span">
-                  <strong>Director:</strong> {props.director} / {props.year} / {props.run_time}
+                <Typography gutterBottom variant="body2" component="div">
+                  <strong>Director:</strong> {info.director} / {info.year} / {info.run_time}
+                </Typography>
+                <Typography gutterBottom variant="body2" component="div">
+                  <strong>IMDB Rating:</strong> {info.rating_imdb}
                 </Typography>
               </CardContent>
             </Card>
@@ -127,16 +149,16 @@ function MovieBlock (props) {
                   Overview:
                 </Typography>
                 <Divider/>
-                {props.overview}
+                {info.overview}
               </CardContent>
             </Card>
             <Stack direction="row" spacing={2}>
               <Box display={'flex'}>
-                <Box sx={{ p: 1 }}>
-                  <Typography gutterBottom variant="h5" component="span">
-                    IMDB Rating: {props.rating}
-                  </Typography>
-                </Box>
+                {/*<Box sx={{ p: 1 }}>*/}
+                  {/*<Typography gutterBottom variant="h5" component="span">*/}
+                  {/*  IMDB Rating: {info.rating_imdb}*/}
+                  {/*</Typography>*/}
+                {/*</Box>*/}
                 <Box sx={{ p: 1 }}>
                   <Stack direction="row">
                     <Button variant="outlined"
@@ -198,12 +220,25 @@ function MovieBlock (props) {
               </Box>
             </Stack>
             <Box display={'flex'} flexDirection={'column'}>
-              <Box display={'flex'} alignItems={'center'}> 5 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={10} sx={{ width: '65%', height: 10 }}/> </Box>
-              <Box display={'flex'} alignItems={'center'}> 4 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={10} sx={{ width: '65%', height: 10 }}/> </Box>
-              <Box display={'flex'} alignItems={'center'}> 3 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={10} sx={{ width: '65%', height: 10 }}/> </Box>
-              <Box display={'flex'} alignItems={'center'}> 2 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={10} sx={{ width: '65%', height: 10 }}/> </Box>
-              <Box display={'flex'} alignItems={'center'}> 1 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={10} sx={{ width: '65%', height: 10 }}/> </Box>
-              <Box display={'flex'} alignItems={'center'}> 0 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={10} sx={{ width: '65%', height: 10 }}/> </Box>
+              <Box><Typography variant={'h5'}>DOUBI Rating:</Typography><Rating value={info.rating} precision={0.5} readOnly/></Box>
+              <Box display={'flex'} alignItems={'center'}>
+                5 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[5]} sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[5]}%
+              </Box>
+              <Box display={'flex'} alignItems={'center'}>
+                4 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[4]} sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[4]}%
+              </Box>
+              <Box display={'flex'} alignItems={'center'}>
+                3 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[3]} sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[3]}%
+              </Box>
+              <Box display={'flex'} alignItems={'center'}>
+                2 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[2]} sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[2]}%
+              </Box>
+              <Box display={'flex'} alignItems={'center'}>
+                1 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[1]} sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[1]}%
+              </Box>
+              <Box display={'flex'} alignItems={'center'}>
+                0 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[0]} sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[0]}%
+              </Box>
             </Box>
           </Grid>
         </Grid>
@@ -213,11 +248,12 @@ function MovieBlock (props) {
   );
 }
 
-MovieBlock.propTypes = {
-  title: PropTypes.string,
-  rating: PropTypes.number,
-  poster: PropTypes.string,
-  run_time: PropTypes.string,
-}
+// MovieBlock.propTypes = {
+//   title: PropTypes.string,
+//   rating: PropTypes.number,
+//   rating_imdb: PropTypes.number,
+//   poster: PropTypes.string,
+//   run_time: PropTypes.string,
+// }
 
 export default MovieBlock;

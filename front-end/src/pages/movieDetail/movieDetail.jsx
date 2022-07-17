@@ -45,14 +45,15 @@ function MovieDetail () {
                 <Header/>
                 <MovieBlock
                     id={movieId}
-                    title={movie_info.title}
-                    year={movie_info.year}
-                    run_time={movie_info.run_time}
-                    rating={movie_info.rating_imdb}
-                    overview={movie_info.overview}
-                    director={movie_info.director}
-                    poster={movie_info.url_poster}
-                    rating_distribution={movie_info.rating_distribution}
+                    // title={movie_info.title}
+                    // year={movie_info.year}
+                    // run_time={movie_info.run_time}
+                    // rating_imdb={movie_info.rating_imdb}
+                    // overview={movie_info.overview}
+                    // director={movie_info.director}
+                    // poster={movie_info.url_poster}
+                    // rating_distribution={movie_info.rating_distribution}
+                    // rating={movie_info.rating}
                 />
                 {movie_review && <CommentBlock props={movie_review}/>}
             </Container>
