@@ -9,8 +9,8 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Button from "@mui/material/Button";
 
-function createData(photo, name, email) {
-  return {photo, name, email};
+function createData(uid, photo, name, email) {
+  return {uid, photo, name, email};
 }
 
 function isSelf(userID) {
@@ -20,6 +20,25 @@ function isSelf(userID) {
 function BlackList() {
   const userID = useParams().uid;
   const [blackList, setBlackList] = React.useState([]);
+  
+  const unblack = async (uid) => {
+    
+    const requestInfo = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+      },
+    };
+    const response = await fetch(`http://127.0.0.1:5000/auth/user/${uid}/black_list`, requestInfo);
+    if (response.status === 200) {
+      window.location.reload();
+    } else {
+      alert("Please login first")
+      window.location.reload();
+      
+    }
+  }
   
   
   React.useEffect(() => {
@@ -35,7 +54,7 @@ function BlackList() {
         console.log(tempData)
         const data = []
         for (let i = 0; i < tempData.length; i++) {
-          data.push(createData(tempData[i].photo_url, tempData[i].username, tempData[i].email))
+          data.push(createData(tempData[i].u_id, tempData[i].photo_url, tempData[i].username, tempData[i].email))
         }
         setBlackList(data);
       }
@@ -65,7 +84,7 @@ function BlackList() {
                 <TableCell>{row.name}</TableCell>
                 <TableCell>{row.email}</TableCell>
                 {isSelf(userID) ? <TableCell>
-                  <Button variant="contained">Unblack</Button>
+                  <Button variant="contained" onClick={() => unblack(row.uid)}>Remove</Button>
                 </TableCell> : null}
               </TableRow>
             ))}
