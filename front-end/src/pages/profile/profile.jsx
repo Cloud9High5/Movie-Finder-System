@@ -50,10 +50,9 @@ function Profile() {
 
   React.useEffect(() => {
     const reqInfo = {
-      method: 'GET',
       headers: {
         'Authorization': helpers.hasNoToken() ? '' : 'Bearer ' + localStorage.getItem('token'),
-      }
+      },
     }
     fetch('http://localhost:5000/auth/user/' + uid, reqInfo).then(async (response) => {
       const data = await response.json();

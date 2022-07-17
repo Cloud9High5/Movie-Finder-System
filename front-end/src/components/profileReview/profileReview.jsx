@@ -14,6 +14,7 @@ import {
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import * as helpers from "../../helpers";
 
 const columns = [
   { id: 'created_time', label: 'Date', minWidth: 100 },
@@ -31,7 +32,7 @@ function ProfileReview () {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [data, setData] = React.useState([]);
   const [flag, setFlag] = React.useState(true);
-  const [likesDislikes, setLikesDislikes] = React.useState({});
+  const [likesDislikes, setLikesDislikes] = React.useState({likes: [], dislikes: []});
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -53,7 +54,12 @@ function ProfileReview () {
 
   // get all review of target user
   React.useEffect(() => {
-    fetch("http://localhost:5000/review?method=u_id&u_id=" + uid, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }).then(async (response) => {
+    const reqInfo = {
+      headers: {
+        'Authorization': helpers.hasNoToken() ? '' : 'Bearer ' + localStorage.getItem('token'),
+      },
+    }
+    fetch("http://localhost:5000/review?method=u_id&u_id=" + uid, reqInfo).then(async (response) => {
       const data = await response.json();
       Array.isArray(data) ?
         setData(data)
@@ -64,11 +70,11 @@ function ProfileReview () {
 
   // update like / dislike list
   React.useEffect(() => {
+    if (helpers.hasNoToken()) {return}
     const reqInfo = {
-      method: 'GET',
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('token'),
-      }
+      },
     }
     fetch('http://127.0.0.1:5000/review/likes_dislikes', reqInfo).then(async (response) => {
       const data = await response.json();
@@ -77,7 +83,12 @@ function ProfileReview () {
   }, [flag])
 
   React.useEffect(() => {
-    fetch(`http://127.0.0.1:5000/auth/user/${uid}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }).then(async (response) => {
+    const reqInfo = {
+      headers: {
+        'Authorization': helpers.hasNoToken() ? '' : 'Bearer ' + localStorage.getItem('token'),
+      },
+    }
+    fetch(`http://127.0.0.1:5000/auth/user/${uid}`, reqInfo).then(async (response) => {
       const data = await response.json();
       setTargetInfo({...data});
     })
