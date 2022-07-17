@@ -63,7 +63,7 @@ function FollowList() {
   console.log(followList)
   return (
     <div style={{height: 400, width: '100%'}}>
-      {Array.isArray(followList) ? <TableContainer component={Paper}>
+      {followList.length !== 0 ? <TableContainer component={Paper}>
         <Table sx={{minWidth: 650}} aria-label="simple table">
           <TableHead>
             <TableRow>
@@ -90,7 +90,7 @@ function FollowList() {
             ))}
           </TableBody>
         </Table>
-      </TableContainer> : <div>You have a empty following list</div>}
+      </TableContainer> : <div>You have an empty following list</div>}
     
     </div>
   )

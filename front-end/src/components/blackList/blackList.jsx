@@ -64,7 +64,7 @@ function BlackList() {
   
   return (
     <div style={{height: 400, width: '100%'}}>
-      {Array.isArray(blackList) ? <TableContainer component={Paper}>
+      {blackList.length !== 0 ? <TableContainer component={Paper}>
         <Table sx={{minWidth: 650}} aria-label="simple table">
           <TableHead>
             <TableRow>
@@ -90,7 +90,7 @@ function BlackList() {
             ))}
           </TableBody>
         </Table>
-      </TableContainer> : <div>You have a empty black list</div>}
+      </TableContainer> : <div>You have an empty black list</div>}
     
     </div>
   )
