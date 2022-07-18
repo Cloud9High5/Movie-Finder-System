@@ -1,22 +1,35 @@
-import {Box, Grid, Typography, Button, TextField, Avatar, Alert} from '@mui/material';
+import { Alert, Box, Button, Grid, TextField, Typography } from '@mui/material';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
-import {useState, useEffect} from 'react';
-import {useParams, useNavigate} from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from "react-router-dom";
 import * as helpers from "../../helpers";
 
+export const loadImageFromFile = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      resolve(e.target.result);
+    }
+    reader.readAsDataURL(file);
+  })
+}
+const validatePassword = (password) => {
+  let valid = password.length >= 8 && password.length <= 12;
+  valid = valid && !/[^0-9a-zA-Z]/.test(password);
+  valid = valid && /\d/.test(password);
+  valid = valid && /[a-z]/.test(password);
+  valid = valid && /[A-Z]/.test(password);
+  return valid;
+}
 
-function ProfileCard() {
+function ProfileCard () {
   const navigate = useNavigate();
   const [mode, setMode] = useState('display');
   const [profile, setProfile] = useState(null);
   const userID = useParams().uid;
   const [refresh, setRefresh] = useState(true);
   const [message, setMessage] = useState('');
-  useEffect(() => {
-    if (!localStorage.getItem('token')) {
-      navigate('/login');
-    }
-  }, []);
+
   // get user info
   useEffect(() => {
     const reqInfo = {
@@ -30,18 +43,33 @@ function ProfileCard() {
           const data = await res.json();
           data.avatar = data.photo_url;
           setProfile(data);
-          console.log(data);
+          console.log(data)
         }
+
       })
     }
-  }, [refresh]);
+  }, [refresh, userID]);
+  // update user profile
   const handleSubmit = () => {
+    if (profile.old_password && !validatePassword(profile.old_password)) {
+      setMessage("Password length should in 8-12, and composed by upper case letters, lower case letters and numbers");
+      return;
+    }
+    if (profile.new_password && !validatePassword(profile.new_password)) {
+      setMessage("Password length should in 8-12, and composed by upper case letters, lower case letters and numbers");
+      return;
+    }
+    if (profile.confirmPassword && !validatePassword(profile.confirmPassword)) {
+      setMessage("Password length should in 8-12, and composed by upper case letters, lower case letters and numbers");
+      return;
+    }
+
     if (profile.new_password !== profile.confirmPassword) {
       setMessage('New password not same as confirm password!');
       return;
     }
-    
-    
+
+
     fetch(`http://127.0.0.1:5000/auth/user/${userID}`, {
       method: 'PUT',
       headers: {
@@ -67,9 +95,34 @@ function ProfileCard() {
       if (res.status === 403) {
         setMessage('Old password is incorrect！');
       }
-      
+
     })
   }
+  // follow / black list user
+  const userAction = async (action) => {
+    if (helpers.hasNoToken()) {
+      alert('You need to login first.');
+      return
+    }
+    const reqInfo = {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+      },
+    }
+    let response;
+    if (action === 'black') {
+      response = await fetch(`http://127.0.0.1:5000/auth/user/${userID}/black_list`, reqInfo);
+    } else if (action === 'follow') {
+      response = await fetch(`http://127.0.0.1:5000/auth/user/${userID}/following_list`, reqInfo);
+    }
+    if (response.status !== 200) {
+      const data = await response.json();
+      alert(data['message']);
+    }
+  }
+
+
   if (!profile) {
     return <Typography component={'span'} variant={'h4'}>Cannot fetch information of this user!</Typography>
   }
@@ -85,16 +138,27 @@ function ProfileCard() {
             <Typography component={'span'} variant={'h3'}>Account</Typography>
           </Grid>
           <Grid item xs={4}>
-            <img style={{width: '300px'}} src={avatar}/>
+            <img style={{ width: '300px' }} src={avatar}/>
           </Grid>
           <Grid item xs={8}
-                style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+                style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Box>
               <Typography variant={'h3'}>{profile.username}</Typography>
               <Typography variant={'h6'}>{profile.email}</Typography>
             </Box>
             <Box>
-              <Button variant={'contained'} onClick={() => setMode('edit')}>UPDATE</Button>
+              {
+                profile.is_self ?
+                  <Button variant={'contained'} onClick={() => setMode('edit')}>UPDATE</Button>
+                  : <Box display={'flex'} justifyContent={'space-between'} width={'50%'}>
+                    <Button sx={{ textTransform: 'none' }} onClick={() => userAction('follow')} color={'info'} variant={'outlined'} disabled={profile.blocked}>
+                      <b>{profile.followed ? 'Followed' : 'Follow'}</b>
+                    </Button>
+                    <Button sx={{ textTransform: 'none' }} onClick={() => userAction('black')} color={'error'} variant={'outlined'} disabled={profile.followed}>
+                      <b>{profile.blocked ? 'In your blacklist' : 'Add to blacklist'}</b>
+                    </Button>
+                  </Box>
+              }
             </Box>
           </Grid>
         </Grid>
@@ -102,9 +166,9 @@ function ProfileCard() {
       {mode === 'edit' && (
         <Grid container spacing={1}>
           <Grid item xs={4}>
-            {profile.avatar && <img src={profile.avatar} width={'300px'} alt={'avatar'}/>}
+            {profile.avatar && <img src={profile.avatar} width={'300px'}/>}
             <input accept={'image/*'} onChange={e => {
-              helpers.loadImageFromFile(e.target.files[0])
+              loadImageFromFile(e.target.files[0])
                 .then(src => {
                   setProfile({
                     ...profile,
@@ -112,9 +176,9 @@ function ProfileCard() {
                     avatarFile: e.target.files[0]
                   })
                 })
-            }} id={'upload-avatar'} type={'file'} style={{display: 'none'}}/>
-            <label htmlFor={'upload-avatar'} style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-              <AddAPhotoIcon style={{fontSize: '100px'}}/>
+            }} id={'upload-avatar'} type={'file'} style={{ display: 'none' }}/>
+            <label htmlFor={'upload-avatar'} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <AddAPhotoIcon style={{ fontSize: '100px' }}/>
               <Typography>Update Avatar</Typography>
             </label>
           </Grid>
@@ -181,9 +245,9 @@ function ProfileCard() {
               </Box>
             </Box>
             {message &&
-              <Box>
-                <Alert severity="error">{message}</Alert>
-              </Box>
+            <Box>
+              <Alert severity="error">{message}</Alert>
+            </Box>
             }
             <Box>
               <Button variant={'contained'}
@@ -194,7 +258,7 @@ function ProfileCard() {
                         setMode('display');
                         setRefresh(!refresh);
                       }}
-                      style={{marginLeft: '20px'}}
+                      style={{ marginLeft: '20px' }}
                       color={'inherit'}>Cancel</Button>
             </Box>
           </Grid>

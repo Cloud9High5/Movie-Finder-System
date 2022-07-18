@@ -59,7 +59,7 @@ function Profile() {
       setUserInfo(data);
       console.log(data)
     })
-  }, [])
+  }, [uid])
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };

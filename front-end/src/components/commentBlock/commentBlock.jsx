@@ -60,6 +60,7 @@ function CommentBlock ({ props }) {
       fetch('http://127.0.0.1:5000/auth/user/' + t.u_id).then(async (response) => {
         const data = await response.json();
         t['username'] = data.username;
+        t['photo_url'] = data.photo_url;
         setComments([...temp]);
       })
     ))
@@ -107,6 +108,7 @@ function CommentBlock ({ props }) {
       <Typography variant={'h5'}>Comments:</Typography>
       <Divider/>
       {Array.isArray(props) ? comments.map((review, idx) => {
+        console.log(review)
         return (
           <Box borderTop={'1px solid gainsboro'}
                padding={'20px 0'}
@@ -116,8 +118,8 @@ function CommentBlock ({ props }) {
             <Grid container spacing={1}>
               <Grid item xs={12}>
                 <Box display={'flex'} alignItems={'center'}>
-                  <Avatar className={classes.green}>
-                    U
+                  <Avatar className={classes.green} src={review.photo_url}>
+                    {review.username}
                   </Avatar>
                   <Box marginLeft={'10px'}>
                     <Typography variant={'p'} color={'gray'} onClick={() => path('/profile/' + review.u_id)}

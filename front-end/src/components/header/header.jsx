@@ -134,8 +134,9 @@ export default function Header() {
             <span>
                             <Avatar className={classes.green}
                                     onClick={handleClick}
+                                    src={userInfo.photo_url ? userInfo.photo_url : ''}
                             >
-                            {userInfo.username}
+                            {userInfo.photo_url ? userInfo.photo_url : userInfo.username}
                             </Avatar>
 
                                 <Menu
