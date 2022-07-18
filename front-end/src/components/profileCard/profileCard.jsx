@@ -1,17 +1,9 @@
 import {Box, Grid, Typography, Button, TextField, Avatar, Alert} from '@mui/material';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from "react-router-dom";
+import {useState, useEffect} from 'react';
+import {useParams, useNavigate} from "react-router-dom";
 import * as helpers from "../../helpers";
-export const loadImageFromFile = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      resolve(e.target.result);
-    }
-    reader.readAsDataURL(file);
-  })
-}
+
 
 function ProfileCard() {
   const navigate = useNavigate();
@@ -38,6 +30,7 @@ function ProfileCard() {
           const data = await res.json();
           data.avatar = data.photo_url;
           setProfile(data);
+          console.log(data);
         }
       })
     }
@@ -47,8 +40,8 @@ function ProfileCard() {
       setMessage('New password not same as confirm password!');
       return;
     }
-
-
+    
+    
     fetch(`http://127.0.0.1:5000/auth/user/${userID}`, {
       method: 'PUT',
       headers: {
@@ -74,7 +67,7 @@ function ProfileCard() {
       if (res.status === 403) {
         setMessage('Old password is incorrect！');
       }
-
+      
     })
   }
   if (!profile) {
@@ -85,7 +78,7 @@ function ProfileCard() {
     avatar = profile.photo_url;
   }
   return (
-    <Box >
+    <Box>
       {mode === 'display' && (
         <Grid container spacing={1}>
           <Grid item xs={12}>
@@ -109,9 +102,9 @@ function ProfileCard() {
       {mode === 'edit' && (
         <Grid container spacing={1}>
           <Grid item xs={4}>
-            {profile.avatar && <img src={profile.avatar} width={'300px'}/>}
+            {profile.avatar && <img src={profile.avatar} width={'300px'} alt={'avatar'}/>}
             <input accept={'image/*'} onChange={e => {
-              loadImageFromFile(e.target.files[0])
+              helpers.loadImageFromFile(e.target.files[0])
                 .then(src => {
                   setProfile({
                     ...profile,
@@ -119,7 +112,7 @@ function ProfileCard() {
                     avatarFile: e.target.files[0]
                   })
                 })
-            }} id={'upload-avatar'} type={'file'} style={{display: 'none'}} />
+            }} id={'upload-avatar'} type={'file'} style={{display: 'none'}}/>
             <label htmlFor={'upload-avatar'} style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
               <AddAPhotoIcon style={{fontSize: '100px'}}/>
               <Typography>Update Avatar</Typography>

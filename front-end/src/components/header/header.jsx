@@ -89,7 +89,7 @@ export default function Header() {
       }
     })
   }, [token])
-
+  
   // TODO: return is_active to decide whether the user can do actions
   // React.useEffect(() => {
   //   fetch('http://127.0.0.1:5000/auth/user/' + uid).then(async (response) => {
@@ -101,8 +101,8 @@ export default function Header() {
   //       }
   //   })
   // }, [])
-
-
+  
+  
   return (
     <React.Fragment>
       <Toolbar className={classes.toolbar} sx={{maxWidth: 'lg'}}>
@@ -147,11 +147,12 @@ export default function Header() {
                                     <MenuItem onClick={() => {
                                       navigate("/profile/" + localStorage.getItem('uid'));
                                       handleClose()
-  
-                                    }
-                                    }>Profile</MenuItem>
-                                    <MenuItem onClick={handleClose}>My account</MenuItem>
-                                    <MenuItem onClick={userLogout}>Logout</MenuItem>
+                                    }}>Profile</MenuItem>
+                                  {userInfo.is_admin ? <MenuItem onClick={() => {
+                                    navigate("/admin/" + localStorage.getItem('uid'));
+                                    handleClose()
+                                  }}>Admin</MenuItem> : null}
+                                  <MenuItem onClick={userLogout}>Logout</MenuItem>
                                 </Menu>
                         </span>
           // endregion

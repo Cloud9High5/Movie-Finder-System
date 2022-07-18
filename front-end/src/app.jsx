@@ -1,6 +1,6 @@
 import React from 'react';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import {Dashboard, Login, SignUp, MovieDetail, ResetPassword, Profile} from "./pages";
+import {Dashboard, Login, SignUp, MovieDetail, ResetPassword, Profile, Admin} from "./pages";
 
 function App() {
   return (
@@ -13,6 +13,7 @@ function App() {
             <Route exact path={'/signup'} element={<SignUp/>}/>
             <Route exact path={'/movie_detail/:movieID'} element={<MovieDetail/>}/>
             <Route exact path={'/profile/:uid'} element={<Profile/>} />
+            <Route exact path={'/admin/:uid'} element={<Admin/>} />
             <Route exact path={'/resetPassword'} element={<ResetPassword/>}/>
             {/* should be at the bottom */}
             <Route path={'/'} element={<Dashboard/>}/> {/* redirect to homepage */}

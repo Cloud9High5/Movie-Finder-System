@@ -12,3 +12,4 @@ export {default as ProfileCard} from './profileCard/profileCard';
 export {default as FollowList} from './followList/followList';
 export {default as BlackList} from './blackList/blackList';
 export {default as ProfileReview} from './profileReview/profileReview';
+export {default as UploadMovie} from './uploadMovie/uploadMovie';
