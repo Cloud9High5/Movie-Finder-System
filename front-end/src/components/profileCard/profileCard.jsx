@@ -12,7 +12,14 @@ export const loadImageFromFile = (file) => {
     reader.readAsDataURL(file);
   })
 }
-
+const validatePassword = (password) => {
+  let valid = password.length >= 8 && password.length <= 12;
+  valid = valid && !/[^0-9a-zA-Z]/.test(password);
+  valid = valid && /\d/.test(password);
+  valid = valid && /[a-z]/.test(password);
+  valid = valid && /[A-Z]/.test(password);
+  return valid;
+}
 function ProfileCard() {
   const navigate = useNavigate();
   const [mode, setMode] = useState('display');
@@ -39,10 +46,24 @@ function ProfileCard() {
           data.avatar = data.photo_url;
           setProfile(data);
         }
+
       })
     }
   }, [refresh]);
   const handleSubmit = () => {
+    if (profile.old_password && !validatePassword(profile.old_password)) {
+      setMessage("Password length should in 8-12, and composed by upper case letters, lower case letters and numbers");
+      return;
+    }
+    if (profile.new_password && !validatePassword(profile.new_password)) {
+      setMessage("Password length should in 8-12, and composed by upper case letters, lower case letters and numbers");
+      return;
+    }
+    if (profile.confirmPassword && !validatePassword(profile.confirmPassword)) {
+      setMessage("Password length should in 8-12, and composed by upper case letters, lower case letters and numbers");
+      return;
+    }
+
     if (profile.new_password !== profile.confirmPassword) {
       setMessage('New password not same as confirm password!');
       return;
