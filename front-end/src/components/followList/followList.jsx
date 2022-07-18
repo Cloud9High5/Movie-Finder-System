@@ -47,7 +47,7 @@ function FollowList() {
         'Authorization': 'Bearer ' + localStorage.getItem('token')
       }
     }
-    // TODO: error when returned content is empty
+
     fetch(`http://127.0.0.1:5000/auth/user/${userID}/following_list`, reqInfo).then(async (res) => {
       if (res.status === 200) {
         const tempData = await res.json();

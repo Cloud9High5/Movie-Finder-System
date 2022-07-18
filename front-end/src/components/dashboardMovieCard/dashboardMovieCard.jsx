@@ -14,7 +14,7 @@ function DashboardMovieCard (props) {
     const [hotComments, setHotComments] = useState([]);
     const { movie_id } = props;
     useEffect(() => {
-        fetch(`http://127.0.0.1:5000/review?method=f_id&f_id=${movie_id}`)
+        fetch(`http://127.0.0.1:5000/review?method=f_id&f_id=${props.movie_id}`)
             .then(async (response) => {
                 const comments = await response.json();
                 Array.isArray(comments) ?
@@ -76,6 +76,7 @@ function DashboardMovieCard (props) {
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                         IMDB Rating: {props.rating}
+                      {/*{props.movie_id}*/}
                     </Typography>
                 </CardContent>
             </CardActionArea>
