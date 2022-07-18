@@ -119,10 +119,7 @@ class film(Resource):
                                     rating_imdb=payload['rating_imdb'], overview=payload['overview'], director=director,
                                     url_poster=payload['url_poster']))
                 db.session.commit()
-                return {
-                           'message': 'Film created',
-                            'f_id': Film.query.filter(Film.title == title, Film.year == year, Film.director == director).first().f_id
-                        }, 201
+                return {'message': 'Film created'}, 201
         else:
             return {'message': 'Film can only be created by admin'}
 
