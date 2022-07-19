@@ -23,7 +23,7 @@ function UploadMovie() {
     "title": "",
     "year": 2022,
     "run_time": "",
-    "rating_imdb": '',
+    "rating_imdb": 0.0,
     "director": "",
     "url_poster": ""
   });
@@ -125,24 +125,50 @@ function UploadMovie() {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">IMDB Rating</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={movie.rating_imdb.toString()}
-                  label="IMDB Rating"
-                  onChange={(e: SelectChangeEvent) => {
-                    setMovie({...movie, rating_imdb: parseInt(e.target.value)})
-                  }}
-                >
-                  <MenuItem value={1}>1</MenuItem>
-                  <MenuItem value={2}>2</MenuItem>
-                  <MenuItem value={3}>3</MenuItem>
-                  <MenuItem value={4}>4</MenuItem>
-                  <MenuItem value={5}>5</MenuItem>
-                </Select>
-              </FormControl>
+              <TextField
+                required
+                type={"number"}
+                id="rating_imdb"
+                name="rating_imdb"
+                label="IMDB rating"
+                value={movie.rating_imdb.toString()}
+                fullWidth
+                InputProps={{
+                  inputProps: {min: 0.0, max: 10.0},
+                  endAdornment: (
+                    <InputAdornment position='end'>/10</InputAdornment>
+                  ),
+                }}
+                onChange={(event) => {
+                  const regex = /^((10.0)|(10|\d)|(\d)(\.\d{1}))?$/
+                  if (regex.test(event.target.value)) {
+                    setMovie({...movie, rating_imdb: parseFloat(event.target.value)});
+                  }
+                  else {
+                    console.log(event.target.value, movie.rating_imdb)
+                    setMovie({...movie, rating_imdb: 0.0});
+                  }
+                }
+                }
+              />
+              {/*<FormControl fullWidth>*/}
+              {/*  <InputLabel id="demo-simple-select-label">IMDB Rating</InputLabel>*/}
+              {/*  <Select*/}
+              {/*    labelId="demo-simple-select-label"*/}
+              {/*    id="demo-simple-select"*/}
+              {/*    value={movie.rating_imdb.toString()}*/}
+              {/*    label="IMDB Rating"*/}
+              {/*    onChange={(e: SelectChangeEvent) => {*/}
+              {/*      setMovie({...movie, rating_imdb: parseInt(e.target.value)})*/}
+              {/*    }}*/}
+              {/*  >*/}
+              {/*    <MenuItem value={1}>1</MenuItem>*/}
+              {/*    <MenuItem value={2}>2</MenuItem>*/}
+              {/*    <MenuItem value={3}>3</MenuItem>*/}
+              {/*    <MenuItem value={4}>4</MenuItem>*/}
+              {/*    <MenuItem value={5}>5</MenuItem>*/}
+              {/*  </Select>*/}
+              {/*</FormControl>*/}
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
