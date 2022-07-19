@@ -8,7 +8,6 @@ from Models.model import Film, Review
 
 api = Namespace("film", description="Authentication related operations", path="/")
 
-
 ################################################################################
 #                                  FILM MODEL                                  #
 ################################################################################
@@ -46,10 +45,10 @@ top_rating_arguments.add_argument('number')
 top_recent_arguments = reqparse.RequestParser()
 top_recent_arguments.add_argument('number')
 
+
 ################################################################################
 #                                    ROUTES                                    #
 ################################################################################
-
 
 
 @api.route('/films', methods=['GET', 'POST'])
@@ -57,7 +56,7 @@ class film(Resource):
 
     @api.doc(
         'Get film by ID',
-        responses = {
+        responses={
             200: 'Success, film found',
             404: 'Fail, film not found'
         }
@@ -69,7 +68,7 @@ class film(Resource):
         args = film_arguments.parse_args()
         if db.session.query(exists().where(Film.f_id == args['f_id'])).scalar():
             film = Film.query.filter_by(f_id=args['f_id']).first()
-            
+
             reviews = film.reviews.all()
             # compute average rating for review on DOUBI
             if current_user:
@@ -77,7 +76,7 @@ class film(Resource):
                 reviews = [x for x in reviews if x.u_id not in blocked_id]
 
             rating = 0 if reviews == [] else format(sum(review.rating for review in reviews) / len(reviews), '.1f')
-            
+
             rating_distribution = {x: 0 for x in range(0, 5)}
 
             for review in reviews:
@@ -119,7 +118,11 @@ class film(Resource):
                                     rating_imdb=payload['rating_imdb'], overview=payload['overview'], director=director,
                                     url_poster=payload['url_poster']))
                 db.session.commit()
-                return {'message': 'Film created'}, 201
+                return {
+                           'message': 'Film created',
+                           'f_id': Film.query.filter(Film.title == title, Film.year == year,
+                                                     Film.director == director).first().f_id
+                       }, 201
         else:
             return {'message': 'Film can only be created by admin'}
 
@@ -144,10 +147,10 @@ class top_rating(Resource):
 
     @api.doc(
         "Get top <number> films with the highest IMDB rate",
-        params = {
+        params={
             "number": "Number of films to return"
         },
-        responses = {
+        responses={
             200: 'Success, films found',
         }
     )
@@ -157,16 +160,15 @@ class top_rating(Resource):
         return result, 200
 
 
-
 @api.route('/films/recent/<int:number>', methods=['GET'])
 class top_recent(Resource):
 
     @api.doc(
         "Get films in the recent <number> years",
-        params = {
+        params={
             "number": "Number of films to return"
         },
-        responses = {
+        responses={
             200: 'Success, films found',
         }
     )
