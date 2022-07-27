@@ -23,6 +23,11 @@ blocked_users = Table('blocked_users', db.metadata,
     db.Column('blocker_id', db.String(32), db.ForeignKey('user.u_id')),
 )
 
+users_wish_film = Table('users_wish_film', db.metadata,
+    db.Column('user_id', db.String(32), db.ForeignKey('user.u_id')),
+    db.Column('film_id', db.String(32), db.ForeignKey('film.f_id'))
+)
+
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -31,7 +36,7 @@ class User(db.Model):
     username = db.Column(db.String(80), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(80), nullable=False, unique=True)
-    photo_url = db.Column(db.Text, nullable=True)
+    url_photo = db.Column(db.Text, nullable=True)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     is_blocked = db.Column(db.Boolean, nullable=False, default=False)
 
@@ -56,6 +61,8 @@ class User(db.Model):
 
     review_likes = db.relationship('Review_Like', backref='user', lazy='dynamic')
     review_dislikes = db.relationship('Review_Dislike', backref='user', lazy='dynamic')
+    
+    wish = db.relationship('Film', secondary=users_wish_film, backref='users', lazy='dynamic')
 
 
     
@@ -65,17 +72,23 @@ class Film(db.Model):
 
     f_id = db.Column(db.String(32), primary_key=True, nullable=False, unique=True, default=f_id_generator)
     title = db.Column(db.String(80), nullable=False)
+    genre = db.Column(db.String(80), nullable=False)
     year = db.Column(db.Integer, nullable=True)
     run_time = db.Column(db.String(16), nullable=True)
     rating_imdb = db.Column(db.Float, nullable=True)
     overview = db.Column(db.String(500), nullable=True)
     director = db.Column(db.String(80), nullable=True)
+    actor = db.Column(db.String(200), nullable=True)
     url_poster = db.Column(db.Text, nullable=True)
 
     created_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     reviews = db.relationship('Review', backref='film', lazy='dynamic')
+    
+    wish_by = db.relationship('User', secondary=users_wish_film, backref='wish_films', lazy='dynamic')
+    
+    
 
 
 class Review(db.Model):
