@@ -34,7 +34,7 @@ class User(db.Model):
     
     u_id = db.Column(db.String(32), primary_key=True, nullable=False, unique=True, default=u_id_generator)
     username = db.Column(db.String(80), nullable=False, unique=True)
-    password = db.Column(db.String(80), nullable=False)
+    password_hash = db.Column(db.Text, nullable=False)
     email = db.Column(db.String(80), nullable=False, unique=True)
     url_photo = db.Column(db.Text, nullable=True)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
@@ -62,7 +62,19 @@ class User(db.Model):
     review_likes = db.relationship('Review_Like', backref='user', lazy='dynamic')
     review_dislikes = db.relationship('Review_Dislike', backref='user', lazy='dynamic')
     
-    wish = db.relationship('Film', secondary=users_wish_film, backref='users', lazy='dynamic')
+    wish = db.relationship('Film', secondary=users_wish_film, backref='user', lazy='dynamic')
+    
+    @property
+    def password(self):
+        raise AttributeError('password is not a readable attribute')
+
+    @password.setter
+    def password(self, password):
+        salt = bcrypt.gensalt()
+        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), salt)
+    
+    def verify_password(self, password):
+        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash)
 
 
     
@@ -86,7 +98,7 @@ class Film(db.Model):
 
     reviews = db.relationship('Review', backref='film', lazy='dynamic')
     
-    wish_by = db.relationship('User', secondary=users_wish_film, backref='wish_films', lazy='dynamic')
+    wish_by = db.relationship('User', secondary=users_wish_film, backref='film', lazy='dynamic')
     
     
 
@@ -99,6 +111,7 @@ class Review(db.Model):
     f_id = db.Column(db.String(32), db.ForeignKey('film.f_id'), nullable=False)
     content = db.Column(db.String(500), nullable=True)
     rating = db.Column(db.Integer, nullable=False)
+    bad_word = db.Column(db.Boolean, nullable=False, default=False)
 
     created_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
