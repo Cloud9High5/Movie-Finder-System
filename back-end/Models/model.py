@@ -2,6 +2,7 @@ from datetime import datetime
 from extensions import db, jwt
 from .helper import u_id_generator, f_id_generator, r_id_generator
 from sqlalchemy import Table
+import bcrypt
 
 @jwt.user_identity_loader
 def user_identity_lookup(user):
