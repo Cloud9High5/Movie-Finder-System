@@ -277,7 +277,7 @@ class user_info(Resource):
                 'u_id': target_user.u_id,
                 'email': target_user.email,
                 'username': target_user.username,
-                'photo_url': target_user.photo_url,
+                'photo_url': target_user.url_photo,
                 'is_admin': target_user.is_admin,
                 'is_blocked': target_user.is_blocked,
                 'is_self': False
@@ -329,7 +329,7 @@ class user_info(Resource):
             if 'email' in payload:
                 user.email = payload['email']
             if 'photo_url' in payload:
-                user.photo_url = payload['photo_url']
+                user.url_photo = payload['photo_url']
             db.session.commit()
             return {
                 'message': '{} User info modified'.format(user.username)
@@ -363,7 +363,7 @@ class following_list(Resource):
                     'u_id': user.u_id,
                     'email': user.email,
                     'username': user.username,
-                    'photo_url': user.photo_url,
+                    'photo_url': user.url_photo,
                     'is_admin': user.is_admin,
                     'is_blocked': user.is_blocked
                     } for user in users], 200
@@ -440,7 +440,7 @@ class black_list(Resource):
                 'u_id': user.u_id,
                 'email': user.email,
                 'username': user.username,
-                'photo_url': user.photo_url,
+                'photo_url': user.url_photo,
                 'is_admin': user.is_admin,
                 'is_blocked': user.is_blocked
             } for user in result]

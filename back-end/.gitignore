@@ -173,5 +173,5 @@ cython_debug/
 
 
 # testdb.py file in root directory of project
-testdb.py
-data.ipynb
+back-end/data.ipynb
+back-end/testdb.py
