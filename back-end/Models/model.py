@@ -104,7 +104,7 @@ class Film(db.Model):
     
     wish_by = db.relationship('User', secondary=users_wish_film, backref='film', lazy='dynamic')
     
-    def rating(self):
+    def rating_doubi(self):
         reviews = self.reviews.all()
         if len(reviews) == 0:
             return 0

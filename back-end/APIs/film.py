@@ -27,6 +27,8 @@ film_model = api.model('film', {
     "overview": fields.String(required=True, description="Film overview"),
     "director": fields.String(required=True, description="Film director"),
     "url_poster": fields.String(required=True, description="Film poster url"),
+    "genres": fields.List(fields.String, required=True, description="Film genres"),
+    "actors": fields.List(fields.String, required=True, description="Film actors"),
 })
 
 film_create_model = api.model('film', {
@@ -37,6 +39,8 @@ film_create_model = api.model('film', {
     "overview": fields.String(required=True, description="Film overview"),
     "director": fields.String(required=True, description="Film director"),
     "url_poster": fields.String(required=True, description="Film poster url"),
+    "genres": fields.List(fields.String, required=True, description="Film genres"),
+    "actors": fields.List(fields.String, required=True, description="Film actors"),
 })
 
 top_rating_arguments = reqparse.RequestParser()
@@ -47,8 +51,8 @@ top_recent_arguments.add_argument('number')
 
 search_arguments = reqparse.RequestParser()
 search_arguments.add_argument('method', type=str, default='title')
-search_arguments.add_argument('title', type=str)
-search_arguments.add_argument('director', type=str)
+search_arguments.add_argument('value', type=str, default='')
+search_arguments.add_argument('order', type=str, default='year')
 
 ################################################################################
 #                                    ROUTES                                    #
@@ -191,9 +195,9 @@ class search(Resource):
         'search films based on the given method',
         params={
             'method': {'type': 'str', 'required': False,
-                       'description': 'the method to get reviews, from [title, director]'},
-            'title': {'type': 'str', 'required': False, 'description': 'the movie title'},
-            'director': {'type': 'str', 'required': False, 'description': 'the movie director'},
+                       'description': 'the method to get reviews, either title, director'},
+            'value': {'type': 'str', 'required': False, 'description': 'the query to search for'},
+            'order': {'type': 'str', 'required': False, 'description': 'the order to sort the results'}
         },
         responses={
             200: 'Success, films found',
@@ -208,17 +212,23 @@ class search(Resource):
         result = []
         args = search_arguments.parse_args()
         if args['method'] == 'title':
-            if args['title'] is None:
+            if args['value'] is None:
                 return {'message': 'title is required'}, 400
             else:
-                result = db.session.query(Film).filter(and_(Film.title.like("%" + str(args['title']) + "%"))).all()
+                result = Film.query.filter(Film.title.like('%' + args['value'] + '%')).all()
         elif args['method'] == 'director':
-            if args['director'] is None:
+            if args['value'] is None:
                 return {'message': 'director is required'}, 400
             else:
-                result = db.session.query(Film).filter(and_(Film.director.like("%" + str(args['director']) + "%"))).all()
-
+                result = Film.query.filter(Film.director.like('%' + args['value'] + '%')).all()
+        
         if len(result) == 0:
             return {'message': 'film not found'}, 404
-        else:
-            return result, 200
+        
+        
+        if args['order'] == 'year':
+            result = sorted(result, key=lambda x: x.year, reverse=True)
+        elif args['order'] == 'rating_imdb':
+            result = sorted(result, key=lambda x: x.rating_imdb, reverse=True)
+        
+        return result, 200
