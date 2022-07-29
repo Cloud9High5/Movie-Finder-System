@@ -115,9 +115,6 @@ class Film(db.Model):
     def __repr__(self):
         return '<Film %r>' % self.title
     
-    
-    
-    
 
 
 class Review(db.Model):
