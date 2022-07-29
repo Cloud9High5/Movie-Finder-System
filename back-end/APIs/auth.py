@@ -232,7 +232,7 @@ class login(Resource):
 
         if db.session.query(exists().where(User.email == email)).scalar():
             user = db.session.query(User).filter(User.email == email).first()
-            if user.password == password:
+            if user.verify_password(password):
                 access_token = create_access_token(identity=user)
                 return {
                     'message': 'Logged in as {}'.format(user.username),
