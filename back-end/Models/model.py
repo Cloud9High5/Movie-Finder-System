@@ -76,6 +76,9 @@ class User(db.Model):
     
     def verify_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash)
+    
+    def __repr__(self):
+        return '<User %r>' % self.username
 
 
     
@@ -100,6 +103,19 @@ class Film(db.Model):
     reviews = db.relationship('Review', backref='film', lazy='dynamic')
     
     wish_by = db.relationship('User', secondary=users_wish_film, backref='film', lazy='dynamic')
+    
+    def rating(self):
+        reviews = self.reviews.all()
+        if len(reviews) == 0:
+            return 0
+        else:
+            return sum(review.rating for review in reviews) / len(reviews)
+
+    
+    def __repr__(self):
+        return '<Film %r>' % self.title
+    
+    
     
     
 
