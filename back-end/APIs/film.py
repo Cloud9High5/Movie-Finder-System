@@ -45,6 +45,10 @@ top_rating_arguments.add_argument('number')
 top_recent_arguments = reqparse.RequestParser()
 top_recent_arguments.add_argument('number')
 
+search_arguments = reqparse.RequestParser()
+search_arguments.add_argument('method', type=str, default='title')
+search_arguments.add_argument('title', type=str)
+search_arguments.add_argument('director', type=str)
 
 ################################################################################
 #                                    ROUTES                                    #
@@ -176,3 +180,45 @@ class top_recent(Resource):
     def get(self, number):
         result = db.session.query(Film).order_by(Film.year.desc()).limit(number).all()
         return result, 200
+
+@api.route('/films/search', methods=['GET'])
+class search(Resource):
+
+    ########################################
+    #             Search Film              #
+    ########################################
+    @api.doc(
+        'search films based on the given method',
+        params={
+            'method': {'type': 'str', 'required': False,
+                       'description': 'the method to get reviews, from [title, director]'},
+            'title': {'type': 'str', 'required': False, 'description': 'the movie title'},
+            'director': {'type': 'str', 'required': False, 'description': 'the movie director'},
+        },
+        responses={
+            200: 'Success, films found',
+            400: 'Fail, invalid method',
+            404: 'Fail, films not found',
+        },
+    )
+    @api.expect(search_arguments, validate=True)
+    @api.marshal_list_with(film_model, code=200)
+    @jwt_required(optional=True)
+    def get(self):
+        result = []
+        args = search_arguments.parse_args()
+        if args['method'] == 'title':
+            if args['title'] is None:
+                return {'message': 'title is required'}, 400
+            else:
+                result = db.session.query(Film).filter(and_(Film.title.like("%" + str(args['title']) + "%"))).all()
+        elif args['method'] == 'director':
+            if args['director'] is None:
+                return {'message': 'director is required'}, 400
+            else:
+                result = db.session.query(Film).filter(and_(Film.director.like("%" + str(args['director']) + "%"))).all()
+
+        if len(result) == 0:
+            return {'message': 'film not found'}, 404
+        else:
+            return result, 200
