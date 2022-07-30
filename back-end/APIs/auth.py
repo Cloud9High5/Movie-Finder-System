@@ -571,4 +571,6 @@ class wish_list_edit(Resource):
 # TODO - admin unblock user
 # TODO - admin return all blocked users
 
+# TODO - remove from wish list after review
+
 # TODO - blocked user athorized to access only his own data

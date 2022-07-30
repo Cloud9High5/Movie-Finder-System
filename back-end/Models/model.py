@@ -30,6 +30,9 @@ users_wish_film = Table('users_wish_film', db.metadata,
     db.Column('film_id', db.String(32), db.ForeignKey('film.f_id'))
 )
 
+bad_word = db.Table('bad_word', db.metadata,
+    db.Column('w_id', db.Integer, primary_key=True, autoincrement=True),
+    db.Column('word', db.String(32), nullable=False))
 
 class User(db.Model):
     __tablename__ = 'user'
