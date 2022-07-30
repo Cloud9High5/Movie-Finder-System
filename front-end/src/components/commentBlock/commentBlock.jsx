@@ -28,7 +28,8 @@ const parseDateString = (date) => {
 }
 
 
-function CommentBlock ({ props }) {
+// function CommentBlock ({ props }) {
+function CommentBlock () {
   const classes = useStyles();
   const path = useNavigate();
   const [rawComments, setRawComments] = React.useState([]);  // comments with uid and movie_id
@@ -36,6 +37,8 @@ function CommentBlock ({ props }) {
   const [flag, setFlag] = React.useState(false);
   const mid = useParams()['movieID'];
   const [likesDislikes, setLikesDislikes] = React.useState({});
+  const [numDisplayedReviews, setNumDisplayedReviews] = React.useState(15);
+  const [slicedReviews, setSlicedReviews] = React.useState([]);
 
 
   // obtain comments from backend
@@ -53,9 +56,14 @@ function CommentBlock ({ props }) {
       }
     })
   }, [flag, mid])
+  // display a subset of the whole comments
+  React.useEffect(() => {
+    const temp = rawComments.slice(0, numDisplayedReviews >= rawComments.length ? rawComments.length : numDisplayedReviews);
+    setSlicedReviews([...temp]);
+  }, [rawComments, numDisplayedReviews])
   // obtain username from backend
   React.useEffect(() => {
-    let temp = [...rawComments];
+    let temp = [...slicedReviews];
     temp.map((t) => (
       fetch('http://127.0.0.1:5000/auth/user/' + t.u_id).then(async (response) => {
         const data = await response.json();
@@ -64,10 +72,12 @@ function CommentBlock ({ props }) {
         setComments([...temp]);
       })
     ))
-  }, [rawComments])
+  }, [slicedReviews])
   // like/dislike list
   React.useEffect(() => {
-    if (helpers.hasNoToken()) { return }
+    if (helpers.hasNoToken()) {
+      return
+    }
     const reqInfo = {
       method: 'GET',
       headers: {
@@ -102,12 +112,12 @@ function CommentBlock ({ props }) {
     }
   }
 
-
   return (
     <Box sx={{ marginTop: 3 }}>
       <Typography variant={'h5'}>Comments:</Typography>
       <Divider/>
-      {Array.isArray(props) ? comments.map((review, idx) => {
+      {/*{Array.isArray(props) ? comments.map((review, idx) => {*/}
+      {comments.length > 0 ? comments.map((review, idx) => {
         return (
           <Box borderTop={'1px solid gainsboro'}
                padding={'20px 0'}
@@ -146,10 +156,12 @@ function CommentBlock ({ props }) {
                   </Box>
                   <Box sx={{ marginLeft: '20px' }}>
                     {!helpers.hasNoToken() &&
-                      likesDislikes.likes.indexOf(review.r_id) !== -1 ? <Chip label={'You Liked'} color={'success'} size={'small'} variant={'outlined'} /> : <></>
+                    likesDislikes.likes.indexOf(review.r_id) !== -1 ?
+                      <Chip label={'You Liked'} color={'success'} size={'small'} variant={'outlined'}/> : <></>
                     }
                     {!helpers.hasNoToken() &&
-                      likesDislikes.dislikes.indexOf(review.r_id) !== -1 ? <Chip label={'You Dislike'} color={'error'} size={'small'} variant={'outlined'} /> : <></>
+                    likesDislikes.dislikes.indexOf(review.r_id) !== -1 ?
+                      <Chip label={'You Dislike'} color={'error'} size={'small'} variant={'outlined'}/> : <></>
                     }
                   </Box>
                 </Box>
@@ -165,6 +177,15 @@ function CommentBlock ({ props }) {
       }) : <Box className={classes.textBar}>
         <Typography align={'center'} component={'span'} variant={'h5'}>No Comment</Typography>
       </Box>}
+      <Divider/>
+      {
+        numDisplayedReviews <= rawComments.length &&
+        <Box sx={{ marginTop: 3, marginBottom: 3 }}>
+          <Typography display={'flex'} justifyContent={'center'} sx={{ cursor: 'pointer', "&:hover": {color: 'blueviolet'} }} onClick={() => {setNumDisplayedReviews(numDisplayedReviews + 10)}}>
+            Load More Comments.
+          </Typography>
+        </Box>
+      }
     </Box>
   )
 }
