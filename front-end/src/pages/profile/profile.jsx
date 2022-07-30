@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
-import {ProfileCard, ProfileReview, FollowList, BlackList} from "../../components/";
+import { ProfileCard, ProfileReview, FollowList, BlackList, Wishlist } from "../../components/";
 import { useParams } from "react-router-dom";
 import * as helpers from "../../helpers";
 
@@ -57,7 +57,6 @@ function Profile() {
     fetch('http://localhost:5000/auth/user/' + uid, reqInfo).then(async (response) => {
       const data = await response.json();
       setUserInfo(data);
-      console.log(data)
     })
   }, [uid])
   const handleChange = (event, newValue) => {
@@ -83,6 +82,7 @@ function Profile() {
             <Tab label="My Follows" {...a11yProps(1)} style={{fontSize: "large"}} sx={userInfo.is_self ? {display: 'inline-flex', textTransform: 'none'} : {display: 'none'}}/>
             <Tab label="My Blacklist" {...a11yProps(2)} style={{fontSize: "large"}} sx={userInfo.is_self ? {display: 'inline-flex', textTransform: 'none'} : {display: 'none'}}/>
             <Tab label="Reviews" {...a11yProps(3)} sx={{textTransform: 'none'}} style={{fontSize: "large"}}/>
+            <Tab label="WishList" {...a11yProps(4)} sx={{textTransform: 'none'}} style={{fontSize: "large"}}/>
           </Tabs>
           <Box style={{width: '100%'}}>
             <TabPanel value={value} index={0}>
@@ -96,6 +96,9 @@ function Profile() {
             </TabPanel>
             <TabPanel value={value} index={3}>
               <ProfileReview/>
+            </TabPanel>
+            <TabPanel value={value} index={4}>
+              <Wishlist/>
             </TabPanel>
           </Box>
         </Box>
