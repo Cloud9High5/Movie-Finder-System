@@ -64,8 +64,14 @@ function ResetPassword () {
     }
 
     const inputCode = (e, num) => {
-        const input = e.target.value;
-        if (!(isNaN(parseInt(input))) && (/^[0-9]$/).test(input)) {
+        // const input = e.target.value;
+        const input = e.key;
+        if (e.keyCode === 8) {
+            setCode({ ...code, [num]: '' });
+            if (num > 0) {
+                codeRefs[num - 1].current.focus();
+            }
+        } else if (!(isNaN(parseInt(input))) && (/^[0-9]$/).test(input)) {
             setCode({ ...code, [num]: input });
             if (num < 5) {
                 codeRefs[num + 1].current.focus();
@@ -173,7 +179,7 @@ function ResetPassword () {
                                     return (
                                         <TextField className={'codeBlock'} key={num} inputRef={codeRefs[num]}
                                                    value={code[num]}
-                                                   onInput={(e) => inputCode(e, num)} variant="outlined"
+                                                   onKeyDown={(e) => inputCode(e, num)} variant="outlined"
                                                    inputProps={{ style: { textAlign: 'center' } }}/>
                                     )
                                 })
