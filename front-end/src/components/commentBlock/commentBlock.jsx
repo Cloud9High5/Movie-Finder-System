@@ -108,7 +108,6 @@ function CommentBlock ({ props }) {
       <Typography variant={'h5'}>Comments:</Typography>
       <Divider/>
       {Array.isArray(props) ? comments.map((review, idx) => {
-        console.log(review)
         return (
           <Box borderTop={'1px solid gainsboro'}
                padding={'20px 0'}

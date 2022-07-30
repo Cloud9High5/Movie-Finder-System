@@ -84,12 +84,27 @@ function ResetPassword () {
         setCodeValid(true);
     }, [code])
 
-    const verifyCode = () => {
+    const verifyCode = async () => {
         if (!codeValid) {
             setModalMsg('Your verification code is incorrect!');
             setVisibility(true);
         } else {
-            path('/login')
+            const requestInfo = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: states.password,
+                })
+            };
+            const response = await fetch(`http://127.0.0.1:5000/auth/resetpwd`, requestInfo);
+            const data = await response.json();
+            console.log(data)
+            if (response.status === 200) {
+                path('/login')
+            }
         }
     }
 
