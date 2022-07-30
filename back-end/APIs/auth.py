@@ -541,8 +541,7 @@ class wish_list_edit(Resource):
         },
         responses = {
             200: 'Success, film added to wish list',
-            401: 'Fail, film not found',
-            403: 'Fail, film already in wish list',
+            401: 'Fail, film not found'
         }
     )
     @jwt_required()
@@ -567,8 +566,73 @@ class wish_list_edit(Resource):
                 'message': 'User not found'
             }, 401
 
-# TODO - admin block user
-# TODO - admin unblock user
-# TODO - admin return all blocked users
-
-# TODO - blocked user athorized to access only his own data
+@api.route('/auth/admin/block_list', methods=['GET','PUT'])
+class block(Resource):
+    
+    ########################################
+    #         Get All Blocked User         #
+    ########################################
+    @api.doc(
+        description = "Get system block list",
+        responses = {
+            200: 'Success, block list returned',
+            401: 'Fail, Empty list',
+        }
+    )
+    @jwt_required()
+    def get(self):
+        if current_user.is_admin:
+            result = User.query.filter_by(is_blocked=True).all()
+            result = [{
+                'u_id': user.u_id,
+                'email': user.email,
+                'username': user.username,
+                'photo_url': user.url_photo,
+                'is_admin': user.is_admin,
+                'is_blocked': user.is_blocked
+            } for user in result]
+            if result != []:
+                return result, 200
+            else:
+                return [], 200
+        else:
+            return {
+                'message': 'You are not admin'
+            }, 401
+    
+@api.route('/auth/admin/block_list/<string:u_id>', methods=['GET','PUT'])
+class block_edit(Resource):
+    ########################################
+    #      Add & Remove block list         #
+    ########################################
+    @api.doc(
+        description = "Add User to block List, remove if already in list",
+        params = {
+            "u_id": "User ID"
+        },
+        responses = {
+            200: 'Success, user added to block list',
+            401: 'Fail, user not found'
+        }
+    )
+    @jwt_required()
+    def put(self, u_id):
+        target_user = User.query.filter_by(u_id=u_id).first()
+        if not target_user:
+            return {
+                'message': 'User not found'
+            }, 401
+        
+        if current_user.is_admin:
+            if target_user.is_blocked:
+                target_user.is_blocked = False
+                db.session.commit()
+                return {
+                    'message': "{} is removed from block list".format(target_user.username)
+                }, 200
+            else:
+                target_user.is_blocked = True
+                db.session.commit()
+                return {
+                    'message': "{} is added to block list".format(target_user.username)
+                }, 200

@@ -30,6 +30,9 @@ users_wish_film = Table('users_wish_film', db.metadata,
     db.Column('film_id', db.String(32), db.ForeignKey('film.f_id'))
 )
 
+bad_word = db.Table('bad_word', db.metadata,
+    db.Column('w_id', db.Integer, primary_key=True, autoincrement=True),
+    db.Column('word', db.String(32), nullable=False))
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -148,9 +151,18 @@ class Review(db.Model):
     bad_word = db.Column(db.Boolean, nullable=False, default=False)
 
     created_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     likes = db.relationship('Review_Like', backref='review', lazy='dynamic')
     dislikes = db.relationship('Review_Dislike', backref='review', lazy='dynamic')
+    
+    @property
+    def like(self):
+        return self.likes.count()
+    
+    @property
+    def dislike(self):
+        return self.dislikes.count()
 
 
 class Review_Like(db.Model):
