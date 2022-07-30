@@ -83,7 +83,7 @@ class film(Resource):
             if current_user:
                 blocked_id = [x.u_id for x in current_user.blocked.all()]
                 reviews = [x for x in reviews if x.u_id not in blocked_id]
-                result.rating_doubi = sum([x.rating for x in reviews]) / len(reviews)
+                result.rating = sum([x.rating for x in reviews]) / len(reviews)
 
             return result, 200
         else:

@@ -137,16 +137,6 @@ class reviews(Resource):
         if len(result) == 0:
             return {'message': 'review not found'}, 404
         else:
-            result = [{
-                'r_id': x.r_id,
-                'f_id': x.f_id,
-                'u_id': x.u_id,
-                'rating': x.rating,
-                'content': x.content,
-                'created_time': x.created_time,
-                'like': len(x.likes.all()),
-                'dislike': len(x.dislikes.all()),
-            } for x in result]
             return result, 200
     
     ########################################
@@ -291,16 +281,7 @@ class get_review(Resource):
         if result is None:
             return {'message': 'review not found'}, 404
         else:
-            return {
-                'r_id': result.r_id,
-                'f_id': result.f_id,
-                'u_id': result.u_id,
-                'rating': result.rating,
-                'content': result.content,
-                'created_time': result.created_time,
-                'like': len(result.likes.all()),
-                'dislike': len(result.dislikes.all()),
-            }, 200
+            return result, 200
 
 
 @api.route('/review/rating', methods=['POST'])

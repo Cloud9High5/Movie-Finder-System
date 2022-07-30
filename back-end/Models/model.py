@@ -155,6 +155,14 @@ class Review(db.Model):
 
     likes = db.relationship('Review_Like', backref='review', lazy='dynamic')
     dislikes = db.relationship('Review_Dislike', backref='review', lazy='dynamic')
+    
+    @property
+    def like(self):
+        return self.likes.count()
+    
+    @property
+    def dislike(self):
+        return self.dislikes.count()
 
 
 class Review_Like(db.Model):
