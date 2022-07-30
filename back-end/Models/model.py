@@ -1,7 +1,8 @@
 from datetime import datetime
 from extensions import db, jwt
 from .helper import u_id_generator, f_id_generator, r_id_generator
-from sqlalchemy import Table
+from sqlalchemy import Table, select, func
+from sqlalchemy.ext.hybrid import hybrid_property
 import bcrypt
 
 @jwt.user_identity_loader
@@ -96,21 +97,40 @@ class Film(db.Model):
     director = db.Column(db.String(80), nullable=True)
     actor = db.Column(db.String(200), nullable=True)
     url_poster = db.Column(db.Text, nullable=True)
+    rating_doubi = db.Column(db.Float, nullable=True)
 
     created_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     reviews = db.relationship('Review', backref='film', lazy='dynamic')
     
-    wish_by = db.relationship('User', secondary=users_wish_film, backref='film', lazy='dynamic')
-    
-    def rating_doubi(self):
+    @hybrid_property
+    def rating(self):
         reviews = self.reviews.all()
         if len(reviews) == 0:
             return 0
         else:
-            return sum(review.rating for review in reviews) / len(reviews)
+            return round(sum(review.rating for review in reviews) / len(reviews), 1)
+        
+    @rating.expression
+    def rating(cls):
+        return select(func.avg(Review.rating)).where(Review.f_id == cls.f_id)
+    
+    @property
+    def rating_distribution(self):
+        reviews = self.reviews.all()
+        rating_distribution = {x: 0 for x in range(0, 5)}
+        for review in reviews:
+            rating_distribution[review.rating] = rating_distribution.get(review.rating, 0) + 1
+        return rating_distribution
 
+    @property
+    def genres(self):
+        return [genre.strip() for genre in self.genre.split(',')]
+    
+    @property
+    def actors(self):
+        return [actor.strip() for actor in self.actor.split(',')]
     
     def __repr__(self):
         return '<Film %r>' % self.title
