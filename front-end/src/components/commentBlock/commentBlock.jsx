@@ -117,7 +117,7 @@ function CommentBlock () {
       <Typography variant={'h5'}>Comments:</Typography>
       <Divider/>
       {/*{Array.isArray(props) ? comments.map((review, idx) => {*/}
-      {comments.length > 0 ? comments.map((review, idx) => {
+      {(Array.isArray(comments) && (comments.length > 0)) ? comments.map((review, idx) => {
         return (
           <Box borderTop={'1px solid gainsboro'}
                padding={'20px 0'}
@@ -155,11 +155,11 @@ function CommentBlock () {
                     <Thumb quantity={review.dislike} type={'down'}/>
                   </Box>
                   <Box sx={{ marginLeft: '20px' }}>
-                    {!helpers.hasNoToken() &&
+                    {!helpers.hasNoToken() && Object.keys(likesDislikes).length > 0 &&
                     likesDislikes.likes.indexOf(review.r_id) !== -1 ?
                       <Chip label={'You Liked'} color={'success'} size={'small'} variant={'outlined'}/> : <></>
                     }
-                    {!helpers.hasNoToken() &&
+                    {!helpers.hasNoToken() && Object.keys(likesDislikes).length > 0 &&
                     likesDislikes.dislikes.indexOf(review.r_id) !== -1 ?
                       <Chip label={'You Dislike'} color={'error'} size={'small'} variant={'outlined'}/> : <></>
                     }
