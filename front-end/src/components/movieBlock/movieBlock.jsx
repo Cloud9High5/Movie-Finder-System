@@ -16,6 +16,8 @@ import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
 import Button from '@mui/material/Button';
 import TextField from "@mui/material/TextField";
 import * as helpers from "../../helpers";
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 
 const useStyles = makeStyles({
@@ -41,6 +43,8 @@ function MovieBlock (props) {
   const handleClose = () => setVisibility(false);
   const [info, setInfo] = React.useState({rating: 0});
   const [ratePercentage, setRatePercentage] = React.useState({0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0});
+  const [flag, setFlag] = React.useState(true);
+  const [inWishList, setInWishList] = React.useState(false);
 
   const style = {
     position: 'absolute',
@@ -97,6 +101,27 @@ function MovieBlock (props) {
     }
   }
 
+  const addToWishList = async () => {
+    if (helpers.hasNoToken()) {
+      alert("Please login first");
+      return
+    }
+    const requestInfo = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+      },
+    };
+    const response = await fetch('http://127.0.0.1:5000/auth/user/wish_list/' + props.id, requestInfo);
+    if (response.status !== 200) {
+      const data = await response.json();
+      alert(data);
+    } else {
+      setFlag(!flag);
+    }
+  }
+  // calculating the ratio of each rate
   React.useEffect(() => {
     const temp = {...ratePercentage};
     const reqInfo = {
@@ -115,6 +140,23 @@ function MovieBlock (props) {
       setRatePercentage({ ...temp });
     })
   }, [])
+  // whether this movie is in user's wishlist
+  React.useEffect(() => {
+    if (helpers.hasNoToken()){return}
+    fetch('http://localhost:5000/auth/user/' + localStorage.getItem('uid') + '/wish_list').then(async (response) => {
+      if (response.status === 200) {
+        const data = await response.json();
+        if (data.length === 0) {setInWishList(false)}
+        for (const m of data) {
+          if (m['f_id'] === props.id){
+            setInWishList(true);
+            break
+          }
+          setInWishList(false);
+        }
+      }
+    })
+  }, [flag])
 
   return (
     <React.Fragment>
@@ -161,6 +203,15 @@ function MovieBlock (props) {
                             onClick={handleOpen}
                             startIcon={<AutoFixHighOutlinedIcon/>}>
                       Rate the movie!
+                    </Button>
+                    <Button variant="outlined"
+                            size="large"
+                            onClick={addToWishList}
+                            color={inWishList ? 'success' : 'info'}
+                            startIcon={inWishList ? <CheckCircleOutlineIcon/> : <FavoriteBorderIcon/>}
+                            sx={{ textTransform: 'none', marginLeft: '20px' }}
+                    >
+                      {inWishList ? 'In My Wishlist' : 'Want To See'}
                     </Button>
                     <Modal
                       open={visibility}
@@ -224,7 +275,7 @@ function MovieBlock (props) {
                   <Typography variant={'h6'}>{info.rating} out of 5</Typography> &nbsp;&nbsp;&nbsp;
                 </Box>
                 {(typeof info.rating_distribution === 'object') &&
-                  <Typography variant={'subtitle1'}>{Object.values(info.rating_distribution).reduce((a, b)=>a+b, 0)} global rating</Typography>
+                  <Typography variant={'subtitle1'}>{Object.values(info.rating_distribution).reduce((a, b)=>a+b, 0)} global ratings</Typography>
                 }
               </Box>
               <Box display={'flex'} alignItems={'center'}>
