@@ -220,8 +220,4 @@ class search(Resource):
         
         return result, 200
 
-# TODO - add to wish list
-# TODO - browse wish list
-# TODO - remove from wish list
-
 # TODO - recommend films
