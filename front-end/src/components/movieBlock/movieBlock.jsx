@@ -154,11 +154,6 @@ function MovieBlock (props) {
             </Card>
             <Stack direction="row" spacing={2}>
               <Box display={'flex'}>
-                {/*<Box sx={{ p: 1 }}>*/}
-                  {/*<Typography gutterBottom variant="h5" component="span">*/}
-                  {/*  IMDB Rating: {info.rating_imdb}*/}
-                  {/*</Typography>*/}
-                {/*</Box>*/}
                 <Box sx={{ p: 1 }}>
                   <Stack direction="row">
                     <Button variant="outlined"
@@ -220,7 +215,18 @@ function MovieBlock (props) {
               </Box>
             </Stack>
             <Box display={'flex'} flexDirection={'column'}>
-              <Box><Typography variant={'h5'}>DOUBI Rating:</Typography><Rating value={info.rating} precision={0.5} readOnly/></Box>
+              <Box>
+                <Typography variant={'h5'}>
+                  DOUBI Rating:
+                </Typography>
+                <Box display={'flex'} alignItems={'center'}>
+                  <Rating value={info.rating} precision={0.5} readOnly/> &nbsp;&nbsp;&nbsp;
+                  <Typography variant={'h6'}>{info.rating} out of 5</Typography> &nbsp;&nbsp;&nbsp;
+                </Box>
+                {(typeof info.rating_distribution === 'object') &&
+                  <Typography variant={'subtitle1'}>{Object.values(info.rating_distribution).reduce((a, b)=>a+b, 0)} global rating</Typography>
+                }
+              </Box>
               <Box display={'flex'} alignItems={'center'}>
                 5 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[5]} sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[5]}%
               </Box>
