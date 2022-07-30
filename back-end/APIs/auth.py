@@ -7,7 +7,7 @@ from flask_mail import Message
 from flask_jwt_extended import create_access_token, jwt_required, current_user
 from sqlalchemy import exists
 from extensions import db, mail, jwt
-from Models.model import User
+from Models.model import User, Film
 
 api = Namespace("auth", description="Authentication related operations", path="/")
 
@@ -489,3 +489,86 @@ class black_list(Resource):
             return {
                 'message': 'User not found'
             }, 401
+
+
+@api.route('/auth/user/<string:u_id>/wish_list', methods=['GET','POST'])
+class wish_list(Resource):
+
+    ########################################
+    #            Get wish list             #
+    ########################################
+    @api.doc(
+        description = "Get User's wish List",
+        params={'u_id': 'User ID'},
+        responses = {
+            200: 'Success, wish list returned',
+            401: 'Fail, Empty list',
+        }
+    )
+    # @api.marshal_list_with(user_model, code=200)
+    def get(self, u_id):
+        target_user = User.query.filter_by(u_id=u_id).first()
+        if target_user:
+            result = target_user.wish.all()
+            result = [{
+                "f_id": film.f_id,
+                "title": film.title,
+                "year": film.year,
+                "run_time": film.run_time,
+                "rating": film.rating,
+                "rating_distribution": film.rating_distribution,
+                "rating_imdb": film.rating_imdb,
+                "overview": film.overview,
+                "director": film.director,
+                "url_poster": film.url_poster,
+                "genres": film.genres,
+                "actors": film.actors,
+                } for film in result]
+            return result, 200
+        else:
+            return [], 200
+
+@api.route('/auth/user/wish_list/<string:f_id>', methods=['GET','POST'])
+class wish_list_edit(Resource):
+    
+    ########################################
+    #       Add & Remove wish list         #
+    ########################################
+    @api.doc(
+        description = 'Add film to wish List, remove if already in list',
+        params = {
+            'f_id': 'Film ID'
+        },
+        responses = {
+            200: 'Success, film added to wish list',
+            401: 'Fail, film not found',
+            403: 'Fail, film already in wish list',
+        }
+    )
+    @jwt_required()
+    def post(self, f_id):
+        target_film = Film.query.filter_by(f_id=f_id).first()
+
+        if target_film and current_user:
+            if target_film in current_user.wish.all():
+                current_user.wish.remove(target_film)
+                db.session.commit()
+                return {
+                    'message': "{} is removed from {}'s wish list".format(target_film.title, current_user.username)
+                }, 200
+            else:
+                current_user.wish.append(target_film)
+                db.session.commit()
+                return {
+                    'message': "{} is added to {}'s wish list".format(target_film.title, current_user.username)
+                }, 200
+        else:
+            return {
+                'message': 'User not found'
+            }, 401
+
+# TODO - admin block user
+# TODO - admin unblock user
+# TODO - admin return all blocked users
+
+# TODO - blocked user athorized to access only his own data
