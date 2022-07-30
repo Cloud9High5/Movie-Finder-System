@@ -489,3 +489,8 @@ class black_list(Resource):
             return {
                 'message': 'User not found'
             }, 401
+
+
+# TODO - admin block user
+# TODO - admin unblock user
+# TODO - admin return all blocked users

@@ -146,6 +146,7 @@ class reviews(Resource):
     ########################################
     #             Post Review              #
     ########################################
+    # TODO - update rating_doubi when posting a review
     @api.doc(
         'post a review',
         responses = {
@@ -173,9 +174,12 @@ class reviews(Resource):
             current_user.username, 
             db.session.query(Film.title).filter(Film.f_id == payload['f_id']).first()[0])}, 200
     
+    # TODO - edit review
+    
     ########################################
     #             Delete Review            #
     ########################################
+    # TODO - delete by admin
     @api.doc(
         description = "delete a review",
         responses = {
@@ -312,3 +316,7 @@ class like_list(Resource):
         likes = current_user.review_likes.all()
         dislikes = current_user.review_dislikes.all()
         return {'likes': [like.r_id for like in likes], 'dislikes': [dislike.r_id for dislike in dislikes]}, 200
+    
+
+# TODO - show all bad reviews to admin
+

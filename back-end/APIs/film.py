@@ -219,3 +219,9 @@ class search(Resource):
             result = sorted(result, key=lambda x: x.rating_imdb, reverse=True)
         
         return result, 200
+
+# TODO - add to wish list
+# TODO - browse wish list
+# TODO - remove from wish list
+
+# TODO - recommend films
