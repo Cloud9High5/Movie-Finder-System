@@ -2,12 +2,12 @@ import json
 from urllib import response
 from winreg import DisableReflectionKey
 from flask import request
-from flask_restx import Resource, Namespace, fields, reqparse
+from flask_restx import Resource, Namespace, fields, marshal, reqparse
 from flask_jwt_extended import jwt_required, current_user
 import jwt
 from sqlalchemy import exists, func
 from extensions import db
-from Models.model import Review, User, Film, Review_Like, Review_Dislike
+from Models.model import Review, User, Film, Review_Like, Review_Dislike, bad_word
 from datetime import datetime, timedelta
 
 api = Namespace("reviews", description="Reviews related operations", path="/")
@@ -152,9 +152,6 @@ class reviews(Resource):
     ########################################
     #             Post Review              #
     ########################################
-    # TODO - update rating_doubi when posting a review
-    # TODO - check if user has already posted a review for this film
-    # TODO - bad word check
     @api.doc(
         'post a review',
         responses = {
@@ -170,19 +167,46 @@ class reviews(Resource):
 
         if payload['f_id'] is None or payload['rating'] is None:
             return {'message': 'f_id and rating are all required'}, 400
+        
+        # check if user already posted a review for this film
+        if Review.query.filter_by(u_id=current_user.u_id, f_id=payload['f_id']).first() is not None:
+            return {'message': 'you have already posted a review for this film'}, 400
+        
+        # check if target film is in current user's wish list
+        film = Film.query.filter_by(f_id=payload['f_id']).first()
+        if film in current_user.wish.all():
+            current_user.wish.remove(film)
+            db.session.commit()
+        
+        # bad word check
+        bad_words = db.session.query(bad_word.c.word).all()
+        bad_words = [x[0] for x in bad_words]
+        
+        bad_word_flag = False
+        
+        for word in payload['content'].split():
+            if word in bad_words:
+                bad_word_flag = True
 
+        # post review
         db.session.add(Review(
             u_id = current_user.u_id,
             f_id = payload['f_id'],
             content = payload['content'],
-            rating = payload['rating']
+            rating = payload['rating'],
+            bad_word = bad_word_flag,
         ))
         db.session.commit()
+        
+        # modify rating_doubi
+        film = Film.query.filter_by(f_id=payload['f_id']).first()
+        film.rating_doubi = film.rating
+        db.session.commit()
+        
         return {'message': '{} post a review for {}'.format(
             current_user.username, 
             db.session.query(Film.title).filter(Film.f_id == payload['f_id']).first()[0])}, 200
     
-    # TODO - edit review
     ########################################
     #              Edit Review             #
     ########################################
@@ -357,5 +381,23 @@ class like_list(Resource):
         return {'likes': [like.r_id for like in likes], 'dislikes': [dislike.r_id for dislike in dislikes]}, 200
     
 
-# TODO - show all bad reviews to admin
-
+@api.route('/review/bad_word', methods=['GET'])
+class bad_word_review(Resource):
+    
+    ########################################
+    #    get all reviews with bad word     #
+    ########################################    
+    @api.doc(
+        description = "return a list of reviews with bad word",
+        responses={
+            200: 'Success'
+        }
+    )
+    @api.marshal_list_with(review_model)
+    @jwt_required()
+    def get(self):
+        if current_user.is_admin:
+            result = db.session.query(Review).filter(Review.bad_word==True).order_by(Review.created_time.desc()).all()
+            return result, 200
+        else:
+            return {"message": "you are not admin"}, 400

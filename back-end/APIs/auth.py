@@ -636,7 +636,3 @@ class block_edit(Resource):
                 return {
                     'message': "{} is added to block list".format(target_user.username)
                 }, 200
-
-# TODO - remove from wish list after review
-
-# TODO - blocked user athorized to access only his own data

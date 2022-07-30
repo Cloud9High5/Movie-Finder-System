@@ -151,6 +151,7 @@ class Review(db.Model):
     bad_word = db.Column(db.Boolean, nullable=False, default=False)
 
     created_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     likes = db.relationship('Review_Like', backref='review', lazy='dynamic')
     dislikes = db.relationship('Review_Dislike', backref='review', lazy='dynamic')

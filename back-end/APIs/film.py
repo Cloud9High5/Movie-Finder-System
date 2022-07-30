@@ -24,6 +24,7 @@ film_model = api.model('film', {
     "rating": fields.Float(required=True, description="Film rating"),
     "rating_distribution": fields.Raw(required=True, description="Film rating distribution"),
     "rating_imdb": fields.Float(required=True, description="Film rating on IMDB"),
+    "rating_doubi": fields.Float(required=True, description="Film rating on Doubi"),
     "overview": fields.String(required=True, description="Film overview"),
     "director": fields.String(required=True, description="Film director"),
     "url_poster": fields.String(required=True, description="Film poster url"),
