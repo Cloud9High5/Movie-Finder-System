@@ -46,6 +46,12 @@ review_post_model = api.model('Review Post', {
     "content": fields.String(required=False, description="Review Content"),
 })
 
+review_edit_model = api.model('Review Edit', {
+    "r_id": fields.String(required=True, description="Review ID"),
+    "rating": fields.Float(required=True, description="Rating"),
+    "content": fields.String(required=False, description="Review Content"),
+})
+
 
 review_rating_model = api.model('review_rating_model', {
     'method': fields.Integer(required=True, description="Method, 0: dislike, 1: like"),
@@ -59,7 +65,7 @@ review_rating_model = api.model('review_rating_model', {
 
 
 
-@api.route('/review', methods=['GET', 'POST', 'DELETE'])
+@api.route('/review', methods=['GET', 'POST', 'PUT', 'DELETE'])
 class reviews(Resource):
 
     ########################################
@@ -147,6 +153,8 @@ class reviews(Resource):
     #             Post Review              #
     ########################################
     # TODO - update rating_doubi when posting a review
+    # TODO - check if user has already posted a review for this film
+    # TODO - bad word check
     @api.doc(
         'post a review',
         responses = {
@@ -175,11 +183,42 @@ class reviews(Resource):
             db.session.query(Film.title).filter(Film.f_id == payload['f_id']).first()[0])}, 200
     
     # TODO - edit review
+    ########################################
+    #              Edit Review             #
+    ########################################
+    @api.doc(
+        'edit a review',
+        responses = {
+            200: 'Success, review edited',
+            400: 'Fail, invalid review',
+            404: 'Fail, user not found'
+        },
+    )
+    @api.expect(review_edit_model, validate=True)
+    @jwt_required()
+    def put(self):
+        payload = json.loads(str(request.data, 'utf-8'))
+
+        if payload['r_id'] is None or payload['rating'] is None:
+            return {'message': 'r_id and rating are all required'}, 400
+
+        target_review = Review.query.filter_by(r_id=payload['r_id']).first()
+        if target_review is None:
+            return {'message': 'review not found'}, 404
+        
+        if target_review.u_id != current_user.u_id:
+            return {'message': 'you are not the owner of this review'}, 400
+        
+        target_review.content = payload['content']
+        target_review.rating = payload['rating']
+        
+        db.session.commit()
+        return {'message': '{} edit a review'.format(current_user.username)}, 200
+        
     
     ########################################
     #             Delete Review            #
     ########################################
-    # TODO - delete by admin
     @api.doc(
         description = "delete a review",
         responses = {
@@ -198,7 +237,7 @@ class reviews(Resource):
             if review is None:
                 return {'message': 'review not found'}, 404
             else:
-                if review.u_id == current_user.u_id:
+                if review.u_id == current_user.u_id or current_user.admin:
                     db.session.delete(review)
                     db.session.commit()
                     return {'message': 'review deleted'}, 200
