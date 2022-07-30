@@ -494,3 +494,5 @@ class black_list(Resource):
 # TODO - admin block user
 # TODO - admin unblock user
 # TODO - admin return all blocked users
+
+# TODO - blocked user athorized to access only his own data
