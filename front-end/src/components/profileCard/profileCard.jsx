@@ -35,7 +35,6 @@ function ProfileCard() {
           const data = await res.json();
           data.avatar = data.photo_url;
           setProfile(data);
-          console.log(data)
         }
         
       })
