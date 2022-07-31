@@ -18,8 +18,8 @@ import * as helpers from "../../helpers";
 
 const columns = [
   { id: 'created_time', label: 'Date', minWidth: 100 },
-  { id: 'content', label: 'Content', minWidth: 200 },
   { id: 'title', label: 'Movie', minWidth: 30 },
+  { id: 'content', label: 'Content', minWidth: 200 },
   { id: 'rating', label: 'Rating', minWidth: 30 },
   { id: 'like', label: 'Like', minWidth: 30 },
   { id: 'dislike', label: 'Dislike', minWidth: 30 },
