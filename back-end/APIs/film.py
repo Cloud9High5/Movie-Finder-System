@@ -24,7 +24,6 @@ film_model = api.model('film', {
     "rating": fields.Float(required=True, description="Film rating"),
     "rating_distribution": fields.Raw(required=True, description="Film rating distribution"),
     "rating_imdb": fields.Float(required=True, description="Film rating on IMDB"),
-    "rating_doubi": fields.Float(required=True, description="Film rating on Doubi"),
     "overview": fields.String(required=True, description="Film overview"),
     "director": fields.String(required=True, description="Film director"),
     "url_poster": fields.String(required=True, description="Film poster url"),
@@ -83,7 +82,21 @@ class film(Resource):
             if current_user:
                 blocked_id = [x.u_id for x in current_user.blocked.all()]
                 reviews = [x for x in reviews if x.u_id not in blocked_id]
-                result.rating = sum([x.rating for x in reviews]) / len(reviews)
+                rating_customer = sum([x.rating for x in reviews]) / len(reviews)
+                result = {
+                    "f_id": result.f_id,
+                    "title": result.title,
+                    "year": result.year,
+                    "run_time": result.run_time,
+                    "rating": result.rating_customized(current_user),
+                    "rating_distribution": result.rating_distribution_customized(current_user),
+                    "rating_imdb": result.rating_imdb,
+                    "overview": result.overview,
+                    "director": result.director,
+                    "url_poster": result.url_poster,
+                    "genres": result.genres,
+                    "actors": result.actors,
+                }
 
             return result, 200
         else:
