@@ -82,7 +82,6 @@ class film(Resource):
             if current_user:
                 blocked_id = [x.u_id for x in current_user.blocked.all()]
                 reviews = [x for x in reviews if x.u_id not in blocked_id]
-                rating_customer = sum([x.rating for x in reviews]) / len(reviews)
                 result = {
                     "f_id": result.f_id,
                     "title": result.title,
