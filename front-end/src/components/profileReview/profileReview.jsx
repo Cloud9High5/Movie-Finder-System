@@ -19,8 +19,8 @@ import * as helpers from "../../helpers";
 const columns = [
   { id: 'created_time', label: 'Date', minWidth: 100 },
   { id: 'content', label: 'Content', minWidth: 200 },
+  { id: 'title', label: 'Movie', minWidth: 30 },
   { id: 'rating', label: 'Rating', minWidth: 30 },
-  { id: 'title', label: 'Title', minWidth: 30 },
   { id: 'like', label: 'Like', minWidth: 30 },
   { id: 'dislike', label: 'Dislike', minWidth: 30 },
   { id: 'operation', label: 'Operation', minWidth: 30 },
@@ -95,7 +95,6 @@ function ProfileReview () {
       fetch('http://localhost:5000/films?f_id=' + r.f_id, reqInfo).then(async (response) => {
         const data = await response.json();
         r.title = data.title;
-        r.rating = data.rating;
         setReviews([...rawReviews]);
       })
     }
@@ -143,8 +142,6 @@ function ProfileReview () {
       setFlag(!flag);  // force refreshing the comment block
     }
   }
-
-  console.log(reviews)
 
   return (
     <>

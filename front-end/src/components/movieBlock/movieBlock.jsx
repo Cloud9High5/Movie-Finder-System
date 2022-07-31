@@ -41,7 +41,7 @@ function MovieBlock (props) {
   const commentRef = useRef('');
   const handleOpen = () => setVisibility(true);
   const handleClose = () => setVisibility(false);
-  const [info, setInfo] = React.useState({rating: 0});
+  const [info, setInfo] = React.useState({rating: 0, genres: [], actors: []});
   const [ratePercentage, setRatePercentage] = React.useState({0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0});
   const [flag, setFlag] = React.useState(true);
   const [inWishList, setInWishList] = React.useState(false);
@@ -76,6 +76,11 @@ function MovieBlock (props) {
       return
     }
 
+    if (helpers.hasNoToken()) {
+      alert('Please login first.');
+      return
+    }
+
     const requestInfo = {
       method: 'POST',
       headers: {
@@ -95,8 +100,8 @@ function MovieBlock (props) {
     if (response.status === 200) {
       window.location.reload();
     } else {
-      alert("Please login first")
-      window.location.reload();
+      alert("You have already rated this movie.");
+      // window.location.reload();
 
     }
   }
@@ -178,7 +183,10 @@ function MovieBlock (props) {
                   <strong>Director:</strong> {info.director} / {info.year} / {info.run_time}
                 </Typography>
                 <Typography gutterBottom variant="body2" component="div">
-                  <strong>IMDB Rating:</strong> {info.rating_imdb}
+                  <strong>Genre:</strong> {info.genres.join(', ')}
+                </Typography>
+                <Typography gutterBottom variant="body2" component="div">
+                  <strong>Cast:</strong> {info.actors.join(', ')}
                 </Typography>
               </CardContent>
             </Card>

@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import { Chip, Typography } from '@mui/material';
+import { Button, Chip, Typography } from '@mui/material';
 import Avatar from "@material-ui/core/Avatar";
 import { Thumb } from "../../components";
 import Rating from '@mui/material/Rating';
@@ -112,6 +112,24 @@ function CommentBlock () {
     }
   }
 
+  const deleteReview = async (rid) => {
+    if (!window.confirm('Are you sure to delete this review?')) {return}
+    if (helpers.hasNoToken()) {return}
+    const reqInfo = {
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+      },
+    }
+    const response = await fetch('http://127.0.0.1:5000/review?r_id=' + rid, reqInfo);
+    if (response.status !== 200) {
+      const data = await response.json();
+      console.log(data);
+      alert(data);
+    } else {
+      window.location.reload();
+    }
+  }
   return (
     <Box sx={{ marginTop: 3 }}>
       <Typography variant={'h5'}>Comments:</Typography>
@@ -126,16 +144,21 @@ function CommentBlock () {
           >
             <Grid container spacing={1}>
               <Grid item xs={12}>
-                <Box display={'flex'} alignItems={'center'}>
-                  <Avatar className={classes.green} src={review.photo_url}>
-                    {review.username}
-                  </Avatar>
-                  <Box marginLeft={'10px'}>
-                    <Typography variant={'p'} color={'gray'} onClick={() => path('/profile/' + review.u_id)}
-                                sx={{ cursor: 'pointer' }}>
+                <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
+                  <Box display={'flex'}>
+                    <Avatar className={classes.green} src={review.photo_url}>
                       {review.username}
-                    </Typography>
+                    </Avatar>
+                    <Box marginLeft={'10px'}>
+                      <Typography variant={'h6'} color={'gray'} onClick={() => path('/profile/' + review.u_id)}
+                                  sx={{ cursor: 'pointer' }}>
+                        {review.username}
+                      </Typography>
+                    </Box>
                   </Box>
+                  {review.u_id === localStorage.getItem('uid') &&
+                  <Button variant={'outlined'} sx={{textTransform: 'none'}} onClick={() => deleteReview(review.r_id)} color={'warning'}>Delete</Button>
+                  }
                 </Box>
                 <Box marginLeft={'10px'}>
                   <Rating name="read-only"
@@ -181,7 +204,10 @@ function CommentBlock () {
       {
         numDisplayedReviews <= rawComments.length &&
         <Box sx={{ marginTop: 3, marginBottom: 3 }}>
-          <Typography display={'flex'} justifyContent={'center'} sx={{ cursor: 'pointer', "&:hover": {color: 'blueviolet'} }} onClick={() => {setNumDisplayedReviews(numDisplayedReviews + 10)}}>
+          <Typography display={'flex'} justifyContent={'center'}
+                      sx={{ cursor: 'pointer', "&:hover": { color: 'blueviolet' } }} onClick={() => {
+            setNumDisplayedReviews(numDisplayedReviews + 10)
+          }}>
             Load More Comments.
           </Typography>
         </Box>
