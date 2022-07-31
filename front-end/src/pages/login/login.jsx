@@ -106,6 +106,9 @@ function Login() {
     } else if (response.status === 403) {
       setModalMsg('Incorrect password, please try again.');
       setVisibility(true);
+    }else if (response.status === 405) {
+      setModalMsg('User is blocked by DOUBI admin, please send an email to doubi@gmail.com to file a complaint.');
+      setVisibility(true);
     }
   }
 
