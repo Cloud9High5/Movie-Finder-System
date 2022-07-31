@@ -233,6 +233,10 @@ class login(Resource):
         if db.session.query(exists().where(User.email == email)).scalar():
             user = db.session.query(User).filter(User.email == email).first()
             if user.verify_password(password):
+                
+                if user.is_blocked:
+                    return {'message': 'User is blocked'}, 405
+                
                 access_token = create_access_token(identity=user)
                 return {
                     'message': 'Logged in as {}'.format(user.username),

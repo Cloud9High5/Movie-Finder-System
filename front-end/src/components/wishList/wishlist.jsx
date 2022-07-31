@@ -21,7 +21,7 @@ import { hasNoToken } from "../../helpers";
 
 const columns = [
   { id: 'url_poster', label: 'Poster', minWidth: 30 },
-  { id: 'title', label: 'Title', minWidth: 30 },
+  { id: 'title', label: 'Movie', minWidth: 30 },
   { id: 'rating', label: 'Rating', minWidth: 30 },
   { id: 'run_time', label: 'Runtime', minWidth: 30 },
   { id: 'year', label: 'Year', minWidth: 30 },

@@ -75,8 +75,7 @@ function DashboardMovieCard (props) {
                         {props.title}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        IMDB Rating: {props.rating}
-                      {/*{props.movie_id}*/}
+                        DOUBI Rating: {props.rating}
                     </Typography>
                 </CardContent>
             </CardActionArea>
