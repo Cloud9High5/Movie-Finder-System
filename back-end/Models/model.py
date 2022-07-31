@@ -200,3 +200,4 @@ class Review_Dislike(db.Model):
     u_id = db.Column(db.String(32), db.ForeignKey('user.u_id'), primary_key=True, nullable=False)
 
     created_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    

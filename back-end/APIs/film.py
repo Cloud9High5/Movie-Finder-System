@@ -5,6 +5,7 @@ from flask_restx import Resource, Namespace, fields, reqparse
 from sqlalchemy import exists, func
 from extensions import db
 from Models.model import Film, Review
+from .helper import film_based_recommendation
 
 api = Namespace("film", description="Authentication related operations", path="/")
 
@@ -233,4 +234,27 @@ class search(Resource):
         
         return result, 200
 
-# TODO - recommend films
+
+@api.route('/films/<string:f_id>/recommend/film', methods=['GET'])
+class film_based_recommend(Resource):
+
+    @api.doc(
+        'Get 10 recommendations for a film based on film similarity',
+        responses={
+            200: 'Success',
+            404: 'Fail, films not found',
+        },
+    )
+    @api.marshal_list_with(film_model, code=200)
+    def get(self, f_id):
+        result = []
+        # check if film exists
+        if Film.query.filter(Film.f_id == f_id).first() is not None:
+            f_id_list = film_based_recommendation(f_id)
+            for f_id in f_id_list:
+                result.append(Film.query.filter(Film.f_id == f_id).first())
+                
+        if result is None:
+            return {'message': 'film not found'}, 404
+        else:
+            return result, 200
