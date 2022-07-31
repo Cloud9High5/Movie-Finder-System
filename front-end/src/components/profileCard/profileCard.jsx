@@ -3,6 +3,7 @@ import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import {useEffect, useState} from 'react';
 import {useNavigate, useParams} from "react-router-dom";
 import * as helpers from "../../helpers";
+import logo from "../logo.png";
 
 const validatePassword = (password) => {
   let valid = password.length >= 8 && password.length <= 12;
@@ -119,10 +120,12 @@ function ProfileCard() {
   if (!profile) {
     return <Typography component={'span'} variant={'h4'}>Cannot fetch information of this user!</Typography>
   }
-  let avatar = 'https://images.pexels.com/photos/10242803/pexels-photo-10242803.jpeg';
+  // let avatar = 'https://images.pexels.com/photos/10242803/pexels-photo-10242803.jpeg';
+  let avatar = logo;
   if (profile.photo_url) {
     avatar = profile.photo_url;
   }
+
   return (
     <Box>
       {mode === 'display' && (
@@ -131,19 +134,20 @@ function ProfileCard() {
             <Typography component={'span'} variant={'h3'}>Account</Typography>
           </Grid>
           <Grid item xs={4}>
-            <img style={{width: '300px'}} src={avatar}/>
+            <img border={'1px solid #000'} style={{width: '300px'}} src={avatar}/>
           </Grid>
-          <Grid item xs={8}
-                style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+          <Grid item xs={8} style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+            {profile.is_blocked && <Alert severity="error">This user has been banned by DOUBI admin!</Alert>}
             <Box>
               <Typography variant={'h3'}>{profile.username}</Typography>
               <Typography variant={'h6'}>{profile.email}</Typography>
             </Box>
+            <Box sx={{ height: '70%' }}/>
             <Box>
               {
                 profile.is_self ?
                   <Button variant={'contained'} onClick={() => setMode('edit')}>UPDATE</Button>
-                  : <Box display={'flex'} justifyContent={'space-between'} width={'50%'}>
+                  : !profile.is_blocked && <Box display={'flex'} justifyContent={'space-between'} width={'50%'}>
                     <Button sx={{textTransform: 'none'}} onClick={() => userAction('follow')} color={'info'}
                             variant={'outlined'} disabled={profile.blocked}>
                       <b>{profile.followed ? 'Followed' : 'Follow'}</b>
