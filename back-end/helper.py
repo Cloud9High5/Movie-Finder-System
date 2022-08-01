@@ -44,6 +44,6 @@ def register_extensions(app):
 
     from extensions import jwt
     app.config['JWT_SECRET_KEY'] = 'AhDuiDuiDui'
-    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=1)
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=2160)
     jwt.init_app(app)
 
