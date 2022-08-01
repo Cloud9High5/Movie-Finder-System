@@ -91,7 +91,7 @@ function Dashboard() {
             <MenuItem value={'rating_doubi'}>Sort By Rating On Doubi</MenuItem>
           </Select>
         </FormControl>
-        <FormControl sx={{m: 1, minWidth: 120}} size={'small'}>
+        <FormControl sx={{m: 1, minWidth: 300}} size={'small'}>
           <TextField size={'small'}
                      value={keyword}
                      onChange={e => setKeyword(e.target.value)}
