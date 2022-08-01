@@ -321,10 +321,14 @@ class user_info(Resource):
         user = User.query.filter_by(u_id=u_id).first()
         if user == current_user:
             if 'username' in payload:
-                user.username = payload['username']
+                # check if username is taken
+                if db.session.query(exists().where(User.username == payload['username'])).scalar():
+                    return {'message': 'Username taken'}, 403
+                else:
+                    user.username = payload['username']
             if 'new_password' in payload:
                 # check if old password is correct
-                if user.password == payload['old_password']:
+                if current_user.verify_password(payload['old_password']):
                     user.password = payload['new_password']
                 else:
                     return {
