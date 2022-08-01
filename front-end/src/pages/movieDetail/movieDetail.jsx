@@ -3,7 +3,7 @@ import Container from '@material-ui/core/Container';
 import { CommentBlock, DashboardMovieCard, MovieBlock } from "../../components";
 import { useLocation, useParams } from "react-router-dom";
 import Header from "../../components/header/header";
-import { Box, Typography } from "@mui/material";
+import { Alert, Box, Typography } from "@mui/material";
 import { Divider } from "@material-ui/core";
 import * as helpers from '../../helpers';
 import { hasNoToken } from "../../helpers";
@@ -58,15 +58,22 @@ function MovieDetail () {
             })}
           </Box>
         </Box>
-        <Box marginTop={'20px'}>
-          <Typography variant={'h5'}> Movies recommended based on your review history: </Typography>
-          <Divider/>
-          <Box display={'flex'} flexWrap={'wrap'}>
-            {userBasedRec.map((movie, idx) => {
-              return (<DashboardMovieCard title={movie.title} poster={movie.url_poster} rating={movie.rating} movie_id={movie.f_id} key={idx}/>)
-            })}
-          </Box>
-        </Box>
+        {
+          !helpers.hasNoToken() && (
+            <Box marginTop={'20px'}>
+              <Typography variant={'h5'}> Movies recommended based on your review history: </Typography>
+              <Divider/>
+              <Box display={'flex'} flexWrap={'wrap'}>
+                {userBasedRec.length > 0 ? userBasedRec.map((movie, idx) => {
+                  return (<DashboardMovieCard title={movie.title} poster={movie.url_poster} rating={movie.rating}
+                                              movie_id={movie.f_id} key={idx}/>)
+                }):
+                  <Alert severity="info" sx={{ width: '100%', marginTop: '10px' }}>No recommendation, you may need to leave more reviews!</Alert>
+                }
+              </Box>
+            </Box>
+          )
+        }
 
         {<CommentBlock/>}
       </Container>
