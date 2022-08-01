@@ -198,7 +198,7 @@ class search(Resource):
             'method': {'type': 'str', 'required': False,
                        'description': 'the method to search film, either title, director, genre or actor'},
             'value': {'type': 'str', 'required': False, 'description': 'the query to search for'},
-            'order': {'type': 'str', 'required': False, 'description': 'the order to sort the results'}
+            'order': {'type': 'str', 'required': False, 'description': 'the order to sort the results, either year, rating_imdb and rating_doubi'}
         },
         responses={
             200: 'Success, films found',
