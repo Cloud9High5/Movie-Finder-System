@@ -136,6 +136,7 @@ function MovieBlock (props) {
     }
     fetch('http://127.0.0.1:5000/films?f_id=' + props.id, reqInfo).then(async (info) => {
       const data = await info.json();
+      console.log(data)
       setInfo(data);
       let sum = 0;
       for (const key in data.rating_distribution) {sum += data.rating_distribution[key]}
