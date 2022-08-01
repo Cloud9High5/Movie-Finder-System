@@ -5,6 +5,7 @@ from flask_restx import Resource, Namespace, fields, reqparse
 from sqlalchemy import exists, func
 from extensions import db
 from Models.model import Film, Review
+from .helper import film_based_recommendation
 
 api = Namespace("film", description="Authentication related operations", path="/")
 
@@ -24,7 +25,6 @@ film_model = api.model('film', {
     "rating": fields.Float(required=True, description="Film rating"),
     "rating_distribution": fields.Raw(required=True, description="Film rating distribution"),
     "rating_imdb": fields.Float(required=True, description="Film rating on IMDB"),
-    "rating_doubi": fields.Float(required=True, description="Film rating on Doubi"),
     "overview": fields.String(required=True, description="Film overview"),
     "director": fields.String(required=True, description="Film director"),
     "url_poster": fields.String(required=True, description="Film poster url"),
@@ -83,7 +83,20 @@ class film(Resource):
             if current_user:
                 blocked_id = [x.u_id for x in current_user.blocked.all()]
                 reviews = [x for x in reviews if x.u_id not in blocked_id]
-                result.rating = sum([x.rating for x in reviews]) / len(reviews)
+                result = {
+                    "f_id": result.f_id,
+                    "title": result.title,
+                    "year": result.year,
+                    "run_time": result.run_time,
+                    "rating": result.rating_customized(current_user),
+                    "rating_distribution": result.rating_distribution_customized(current_user),
+                    "rating_imdb": result.rating_imdb,
+                    "overview": result.overview,
+                    "director": result.director,
+                    "url_poster": result.url_poster,
+                    "genres": result.genres,
+                    "actors": result.actors,
+                }
 
             return result, 200
         else:
@@ -221,4 +234,27 @@ class search(Resource):
         
         return result, 200
 
-# TODO - recommend films
+
+@api.route('/films/<string:f_id>/recommend/film', methods=['GET'])
+class film_based_recommend(Resource):
+
+    @api.doc(
+        'Get 10 recommendations for a film based on film similarity',
+        responses={
+            200: 'Success',
+            404: 'Fail, films not found',
+        },
+    )
+    @api.marshal_list_with(film_model, code=200)
+    def get(self, f_id):
+        result = []
+        # check if film exists
+        if Film.query.filter(Film.f_id == f_id).first() is not None:
+            f_id_list = film_based_recommendation(f_id)
+            for f_id in f_id_list:
+                result.append(Film.query.filter(Film.f_id == f_id).first())
+                
+        if result is None:
+            return {'message': 'film not found'}, 404
+        else:
+            return result, 200

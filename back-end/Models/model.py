@@ -135,6 +135,25 @@ class Film(db.Model):
     def actors(self):
         return [actor.strip() for actor in self.actor.split(',')]
     
+    
+    def rating_customized(self, current_user):
+        reviews = self.reviews.all()
+        blocked_id = [x.u_id for x in current_user.blocked.all()]
+        reviews = [x for x in reviews if x.u_id not in blocked_id]
+        if len(reviews) == 0:
+            return 0
+        else:
+            return round(sum(review.rating for review in reviews) / len(reviews), 1)
+        
+    def rating_distribution_customized(self, current_user):
+        reviews = self.reviews.all()
+        blocked_id = [x.u_id for x in current_user.blocked.all()]
+        reviews = [x for x in reviews if x.u_id not in blocked_id]
+        rating_distribution = {x: 0 for x in range(0, 5)}
+        for review in reviews:
+            rating_distribution[review.rating] = rating_distribution.get(review.rating, 0) + 1
+        return rating_distribution
+    
     def __repr__(self):
         return '<Film %r>' % self.title
     
@@ -181,3 +200,4 @@ class Review_Dislike(db.Model):
     u_id = db.Column(db.String(32), db.ForeignKey('user.u_id'), primary_key=True, nullable=False)
 
     created_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    

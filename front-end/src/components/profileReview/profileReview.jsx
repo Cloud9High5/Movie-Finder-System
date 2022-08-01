@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
   Paper,
@@ -9,7 +9,7 @@ import {
   TableContainer,
   TableHead,
   TablePagination,
-  TableRow
+  TableRow, Typography
 } from "@mui/material";
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
@@ -18,6 +18,7 @@ import * as helpers from "../../helpers";
 
 const columns = [
   { id: 'created_time', label: 'Date', minWidth: 100 },
+  { id: 'title', label: 'Movie', minWidth: 30 },
   { id: 'content', label: 'Content', minWidth: 200 },
   { id: 'rating', label: 'Rating', minWidth: 30 },
   { id: 'like', label: 'Like', minWidth: 30 },
@@ -27,10 +28,12 @@ const columns = [
 
 function ProfileReview () {
   const uid = useParams().uid;
+  const path = useNavigate();
   const [targetInfo, setTargetInfo] = React.useState({});
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [data, setData] = React.useState([]);
+  const [rawReviews, setRawReviews] = React.useState([]);
+  const [reviews, setReviews] = React.useState([]);
   const [flag, setFlag] = React.useState(true);
   const [likesDislikes, setLikesDislikes] = React.useState({likes: [], dislikes: []});
 
@@ -62,9 +65,9 @@ function ProfileReview () {
     fetch("http://localhost:5000/review?method=u_id&u_id=" + uid, reqInfo).then(async (response) => {
       const data = await response.json();
       Array.isArray(data) ?
-        setData(data)
+        setRawReviews(data)
         :
-        setData([])
+        setRawReviews([])
     })
   }, [flag])
 
@@ -81,6 +84,21 @@ function ProfileReview () {
       setLikesDislikes({ ...data });
     })
   }, [flag])
+  // fetch movie info of each review
+  React.useEffect(() => {
+    for (const r of rawReviews) {
+      const reqInfo = {
+        headers: {
+          'Authorization': helpers.hasNoToken() ? '' : 'Bearer ' + localStorage.getItem('token'),
+        },
+      }
+      fetch('http://localhost:5000/films?f_id=' + r.f_id, reqInfo).then(async (response) => {
+        const data = await response.json();
+        r.title = data.title;
+        setReviews([...rawReviews]);
+      })
+    }
+  }, [rawReviews])
 
   React.useEffect(() => {
     const reqInfo = {
@@ -146,54 +164,69 @@ function ProfileReview () {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              {reviews.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, idx) => {
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={idx}>
                       {columns.map((column) => {
                         const value = row[column.id];
-                        if (column.id === 'operation') {
-                          return null;
+                        if (column.id === 'created_time') {
+                          return (
+                            <TableCell key={column.id}>
+                              {row[column.id].substring(0, 19)}
+                            </TableCell>
+                          )
+                        } else if (column.id === 'title') {
+                          return (
+                            <TableCell key={column.id}>
+                              <Typography sx={{ cursor: 'pointer' }} onClick={() => path('../movie_detail/' + row.f_id)}>{value}</Typography>
+                            </TableCell>
+                          )
+                        } else if (column.id === 'operation') {
+                          return (
+                            <TableCell key={column.id}>
+                              {
+                                isSelf() ?
+                                  <Button variant={'outlined'} color={'warning'} endIcon={<RemoveCircleOutlineIcon/>}
+                                          sx={{ textTransform: 'none' }}
+                                          onClick={() => deleteReview(row.r_id)}>Delete</Button>
+                                  :
+                                  <>
+                                    <Button
+                                      variant={likesDislikes.likes.indexOf(row.r_id) === -1 ? 'outlined' : 'contained'}
+                                      color={'info'}
+                                      endIcon={<ThumbUpIcon sx={{ marginLeft: '12px' }}/>}
+                                      onClick={() => reviewAction(row.r_id, 1)}
+                                      sx={{ width: '80px', marginBottom: '5px', textTransform: 'none' }}
+                                      disabled={likesDislikes.dislikes.indexOf(row.r_id) !== -1}
+                                    >
+                                      {likesDislikes.likes.indexOf(row.r_id) === -1 ? 'Like' : 'Liked'}
+                                    </Button>
+                                    <Button
+                                      variant={likesDislikes.dislikes.indexOf(row.r_id) === -1 ? 'outlined' : 'contained'}
+                                      color={'error'}
+                                      endIcon={<ThumbDownAltIcon/>}
+                                      onClick={() => reviewAction(row.r_id, 0)}
+                                      sx={{ width: '80px', marginTop: '5px', textTransform: 'none' }}
+                                      disabled={likesDislikes.likes.indexOf(row.r_id) !== -1}
+                                    >
+                                      {likesDislikes.dislikes.indexOf(row.r_id) === -1 ? 'Dislike' : 'Disliked'}
+                                    </Button>
+                                  </>
+                              }
+                            </TableCell>
+                          );
                         }
-                        return (
-                          <TableCell key={column.id} align={column.align}>
-                            {column.format && typeof value === 'number'
-                              ? column.format(value)
-                              : value}
-                          </TableCell>
-                        );
+                        else {
+                          return (
+                            <TableCell key={column.id} align={column.align}>
+                              {column.format && typeof value === 'number'
+                                ? column.format(value)
+                                : value}
+                            </TableCell>
+                          );
+                        }
                       })}
-                      <TableCell>
-                        {
-                          isSelf() ?
-                            <Button variant={'outlined'} color={'warning'} endIcon={<RemoveCircleOutlineIcon/>}
-                                    sx={{ textTransform: 'none' }}
-                                    onClick={() => deleteReview(row.r_id)}>Delete</Button>
-                            :
-                            <>
-                              <Button
-                                variant={likesDislikes.likes.indexOf(row.r_id) === -1 ? 'outlined' : 'contained'}
-                                color={'info'}
-                                endIcon={<ThumbUpIcon sx={{ marginLeft: '12px' }}/>}
-                                onClick={() => reviewAction(row.r_id, 1)}
-                                sx={{ width: '80px', marginBottom: '5px', textTransform: 'none' }}
-                                disabled={likesDislikes.dislikes.indexOf(row.r_id) !== -1}
-                              >
-                                {likesDislikes.likes.indexOf(row.r_id) === -1 ? 'Like' : 'Liked'}
-                              </Button>
-                              <Button
-                                variant={likesDislikes.dislikes.indexOf(row.r_id) === -1 ? 'outlined' : 'contained'}
-                                color={'error'}
-                                endIcon={<ThumbDownAltIcon/>}
-                                onClick={() => reviewAction(row.r_id, 0)}
-                                sx={{ width: '80px', marginTop: '5px', textTransform: 'none' }}
-                                disabled={likesDislikes.likes.indexOf(row.r_id) !== -1}
-                              >
-                                {likesDislikes.dislikes.indexOf(row.r_id) === -1 ? 'Dislike' : 'Disliked'}
-                              </Button>
-                            </>
-                        }
-                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -203,7 +236,7 @@ function ProfileReview () {
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          count={data.length}
+          count={reviews.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
