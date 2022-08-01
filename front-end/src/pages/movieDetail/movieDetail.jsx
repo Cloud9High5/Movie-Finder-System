@@ -6,10 +6,12 @@ import Header from "../../components/header/header";
 import { Box, Typography } from "@mui/material";
 import { Divider } from "@material-ui/core";
 import * as helpers from '../../helpers';
+import { hasNoToken } from "../../helpers";
 
 function MovieDetail () {
   const movieId = useParams().movieID;
-  const [recommendedMovies, setRecommendedMovies] = React.useState([]);
+  const [filmBasedRec, setFilmBasedRec] = React.useState([]);
+  const [userBasedRec, setUserBasedRec] = React.useState([]);
   const location = useLocation();
 
   // if (location.state !== null) {
@@ -18,17 +20,27 @@ function MovieDetail () {
 
 
   React.useEffect(() => {
-    const reqInfo = {
-      headers: {
-        'Authorization': helpers.hasNoToken() ? '' :  'Bearer ' + localStorage.getItem('token'),
-      }
-    }
-    fetch('http://localhost:5000/films/' + movieId + '/recommend/film', reqInfo).then(async (response) => {
+    fetch('http://localhost:5000/films/' + movieId + '/recommend/film').then(async (response) => {
       if (response.status === 200){
         const data = await response.json();
-        setRecommendedMovies(data);
+        setFilmBasedRec(data);
       }
     })
+    if (!hasNoToken()) {
+      const reqInfo = {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token'),
+        }
+      }
+      fetch('http://localhost:5000/films/recommend/user', reqInfo).then(async (response) => {
+        if (response.status === 200){
+          const data = await response.json();
+          console.log(data)
+          setUserBasedRec(data);
+        }
+      })
+    }
+
   }, [movieId])
 
   return (
@@ -37,13 +49,20 @@ function MovieDetail () {
       <Container maxWidth="lg">
         <Header/>
         <MovieBlock id={movieId} editInfo={location.state === null ? null : location.state.info}/>
-        {/*{movie_review && <CommentBlock props={movie_review}/>}*/}
         <Box marginTop={'20px'}>
-          <Typography variant={'h5'}> Movies you may interested in: </Typography>
+          <Typography variant={'h5'}> Similar movie you may like: </Typography>
           <Divider/>
-
           <Box display={'flex'} flexWrap={'wrap'}>
-            {recommendedMovies.map((movie, idx) => {
+            {filmBasedRec.map((movie, idx) => {
+              return (<DashboardMovieCard title={movie.title} poster={movie.url_poster} rating={movie.rating} movie_id={movie.f_id} key={idx}/>)
+            })}
+          </Box>
+        </Box>
+        <Box marginTop={'20px'}>
+          <Typography variant={'h5'}> Movies recommended based on your review history: </Typography>
+          <Divider/>
+          <Box display={'flex'} flexWrap={'wrap'}>
+            {userBasedRec.map((movie, idx) => {
               return (<DashboardMovieCard title={movie.title} poster={movie.url_poster} rating={movie.rating} movie_id={movie.f_id} key={idx}/>)
             })}
           </Box>
