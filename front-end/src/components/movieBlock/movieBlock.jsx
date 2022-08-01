@@ -126,7 +126,7 @@ function MovieBlock (props) {
       setFlag(!flag);
     }
   }
-  // calculating the ratio of each rate
+  // fetch info of that movie calculating the ratio of each rate
   React.useEffect(() => {
     const temp = {...ratePercentage};
     const reqInfo = {
@@ -145,7 +145,7 @@ function MovieBlock (props) {
       }
       setRatePercentage({ ...temp });
     })
-  }, [])
+  }, [props.id])
   // whether this movie is in user's wishlist
   React.useEffect(() => {
     if (helpers.hasNoToken()){return}
