@@ -19,7 +19,7 @@ api = Namespace("auth", description="Authentication related operations", path="/
 
 signup_arguments = reqparse.RequestParser()
 signup_arguments.add_argument('email', type=str, required=True)
-signup_arguments.add_argument('verification_code', type=int, required=True)
+signup_arguments.add_argument('verification_code', type=str, required=True)
 
 signup_model = api.model('users', {
     "email": fields.String(required=True, description="User's email"),
@@ -56,7 +56,7 @@ user_profile_model = api.model('user', {
 
 resetpwd_arguments = reqparse.RequestParser()
 resetpwd_arguments.add_argument('email', type=str, required=True, help='Email is required')
-resetpwd_arguments.add_argument('verification_code', type=int, required=True)
+resetpwd_arguments.add_argument('verification_code', type=str, required=True)
 
 resetpwd_model = api.model('resetpwd', {
     "email": fields.String(required=True, description="User's email"),
