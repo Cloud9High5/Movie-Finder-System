@@ -131,17 +131,9 @@ class Film(db.Model):
     def genres(self):
         return [genre.strip() for genre in self.genre.split(',')]
     
-    @genres.setter
-    def genres(self, genres):
-        self.genre = ', '.join(genres)
-    
     @property
     def actors(self):
         return [actor.strip() for actor in self.actor.split(',')]
-    
-    @actors.setter
-    def actors(self, actors):
-        self.actor = ', '.join(actors)
     
     
     def rating_customized(self, current_user):

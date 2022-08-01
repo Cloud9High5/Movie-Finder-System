@@ -118,13 +118,14 @@ class film(Resource):
                 return {'message': 'Film already exists'}, 409
             else:
                 db.session.add(Film(title=title, 
-                                    genre=payload["genres"],
+                                    genre=', '.join(payload["genres"]),
                                     year=year, 
                                     run_time=payload['run_time'],
-                                    rating_imdb=payload['rating_imdb'], 
+                                    rating_imdb=payload['rating_imdb'],
+                                    rating_doubi=0.0,
                                     overview=payload['overview'], 
                                     director=director,
-                                    actor=payload['actors'],
+                                    actor=', '.join(payload['actors']),
                                     url_poster=payload['url_poster']))
                 db.session.commit()
                 return {
