@@ -14,3 +14,4 @@ export {default as BlackList} from './blackList/blackList';
 export {default as ProfileReview} from './profileReview/profileReview';
 export {default as UploadMovie} from './uploadMovie/uploadMovie';
 export {default as Wishlist} from './wishList/wishlist';
+export {default as AdminDropdownMenu} from './adminDropdownMenu/adminDropdownMenu';

@@ -1,12 +1,19 @@
 import Box from "@mui/material/Box";
 import { Button, Chip, Typography } from '@mui/material';
 import Avatar from "@material-ui/core/Avatar";
-import { Thumb } from "../../components";
+
+
+import {AdminDropdownMenu, Thumb} from "../../components";
+
 import Rating from '@mui/material/Rating';
 import { Divider } from "@material-ui/core";
 import Grid from '@mui/material/Grid';
+
 import { makeStyles } from "@material-ui/core/styles";
 import { lightGreen } from "@material-ui/core/colors";
+
+
+
 import React from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import * as helpers from "../../helpers";
@@ -40,6 +47,19 @@ function CommentBlock () {
   const [numDisplayedReviews, setNumDisplayedReviews] = React.useState(15);
   const [slicedReviews, setSlicedReviews] = React.useState([]);
 
+  
+  const [isAdmin, setIsAdmin] = React.useState(false);
+  
+  React.useEffect(() => {
+    fetch('http://127.0.0.1:5000/auth/user/' + localStorage.uid).then(async (response) => {
+      if (response.status === 200) {
+        const data = await response.json();
+        setIsAdmin(data.is_admin);
+      } else {
+        setIsAdmin(false);
+      }
+    })
+  }, [])
 
   // obtain comments from backend
   React.useEffect(() => {
@@ -67,6 +87,7 @@ function CommentBlock () {
     temp.map((t) => (
       fetch('http://127.0.0.1:5000/auth/user/' + t.u_id).then(async (response) => {
         const data = await response.json();
+        // console.log(data)
         t['username'] = data.username;
         t['photo_url'] = data.photo_url;
         setComments([...temp]);
@@ -112,22 +133,29 @@ function CommentBlock () {
     }
   }
 
-  const deleteReview = async (rid) => {
-    if (!window.confirm('Are you sure to delete this review?')) {return}
-    if (helpers.hasNoToken()) {return}
+  
+  const deleteReview = async (review) => {
+    // console.log(review.r_id);
+    if (!window.confirm('Are you sure to delete this review?')) {
+      return
+    }
+    if (helpers.hasNoToken()) {
+      return
+    }
+
     const reqInfo = {
       method: 'DELETE',
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('token'),
       },
     }
-    const response = await fetch('http://127.0.0.1:5000/review?r_id=' + rid, reqInfo);
+    const response = await fetch('http://127.0.0.1:5000/review?r_id=' + review.r_id, reqInfo);
+    const data = await response.json();
     if (response.status !== 200) {
-      const data = await response.json();
-      console.log(data);
       alert(data);
     } else {
-      window.location.reload();
+      console.log(data);
+      // window.location.reload();
     }
   }
   return (
@@ -188,10 +216,17 @@ function CommentBlock () {
                     }
                   </Box>
                 </Box>
-                <Box display={'flex'} alignItems={'flex-end'}>
+
+                <Box display={'flex'}
+                     alignItems={'flex-end'}
+                     justifyContent={"space-between"}
+                     data={review} // pass review to banUser function
+                >
                   <Typography variant={'p'} color={'gray'}>
                     Posted on: {review.created_time.substring(0, 19)}
                   </Typography>
+                  {isAdmin ? <AdminDropdownMenu id={idx} props={review}/> : <></>}
+
                 </Box>
               </Grid>
             </Grid>

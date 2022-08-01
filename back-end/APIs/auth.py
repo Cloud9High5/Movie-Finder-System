@@ -7,7 +7,7 @@ from flask_mail import Message
 from flask_jwt_extended import create_access_token, jwt_required, current_user
 from sqlalchemy import exists
 from extensions import db, mail, jwt
-from Models.model import User, Film
+from Models.model import User, Film, Review
 
 api = Namespace("auth", description="Authentication related operations", path="/")
 
@@ -19,7 +19,7 @@ api = Namespace("auth", description="Authentication related operations", path="/
 
 signup_arguments = reqparse.RequestParser()
 signup_arguments.add_argument('email', type=str, required=True)
-signup_arguments.add_argument('verification_code', type=int, required=True)
+signup_arguments.add_argument('verification_code', type=str, required=True)
 
 signup_model = api.model('users', {
     "email": fields.String(required=True, description="User's email"),
@@ -56,7 +56,7 @@ user_profile_model = api.model('user', {
 
 resetpwd_arguments = reqparse.RequestParser()
 resetpwd_arguments.add_argument('email', type=str, required=True, help='Email is required')
-resetpwd_arguments.add_argument('verification_code', type=int, required=True)
+resetpwd_arguments.add_argument('verification_code', type=str, required=True)
 
 resetpwd_model = api.model('resetpwd', {
     "email": fields.String(required=True, description="User's email"),
@@ -321,10 +321,14 @@ class user_info(Resource):
         user = User.query.filter_by(u_id=u_id).first()
         if user == current_user:
             if 'username' in payload:
-                user.username = payload['username']
+                # check if username is taken
+                if db.session.query(exists().where(User.username == payload['username'])).scalar():
+                    return {'message': 'Username taken'}, 403
+                else:
+                    user.username = payload['username']
             if 'new_password' in payload:
                 # check if old password is correct
-                if user.password == payload['old_password']:
+                if current_user.verify_password(payload['old_password']):
                     user.password = payload['new_password']
                 else:
                     return {
@@ -534,7 +538,6 @@ class wish_list(Resource):
 
 @api.route('/auth/user/wish_list/<string:f_id>', methods=['GET','POST'])
 class wish_list_edit(Resource):
-    
     ########################################
     #       Add & Remove wish list         #
     ########################################
@@ -560,6 +563,12 @@ class wish_list_edit(Resource):
                     'message': "{} is removed from {}'s wish list".format(target_film.title, current_user.username)
                 }, 200
             else:
+                # check if film is reviewed
+                if db.session.query(Review).filter_by(f_id=f_id, u_id=current_user.u_id).first():
+                    return {
+                        'message': 'Film is reviewed, cannot add to wish list'
+                    }, 401
+                
                 current_user.wish.append(target_film)
                 db.session.commit()
                 return {

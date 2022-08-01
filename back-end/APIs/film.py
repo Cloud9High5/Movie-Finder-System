@@ -5,7 +5,7 @@ from flask_restx import Resource, Namespace, fields, reqparse
 from sqlalchemy import exists, func
 from extensions import db
 from Models.model import Film, Review
-from .helper import film_based_recommendation
+from .helper import film_based_recommendation, user_based_recommendation
 
 api = Namespace("film", description="Authentication related operations", path="/")
 
@@ -118,13 +118,14 @@ class film(Resource):
                 return {'message': 'Film already exists'}, 409
             else:
                 db.session.add(Film(title=title, 
-                                    genre=payload["genres"],
+                                    genre=', '.join(payload["genres"]),
                                     year=year, 
                                     run_time=payload['run_time'],
-                                    rating_imdb=payload['rating_imdb'], 
+                                    rating_imdb=payload['rating_imdb'],
+                                    rating_doubi=0.0,
                                     overview=payload['overview'], 
                                     director=director,
-                                    actor=payload['actors'],
+                                    actor=', '.join(payload['actors']),
                                     url_poster=payload['url_poster']))
                 db.session.commit()
                 return {
@@ -239,7 +240,7 @@ class search(Resource):
 class film_based_recommend(Resource):
 
     @api.doc(
-        'Get 10 recommendations for a film based on film similarity',
+        'Get 5 recommendations for a film based on film similarity',
         responses={
             200: 'Success',
             404: 'Fail, films not found',
@@ -257,4 +258,27 @@ class film_based_recommend(Resource):
         if result is None:
             return {'message': 'film not found'}, 404
         else:
+            return result, 200
+
+
+@api.route('/films/recommend/user', methods=['GET'])
+class user_based_recommend(Resource):
+
+    @api.doc(
+        'Get 5 recommendations for a film based on user similarity',
+        responses={
+            200: 'Success',
+            404: 'Fail, films not found',
+        },
+    )
+    @api.marshal_list_with(film_model, code=200)
+    @jwt_required()
+    def get(self):
+        result = []
+        recommend = user_based_recommendation(current_user.u_id)
+        if recommend == []:
+            return {'message': 'film not found, more reviews needed'}, 404
+        else:
+            for film in recommend:
+                result.append(Film.query.filter(Film.f_id == film[1]).first())
             return result, 200

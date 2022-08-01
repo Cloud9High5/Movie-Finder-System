@@ -2,7 +2,7 @@ from numpy import indices
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sqlalchemy import column
-from Models.model import Film
+from Models.model import Film, Review
 
 import pandas as pd
 import re
@@ -139,11 +139,71 @@ def film_based_recommendation(f_id):
     result = []
     idx = indices[indices == f_id].index[0]
     score_series = pd.Series(sim[idx]).sort_values(ascending = False)
-    top_10_indices = list(score_series.iloc[1:11].index)
+    top_5_indices = list(score_series.iloc[1:6].index)
     
-    for i in top_10_indices:
+    for i in top_5_indices:
         result.append(list(film_df['f_id'])[i])
     
     return result
     
-# def film_based_recommendation(f_id):
+def user_based_recommendation(u_id):
+    
+    # Collect all users
+    reviews = Review.query.all()
+    reviews = [[
+        review.f_id,
+        review.u_id,
+        review.rating,
+    ] for review in reviews]
+
+    # convert to dataframe
+    review_df = pd.DataFrame(reviews, columns=['f_id', 'u_id', 'rating'])
+    
+    # create the user-film matrix
+    rating_matrix = review_df.pivot_table(index='u_id', columns='f_id', values='rating')
+    
+    # calculate the similarity between users
+    user_similarity = rating_matrix.T.corr()
+    
+    results = predict_all(u_id, rating_matrix, user_similarity)
+    return sorted(results, key=lambda x: x[2], reverse=True)[:5]
+    
+
+def predict(uid, iid, ratings_matrix, user_similar):
+    
+    # find similar user to targe user
+    similar_users = user_similar[uid].drop([uid]).dropna()
+    
+    # select only positive ratings
+    similar_users = similar_users.where(similar_users>0).dropna()
+    if similar_users.empty is True:
+        return False
+
+    # from the similar users of the target user, select the users who have rated the film
+    ids = set(ratings_matrix[iid].dropna().index)&set(similar_users.index)
+    finally_similar_users = similar_users.loc[list(ids)]
+
+    # using the similarity between users to predict the rating
+    numerator = 0
+    denominator = 0
+    for sim_uid, similarity in finally_similar_users.iteritems():
+        sim_user_rated_movies = ratings_matrix.loc[sim_uid].dropna()
+        sim_user_rating_for_item = sim_user_rated_movies[iid]
+        numerator += similarity * sim_user_rating_for_item
+        denominator += similarity
+    if denominator == 0:
+        return False
+    predict_rating = numerator/denominator
+    return round(predict_rating, 2)
+
+
+def predict_all(uid, ratings_matrix, user_similar):
+    item_ids = ratings_matrix.columns
+    
+    for iid in item_ids:
+        try:
+            rating = predict(uid, iid, ratings_matrix, user_similar)
+        except Exception as e:
+            print(e)
+        else:
+            yield uid, iid, rating
