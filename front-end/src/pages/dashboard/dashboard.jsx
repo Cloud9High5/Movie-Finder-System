@@ -76,8 +76,7 @@ function Dashboard() {
       <div className={classes.cards}>
         {movieInfo.map((movie, idx) => {
           return (
-            <DashboardMovieCard key={idx} title={movie.title} poster={movie.url_poster}
-                                rating={movie.rating} movie_id={movie.f_id}/>
+            <DashboardMovieCard key={idx} title={movie.title} poster={movie.url_poster} rating={movie.rating} movie_id={movie.f_id}/>
           )
         })}
       </div>
