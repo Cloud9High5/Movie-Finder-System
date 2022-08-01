@@ -1,7 +1,7 @@
 import React from 'react';
 import Container from '@material-ui/core/Container';
 import { CommentBlock, DashboardMovieCard, MovieBlock } from "../../components";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import Header from "../../components/header/header";
 import { Box, Typography } from "@mui/material";
 import { Divider } from "@material-ui/core";
@@ -10,6 +10,13 @@ import * as helpers from '../../helpers';
 function MovieDetail () {
   const movieId = useParams().movieID;
   const [recommendedMovies, setRecommendedMovies] = React.useState([]);
+  const location = useLocation();
+
+  // if (location.state !== null) {
+  //   console.log(location.state.info);
+  // }
+
+
   React.useEffect(() => {
     const reqInfo = {
       headers: {
@@ -29,7 +36,7 @@ function MovieDetail () {
       {/*<CssBaseline/>*/}
       <Container maxWidth="lg">
         <Header/>
-        <MovieBlock id={movieId}/>
+        <MovieBlock id={movieId} editInfo={location.state === null ? null : location.state.info}/>
         {/*{movie_review && <CommentBlock props={movie_review}/>}*/}
         <Box marginTop={'20px'}>
           <Typography variant={'h5'}> Movies you may interested in: </Typography>
