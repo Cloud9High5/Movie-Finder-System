@@ -7,7 +7,7 @@ from flask_mail import Message
 from flask_jwt_extended import create_access_token, jwt_required, current_user
 from sqlalchemy import exists
 from extensions import db, mail, jwt
-from Models.model import User, Film
+from Models.model import User, Film, Review
 
 api = Namespace("auth", description="Authentication related operations", path="/")
 
@@ -538,7 +538,6 @@ class wish_list(Resource):
 
 @api.route('/auth/user/wish_list/<string:f_id>', methods=['GET','POST'])
 class wish_list_edit(Resource):
-    
     ########################################
     #       Add & Remove wish list         #
     ########################################
@@ -564,6 +563,12 @@ class wish_list_edit(Resource):
                     'message': "{} is removed from {}'s wish list".format(target_film.title, current_user.username)
                 }, 200
             else:
+                # check if film is reviewed
+                if db.session.query(Review).filter_by(f_id=f_id, u_id=current_user.u_id).first():
+                    return {
+                        'message': 'Film is reviewed, cannot add to wish list'
+                    }, 401
+                
                 current_user.wish.append(target_film)
                 db.session.commit()
                 return {
