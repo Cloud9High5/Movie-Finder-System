@@ -302,17 +302,13 @@ class user_based_recommend(Resource):
         },
     )
     @api.marshal_list_with(film_model, code=200)
-    # @jwt_required
+    @jwt_required()
     def get(self):
-        return {'message': 'user based recommendation not implemented'}, 404
-        
-        # # check if film exists
-        # if Film.query.filter(Film.f_id == f_id).first() is not None:
-        #     f_id_list = film_based_recommendation(f_id)
-        #     for f_id in f_id_list:
-        #         result.append(Film.query.filter(Film.f_id == f_id).first())
-                
-        # if result is None:
-        #     return {'message': 'film not found'}, 404
-        # else:
-        #     return result, 200
+        result = []
+        recommend = user_based_recommendation(current_user.u_id)
+        if recommend is None:
+            return {'message': 'film not found, more reviews needed'}, 404
+        else:
+            for film in recommend:
+                result.append(Film.query.filter(Film.f_id == film[1]).first())
+            return result, 200

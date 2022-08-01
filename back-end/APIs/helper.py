@@ -191,16 +191,14 @@ def predict(uid, iid, ratings_matrix, user_similar):
         sim_user_rating_for_item = sim_user_rated_movies[iid]
         numerator += similarity * sim_user_rating_for_item
         denominator += similarity
-
+    if denominator == 0:
+        return False
     predict_rating = numerator/denominator
     return round(predict_rating, 2)
 
 
 def predict_all(uid, ratings_matrix, user_similar):
     item_ids = ratings_matrix.columns
-    
-    print('Predicting for user:', uid)
-    print('Predicting for items:', item_ids)
     
     for iid in item_ids:
         try:
