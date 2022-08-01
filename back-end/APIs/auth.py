@@ -321,9 +321,11 @@ class user_info(Resource):
         user = User.query.filter_by(u_id=u_id).first()
         if user == current_user:
             if 'username' in payload:
+                # FIXME - check if username is valid
                 user.username = payload['username']
             if 'new_password' in payload:
                 # check if old password is correct
+                # TODO - modify hash function to use bcrypt
                 if user.password == payload['old_password']:
                     user.password = payload['new_password']
                 else:
