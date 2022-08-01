@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Container from '@material-ui/core/Container';
+
+
 import { CommentBlock, DashboardMovieCard, MovieBlock } from "../../components";
 import { useLocation, useParams } from "react-router-dom";
 import Header from "../../components/header/header";
@@ -79,6 +81,7 @@ function MovieDetail () {
       </Container>
     </React.Fragment>
   );
+
 }
 
 export default MovieDetail;

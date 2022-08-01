@@ -59,6 +59,7 @@ function ProfileCard() {
       setMessage('New password not same as confirm password!');
       return;
     }
+    setMessage('');
     
     
     fetch(`http://127.0.0.1:5000/auth/user/${userID}`, {
@@ -72,7 +73,7 @@ function ProfileCard() {
         email: profile.email,
         old_password: profile.old_password,
         new_password: profile.new_password,
-        photo_url: profile.avatar
+        photo_url: profile.avatar || ''
       })
     }).then(res => {
       if (res.status === 200) {
@@ -201,6 +202,7 @@ function ProfileCard() {
               <Box marginTop={'20px'}>
                 <Typography>Email</Typography>
                 <TextField
+                  disabled
                   value={profile.email}
                   onChange={e => setProfile({
                     ...profile,

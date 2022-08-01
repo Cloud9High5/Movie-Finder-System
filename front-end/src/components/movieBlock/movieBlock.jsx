@@ -132,7 +132,7 @@ function MovieBlock (props) {
       setFlag(!flag);
     }
   }
-  // fetch info of that movie calculating the ratio of each rate
+  // calculating the ratio of each rate
   React.useEffect(() => {
     const temp = { ...ratePercentage };
     const reqInfo = {
@@ -142,7 +142,8 @@ function MovieBlock (props) {
     }
     fetch('http://127.0.0.1:5000/films?f_id=' + props.id, reqInfo).then(async (info) => {
       const data = await info.json();
-      // console.log(data)
+
+
       setInfo(data);
       let sum = 0;
       for (const key in data.rating_distribution) {
@@ -153,7 +154,7 @@ function MovieBlock (props) {
       }
       setRatePercentage({ ...temp });
     })
-  }, [props.id])
+  }, [])
   // whether this movie is in user's wishlist
   React.useEffect(() => {
     if (helpers.hasNoToken()) {
