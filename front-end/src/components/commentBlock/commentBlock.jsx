@@ -1,14 +1,10 @@
 import Box from "@mui/material/Box";
 import {Button, Chip, Typography} from '@mui/material';
 import Avatar from "@material-ui/core/Avatar";
-import {Thumb} from "../../components";
+import {AdminDropdownMenu, Thumb} from "../../components";
 import Rating from '@mui/material/Rating';
 import {Divider} from "@material-ui/core";
 import Grid from '@mui/material/Grid';
-import IconButton from '@mui/material/IconButton';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {makeStyles} from "@material-ui/core/styles";
 import {lightGreen} from "@material-ui/core/colors";
 import React from 'react';
@@ -43,15 +39,19 @@ function CommentBlock() {
   const [likesDislikes, setLikesDislikes] = React.useState({});
   const [numDisplayedReviews, setNumDisplayedReviews] = React.useState(15);
   const [slicedReviews, setSlicedReviews] = React.useState([]);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
   
+  const [isAdmin, setIsAdmin] = React.useState(false);
+  
+  React.useEffect(() => {
+    fetch('http://127.0.0.1:5000/auth/user/' + localStorage.uid).then(async (response) => {
+      if (response.status === 200) {
+        const data = await response.json();
+        setIsAdmin(data.is_admin);
+      } else {
+        setIsAdmin(false);
+      }
+    })
+  }, [])
   // obtain comments from backend
   React.useEffect(() => {
     const reqInfo = {
@@ -78,6 +78,7 @@ function CommentBlock() {
     temp.map((t) => (
       fetch('http://127.0.0.1:5000/auth/user/' + t.u_id).then(async (response) => {
         const data = await response.json();
+        console.log(data)
         t['username'] = data.username;
         t['photo_url'] = data.photo_url;
         setComments([...temp]);
@@ -123,7 +124,8 @@ function CommentBlock() {
     }
   }
   
-  const deleteReview = async (rid) => {
+  const deleteReview = async (review) => {
+    console.log(review.r_id);
     if (!window.confirm('Are you sure to delete this review?')) {
       return
     }
@@ -136,13 +138,13 @@ function CommentBlock() {
         'Authorization': 'Bearer ' + localStorage.getItem('token'),
       },
     }
-    const response = await fetch('http://127.0.0.1:5000/review?r_id=' + rid, reqInfo);
+    const response = await fetch('http://127.0.0.1:5000/review?r_id=' + review.r_id, reqInfo);
+    const data = await response.json();
     if (response.status !== 200) {
-      const data = await response.json();
-      console.log(data);
       alert(data);
     } else {
-      window.location.reload();
+      console.log(data);
+      // window.location.reload();
     }
   }
   
@@ -152,6 +154,7 @@ function CommentBlock() {
       <Divider/>
       {/*{Array.isArray(props) ? comments.map((review, idx) => {*/}
       {(Array.isArray(comments) && (comments.length > 0)) ? comments.map((review, idx) => {
+        console.log(review)
         return (
           <Box borderTop={'1px solid gainsboro'}
                padding={'20px 0'}
@@ -205,29 +208,15 @@ function CommentBlock() {
                     }
                   </Box>
                 </Box>
-                <Box display={'flex'} alignItems={'flex-end'} justifyContent={"space-between"}>
+                <Box display={'flex'}
+                     alignItems={'flex-end'}
+                     justifyContent={"space-between"}
+                     data={review} // pass review to banUser function
+                >
                   <Typography variant={'p'} color={'gray'}>
                     Posted on: {review.created_time.substring(0, 19)}
                   </Typography>
-                  <IconButton
-                    aria-label="more"
-                    id="long-button"
-                    aria-controls={open ? 'long-menu' : undefined}
-                    aria-expanded={open ? 'true' : undefined}
-                    aria-haspopup="true"
-                    onClick={handleClick}
-                  >
-                    <MoreVertIcon/>
-                  </IconButton>
-                  <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={handleClose}
-                  >
-                    <MenuItem>Delete Review</MenuItem>
-                    <MenuItem>Ban User</MenuItem>
-                  </Menu>
+                  {isAdmin ? <AdminDropdownMenu id={idx} props={review}/> : <></>}
                 </Box>
               
               </Grid>
