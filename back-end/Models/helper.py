@@ -9,4 +9,4 @@ def f_id_generator(context):
 
 
 def r_id_generator(context):
-    return str(uuid3(uuid1(), context.get_current_parameters()['content']).hex)
+    return str(uuid3(uuid1(), context.get_current_parameters()['f_id']).hex)

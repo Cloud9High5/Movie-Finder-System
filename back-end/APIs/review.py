@@ -129,6 +129,7 @@ class reviews(Resource):
                 result_list = [(x, len(x.likes.all())) for x in reviews]
                 result_list.sort(key=lambda x: x[1], reverse=True)
                 result = [x[0] for x in result_list[:args['top']]]
+                print(result[0].rating)
         
         if current_user:
             blocked_id = [x.u_id for x in current_user.blocked.all()]
