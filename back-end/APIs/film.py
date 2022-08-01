@@ -196,9 +196,9 @@ class search(Resource):
         'search films based on the given method',
         params={
             'method': {'type': 'str', 'required': False,
-                       'description': 'the method to get reviews, either title, director'},
+                       'description': 'the method to search film, either title, director, genre or actor'},
             'value': {'type': 'str', 'required': False, 'description': 'the query to search for'},
-            'order': {'type': 'str', 'required': False, 'description': 'the order to sort the results'}
+            'order': {'type': 'str', 'required': False, 'description': 'the order to sort the results, either year, rating_imdb and rating_doubi'}
         },
         responses={
             200: 'Success, films found',
@@ -221,7 +221,35 @@ class search(Resource):
             if args['value'] is None:
                 return {'message': 'director is required'}, 400
             else:
-                result = Film.query.filter(Film.director.like('%' + args['value'] + '%')).all()
+                values = args['value'].split(',')
+                for i, value in enumerate(values):
+                    if i == 0:
+                        result = Film.query.filter(Film.director.like('%' + value + '%'))
+                    else:
+                        result = result.filter(Film.director.like('%' + value + '%'))
+                result = result.all()
+        elif args['method'] == 'genre':
+            if args['value'] is None:
+                return {'message': 'genre is required'}, 400
+            else:
+                values = args['value'].split(',')
+                for i, value in enumerate(values):
+                    if i == 0:
+                        result = Film.query.filter(Film.genre.like('%' + value + '%'))
+                    else:
+                        result = result.filter(Film.genre.like('%' + value + '%'))
+                result = result.all()
+        elif args['method'] == 'actor':
+            if args['value'] is None:
+                return {'message': 'actor is required'}, 400
+            else:
+                values = args['value'].split(',')
+                for i, value in enumerate(values):
+                    if i == 0:
+                        result = Film.query.filter(Film.actor.like('%' + value + '%'))
+                    else:
+                        result = result.filter(Film.actor.like('%' + value + '%'))
+                result = result.all()
         
         if len(result) == 0:
             return {'message': 'film not found'}, 404
@@ -231,6 +259,8 @@ class search(Resource):
             result = sorted(result, key=lambda x: x.year, reverse=True)
         elif args['order'] == 'rating_imdb':
             result = sorted(result, key=lambda x: x.rating_imdb, reverse=True)
+        elif args['order'] == 'rating_doubi':
+            result = sorted(result, key=lambda x: x.rating, reverse=True)
         
         return result, 200
 

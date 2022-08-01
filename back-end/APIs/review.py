@@ -251,7 +251,7 @@ class reviews(Resource):
             if review is None:
                 return {'message': 'review not found'}, 404
             else:
-                if review.u_id == current_user.u_id or current_user.is_admin:
+                if review.u_id == current_user.u_id or current_user.admin:
                     db.session.delete(review)
                     db.session.commit()
                     return {'message': 'review deleted'}, 200
