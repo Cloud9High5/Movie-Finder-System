@@ -4,7 +4,7 @@ from flask_jwt_extended import current_user, jwt_required
 from flask_restx import Resource, Namespace, fields, reqparse
 from sqlalchemy import exists, func
 from extensions import db
-from Models.model import Film, Review
+from Models.model import Film
 from .helper import film_based_recommendation, user_based_recommendation
 
 api = Namespace("film", description="Authentication related operations", path="/")

@@ -1,11 +1,7 @@
 import json
-from urllib import response
-from winreg import DisableReflectionKey
 from flask import request
-from flask_restx import Resource, Namespace, fields, marshal, reqparse
+from flask_restx import Resource, Namespace, fields, reqparse
 from flask_jwt_extended import jwt_required, current_user
-import jwt
-from sqlalchemy import exists, func
 from extensions import db
 from Models.model import Review, User, Film, Review_Like, Review_Dislike, bad_word
 from datetime import datetime, timedelta

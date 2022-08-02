@@ -1,7 +1,5 @@
-from numpy import indices
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from sqlalchemy import column
 from Models.model import Film, Review
 
 import pandas as pd
