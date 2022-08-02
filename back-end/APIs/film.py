@@ -306,7 +306,7 @@ class user_based_recommend(Resource):
     def get(self):
         result = []
         recommend = user_based_recommendation(current_user.u_id)
-        if recommend is None:
+        if recommend is None or len(recommend) == 0:
             return {'message': 'film not found, more reviews needed'}, 404
         else:
             for film in recommend:
