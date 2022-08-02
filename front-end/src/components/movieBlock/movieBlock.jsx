@@ -10,7 +10,6 @@ import Stack from '@mui/material/Stack';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import { LinearProgress, Rating } from "@mui/material";
-import PropTypes from "prop-types";
 import Divider from '@mui/material/Divider';
 import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
 import Button from '@mui/material/Button';
@@ -18,6 +17,7 @@ import TextField from "@mui/material/TextField";
 import * as helpers from "../../helpers";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { useNavigate } from "react-router-dom";
 
 
 const useStyles = makeStyles({
@@ -35,14 +35,16 @@ const useStyles = makeStyles({
 
 function MovieBlock (props) {
   const classes = useStyles();
+  const path = useNavigate();
   const [visibility, setVisibility] = React.useState(false);
   const [rate, setRate] = React.useState(0);
   const [hover, setHover] = React.useState(-1);
-  const commentRef = useRef('');
+  const commentRef = useRef();
+  const [comment, setComment] = React.useState('');
   const handleOpen = () => setVisibility(true);
   const handleClose = () => setVisibility(false);
-  const [info, setInfo] = React.useState({rating: 0, genres: [], actors: []});
-  const [ratePercentage, setRatePercentage] = React.useState({0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0});
+  const [info, setInfo] = React.useState({ rating: 0, genres: [], actors: [] });
+  const [ratePercentage, setRatePercentage] = React.useState({ 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 });
   const [flag, setFlag] = React.useState(true);
   const [inWishList, setInWishList] = React.useState(false);
 
@@ -82,22 +84,26 @@ function MovieBlock (props) {
     }
 
     const requestInfo = {
-      method: 'POST',
+      method: props.editInfo !== null ? 'PUT' : 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + localStorage.getItem('token'),
       },
-      body: JSON.stringify({
-        // movie_id: props.id,
-        f_id: props.id,
-        u_id: localStorage.getItem('uid'),
-        rating: rate,
-        content: commentRef.current.value
-      }),
+      body: JSON.stringify(props.editInfo !== null ?
+        {
+          r_id: props.editInfo.r_id,
+          rating: rate,
+          content: commentRef.current.value,
+        } : {
+          f_id: props.id,
+          u_id: localStorage.getItem('uid'),
+          rating: rate,
+          content: commentRef.current.value,
+        }),
     };
-    // console.log(requestInfo)
     const response = await fetch('http://127.0.0.1:5000/review', requestInfo);
     if (response.status === 200) {
+      path('../movie_detail/' + props.id, { status: {editInfo: null} });
       window.location.reload();
     } else {
       alert("You have already rated this movie.");
@@ -126,9 +132,9 @@ function MovieBlock (props) {
       setFlag(!flag);
     }
   }
-  // fetch info of that movie calculating the ratio of each rate
+  // calculating the ratio of each rate
   React.useEffect(() => {
-    const temp = {...ratePercentage};
+    const temp = { ...ratePercentage };
     const reqInfo = {
       headers: {
         'Authorization': helpers.hasNoToken() ? '' : 'Bearer ' + localStorage.getItem('token'),
@@ -136,25 +142,32 @@ function MovieBlock (props) {
     }
     fetch('http://127.0.0.1:5000/films?f_id=' + props.id, reqInfo).then(async (info) => {
       const data = await info.json();
-      console.log(data)
+
+
       setInfo(data);
       let sum = 0;
-      for (const key in data.rating_distribution) {sum += data.rating_distribution[key]}
+      for (const key in data.rating_distribution) {
+        sum += data.rating_distribution[key]
+      }
       for (const [key, value] of Object.entries(data.rating_distribution)) {
         temp[key] = value === 0 ? 0 : parseInt((value / sum * 100).toFixed());
       }
       setRatePercentage({ ...temp });
     })
-  }, [props.id])
+  }, [])
   // whether this movie is in user's wishlist
   React.useEffect(() => {
-    if (helpers.hasNoToken()){return}
+    if (helpers.hasNoToken()) {
+      return
+    }
     fetch('http://localhost:5000/auth/user/' + localStorage.getItem('uid') + '/wish_list').then(async (response) => {
       if (response.status === 200) {
         const data = await response.json();
-        if (data.length === 0) {setInWishList(false)}
+        if (data.length === 0) {
+          setInWishList(false)
+        }
         for (const m of data) {
-          if (m['f_id'] === props.id){
+          if (m['f_id'] === props.id) {
             setInWishList(true);
             break
           }
@@ -163,6 +176,14 @@ function MovieBlock (props) {
       }
     })
   }, [flag])
+  // edit user's own comment
+  React.useEffect(() => {
+    if (props.editInfo !== null) {
+      handleOpen();
+      setRate(props.editInfo.rating);
+      setComment(props.editInfo.content);
+    }
+  }, [])
 
   return (
     <React.Fragment>
@@ -263,6 +284,8 @@ function MovieBlock (props) {
                                    multiline
                                    inputRef={commentRef}
                                    required={true}
+                                   value={comment}
+                                   onInput={(e) => setComment(e.target.value)}
                                    rows={6}/>
                         <Button sx={{ marginTop: 2 }}
                                 variant="contained"
@@ -284,26 +307,34 @@ function MovieBlock (props) {
                   <Typography variant={'h6'}>{info.rating} out of 5</Typography> &nbsp;&nbsp;&nbsp;
                 </Box>
                 {(typeof info.rating_distribution === 'object') &&
-                  <Typography variant={'subtitle1'}>{Object.values(info.rating_distribution).reduce((a, b)=>a+b, 0)} global ratings</Typography>
+                <Typography
+                  variant={'subtitle1'}>{Object.values(info.rating_distribution).reduce((a, b) => a + b, 0)} global
+                  ratings</Typography>
                 }
               </Box>
               <Box display={'flex'} alignItems={'center'}>
-                5 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[5]} sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[5]}%
+                5 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[5]}
+                                                    sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[5]}%
               </Box>
               <Box display={'flex'} alignItems={'center'}>
-                4 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[4]} sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[4]}%
+                4 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[4]}
+                                                    sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[4]}%
               </Box>
               <Box display={'flex'} alignItems={'center'}>
-                3 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[3]} sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[3]}%
+                3 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[3]}
+                                                    sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[3]}%
               </Box>
               <Box display={'flex'} alignItems={'center'}>
-                2 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[2]} sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[2]}%
+                2 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[2]}
+                                                    sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[2]}%
               </Box>
               <Box display={'flex'} alignItems={'center'}>
-                1 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[1]} sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[1]}%
+                1 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[1]}
+                                                    sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[1]}%
               </Box>
               <Box display={'flex'} alignItems={'center'}>
-                0 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[0]} sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[0]}%
+                0 star &nbsp;&nbsp; <LinearProgress variant="determinate" value={ratePercentage[0]}
+                                                    sx={{ width: '65%', height: 10 }}/>&nbsp;&nbsp;{ratePercentage[0]}%
               </Box>
             </Box>
           </Grid>

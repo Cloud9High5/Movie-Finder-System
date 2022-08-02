@@ -1,12 +1,10 @@
-from email import message
 import json
-from re import U
-from flask import request, jsonify
+from flask import request
 from flask_restx import Resource, Namespace, fields, reqparse
 from flask_mail import Message
 from flask_jwt_extended import create_access_token, jwt_required, current_user
 from sqlalchemy import exists
-from extensions import db, mail, jwt
+from extensions import db, mail
 from Models.model import User, Film, Review
 
 api = Namespace("auth", description="Authentication related operations", path="/")
@@ -318,12 +316,13 @@ class user_info(Resource):
     @jwt_required()
     def put(self, u_id):
         payload = json.loads(str(request.data, 'utf-8'))
+        print(payload)
         user = User.query.filter_by(u_id=u_id).first()
         if user == current_user:
             if 'username' in payload:
                 # check if username is taken
                 if db.session.query(exists().where(User.username == payload['username'])).scalar():
-                    return {'message': 'Username taken'}, 403
+                    return {'message': 'Username taken'}, 405
                 else:
                     user.username = payload['username']
             if 'new_password' in payload:

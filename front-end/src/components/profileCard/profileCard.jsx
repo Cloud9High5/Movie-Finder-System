@@ -18,10 +18,11 @@ function ProfileCard() {
   const navigate = useNavigate();
   const [mode, setMode] = useState('display');
   const [profile, setProfile] = useState(null);
+  const [oldProfile, setOldProfile] = useState(null);
   const userID = useParams().uid;
   const [refresh, setRefresh] = useState(true);
   const [message, setMessage] = useState('');
-  
+  const [usernameChange, setUserNameChange] = useState(false);
   // get user info
   useEffect(() => {
     const reqInfo = {
@@ -35,6 +36,7 @@ function ProfileCard() {
           const data = await res.json();
           data.avatar = data.photo_url;
           setProfile(data);
+          setOldProfile(data);
         }
         
       })
@@ -59,21 +61,27 @@ function ProfileCard() {
       setMessage('New password not same as confirm password!');
       return;
     }
+    setMessage('');
     
-    
+    const body = {};
+    if (oldProfile.username !== profile.username) {
+      body.username = profile.username;
+    }
+    if (profile.new_password && profile.old_password) {
+      body.new_password = profile.new_password;
+      body.old_password = profile.old_password;
+    }
+    if (oldProfile.avatar !== profile.avatar) {
+      body.photo_url = profile.avatar;
+    }
+
     fetch(`http://127.0.0.1:5000/auth/user/${userID}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': helpers.hasNoToken() ? '' : 'Bearer ' + localStorage.getItem('token'),
       },
-      body: JSON.stringify({
-        username: profile.username,
-        email: profile.email,
-        old_password: profile.old_password,
-        new_password: profile.new_password,
-        photo_url: profile.avatar
-      })
+      body: JSON.stringify(body)
     }).then(res => {
       if (res.status === 200) {
         setMessage('');
@@ -191,16 +199,19 @@ function ProfileCard() {
               <Box>
                 <Typography>Username</Typography>
                 <TextField value={profile.username}
-                           onChange={e => setProfile({
-                             ...profile,
-                             username: e.target.value
-                           })}
+                           onChange={e => {
+                             setProfile({
+                               ...profile,
+                               username: e.target.value
+                             })
+                           }}
                            fullWidth
                            size={'small'}/>
               </Box>
               <Box marginTop={'20px'}>
                 <Typography>Email</Typography>
                 <TextField
+                  disabled
                   value={profile.email}
                   onChange={e => setProfile({
                     ...profile,

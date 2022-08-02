@@ -1,11 +1,7 @@
 import json
-from urllib import response
-from winreg import DisableReflectionKey
 from flask import request
-from flask_restx import Resource, Namespace, fields, marshal, reqparse
+from flask_restx import Resource, Namespace, fields, reqparse
 from flask_jwt_extended import jwt_required, current_user
-import jwt
-from sqlalchemy import exists, func
 from extensions import db
 from Models.model import Review, User, Film, Review_Like, Review_Dislike, bad_word
 from datetime import datetime, timedelta
@@ -252,12 +248,7 @@ class reviews(Resource):
             if review is None:
                 return {'message': 'review not found'}, 404
             else:
-                if review.u_id == current_user.u_id or current_user.is_admin:
-                    # detele related likes and dislikes
-                    db.session.query(Review_Like).filter_by(r_id=args['r_id']).delete()
-                    db.session.query(Review_Dislike).filter_by(r_id=args['r_id']).delete()
-                    db.session.commit()
-                    # delete review
+                if review.u_id == current_user.u_id or current_user.admin:
                     db.session.delete(review)
                     db.session.commit()
                     return {'message': 'review deleted'}, 200

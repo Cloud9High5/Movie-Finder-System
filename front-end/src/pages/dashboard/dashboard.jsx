@@ -1,10 +1,10 @@
 import React from 'react';
 import Container from '@material-ui/core/Container';
 import {Header, DashboardMovieCard, MostPopularComments} from "../../components";
-import {Divider, FormControl, FormHelperText, MenuItem, Select} from "@mui/material";
+import {Divider, FormControl, FormHelperText, MenuItem, Select, TextField} from "@mui/material";
 import {makeStyles} from '@material-ui/styles';
 import './dashboard.css';
-
+import SearchIcon from '@mui/icons-material/Search';
 const styles = makeStyles({
   cards: {
     display: 'flex',
@@ -18,6 +18,10 @@ function Dashboard() {
   const classes = styles();
   const [movieInfo, setMovieInfo] = React.useState([]);
   const [displayMode, setDisplayMode] = React.useState('random');
+  const [searchBy, setSearchBy] = React.useState('all');
+  const [orderBy, setOrderBy] = React.useState('year');
+  const [keyword, setKeyword] = React.useState('');
+  const [searchedMovies, setSearchedMovies] = React.useState([]);
 
   // generate a list of random mostPopularComments id
   React.useEffect(() => {
@@ -26,6 +30,18 @@ function Dashboard() {
       setMovieInfo(data);
     });
   }, [])
+
+  const handleSearch = async () => {
+    if (searchBy === 'all' || keyword === '') {
+
+      return;
+    }
+    fetch(`http://127.0.0.1:5000/films/search?method=${searchBy}&value=${keyword}&order=${orderBy}`)
+      .then(res => res.json())
+      .then(data => {
+        setSearchedMovies(data);
+      })
+  }
 
   const randomID = () => {
     const tempID = [];
@@ -58,7 +74,41 @@ function Dashboard() {
     <Container>
       <Header/>
       {/*<div style={{ fontSize: 40 }}>Dashboard Page</div>*/}
-
+      <Divider variant={'middle'} textAlign={'left'}>
+        <FormControl sx={{m: 1, minWidth: 120}} size={'small'}>
+          <Select onChange={e => setSearchBy(e.target.value)} value={searchBy}>
+            <MenuItem value={'all'}>——Search By——</MenuItem>
+            <MenuItem value={'title'}>Title</MenuItem>
+            <MenuItem value={'director'}>Director</MenuItem>
+            <MenuItem value={'genre'}>Genre</MenuItem>
+            <MenuItem value={'actor'}>Actor</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl sx={{m: 1, minWidth: 120}} size={'small'}>
+          <Select onChange={e => setOrderBy(e.target.value)} value={orderBy}>
+            <MenuItem value={'year'}>Sort By Year</MenuItem>
+            <MenuItem value={'rating_imdb'}>Sort By Rating</MenuItem>
+            <MenuItem value={'rating_doubi'}>Sort By Rating On Doubi</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl sx={{m: 1, minWidth: 300}} size={'small'}>
+          <TextField size={'small'}
+                     value={keyword}
+                     onChange={e => setKeyword(e.target.value)}
+                     InputProps={{
+                       endAdornment: <SearchIcon onClick={handleSearch}/>
+                     }}
+                     placeholder={'Enter keyword'}/>
+        </FormControl>
+      </Divider>
+      <div className={classes.cards}>
+        {searchedMovies.map((movie, idx) => {
+          return (
+            <DashboardMovieCard key={idx} title={movie.title} poster={movie.url_poster}
+                                rating={movie.rating} movie_id={movie.f_id}/>
+          )
+        })}
+      </div>
       <Divider variant="middle" textAlign={'left'}>
         {/*<Chip label="Movies"/>*/}
         <FormControl sx={{m: 1, minWidth: 120}} size={'small'}>
@@ -76,7 +126,8 @@ function Dashboard() {
       <div className={classes.cards}>
         {movieInfo.map((movie, idx) => {
           return (
-            <DashboardMovieCard key={idx} title={movie.title} poster={movie.url_poster} rating={movie.rating} movie_id={movie.f_id}/>
+            <DashboardMovieCard key={idx} title={movie.title} poster={movie.url_poster}
+                                rating={movie.rating} movie_id={movie.f_id}/>
           )
         })}
       </div>
