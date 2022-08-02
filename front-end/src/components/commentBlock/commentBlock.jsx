@@ -87,7 +87,6 @@ function CommentBlock () {
     temp.map((t) => (
       fetch('http://127.0.0.1:5000/auth/user/' + t.u_id).then(async (response) => {
         const data = await response.json();
-        console.log(data)
         t['username'] = data.username;
         t['photo_url'] = data.photo_url;
         setComments([...temp]);
@@ -135,7 +134,7 @@ function CommentBlock () {
 
   
   const deleteReview = async (review) => {
-    console.log(review.r_id);
+    // console.log(review);
     if (!window.confirm('Are you sure to delete this review?')) {
       return
     }
@@ -149,7 +148,7 @@ function CommentBlock () {
         'Authorization': 'Bearer ' + localStorage.getItem('token'),
       },
     }
-    const response = await fetch('http://127.0.0.1:5000/review?r_id=' + review.r_id, reqInfo);
+    const response = await fetch('http://127.0.0.1:5000/review?r_id=' + review, reqInfo);
     const data = await response.json();
     if (response.status !== 200) {
       alert(data);
@@ -164,7 +163,6 @@ function CommentBlock () {
       <Divider/>
       {/*{Array.isArray(props) ? comments.map((review, idx) => {*/}
       {(Array.isArray(comments) && (comments.length > 0)) ? comments.map((review, idx) => {
-        console.log(review)
         return (
           <Box borderTop={'1px solid gainsboro'}
                padding={'20px 0'}

@@ -178,6 +178,8 @@ function MovieBlock (props) {
   }, [flag])
   // edit user's own comment
   React.useEffect(() => {
+    // console.log('props.editInfo')
+    // console.log(props.editInfo)
     if (props.editInfo !== null) {
       handleOpen();
       setRate(props.editInfo.rating);
