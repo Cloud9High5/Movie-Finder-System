@@ -1,21 +1,20 @@
 import Box from "@mui/material/Box";
-import { Button, Chip, Typography } from '@mui/material';
+import {Button, Chip, Typography} from '@mui/material';
 import Avatar from "@material-ui/core/Avatar";
 
 
 import {AdminDropdownMenu, Thumb} from "../../components";
 
 import Rating from '@mui/material/Rating';
-import { Divider } from "@material-ui/core";
+import {Divider} from "@material-ui/core";
 import Grid from '@mui/material/Grid';
 
-import { makeStyles } from "@material-ui/core/styles";
-import { lightGreen } from "@material-ui/core/colors";
-
+import {makeStyles} from "@material-ui/core/styles";
+import {lightGreen} from "@material-ui/core/colors";
 
 
 import React from 'react';
-import { useNavigate, useParams } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import * as helpers from "../../helpers";
 
 const useStyles = makeStyles(theme => ({
@@ -36,7 +35,7 @@ const parseDateString = (date) => {
 
 
 // function CommentBlock ({ props }) {
-function CommentBlock () {
+function CommentBlock() {
   const classes = useStyles();
   const path = useNavigate();
   const [rawComments, setRawComments] = React.useState([]);  // comments with uid and movie_id
@@ -46,21 +45,26 @@ function CommentBlock () {
   const [likesDislikes, setLikesDislikes] = React.useState({});
   const [numDisplayedReviews, setNumDisplayedReviews] = React.useState(15);
   const [slicedReviews, setSlicedReviews] = React.useState([]);
-
+  
   
   const [isAdmin, setIsAdmin] = React.useState(false);
+  const [isSelf, setIsSelf] = React.useState(false);
+  
   
   React.useEffect(() => {
     fetch('http://127.0.0.1:5000/auth/user/' + localStorage.uid).then(async (response) => {
       if (response.status === 200) {
         const data = await response.json();
+        console.log(data)
         setIsAdmin(data.is_admin);
+        setIsSelf(data.is_self);
       } else {
         setIsAdmin(false);
+        setIsSelf(false);
       }
     })
   }, [])
-
+  
   // obtain comments from backend
   React.useEffect(() => {
     const reqInfo = {
@@ -106,7 +110,7 @@ function CommentBlock () {
     }
     fetch('http://127.0.0.1:5000/review/likes_dislikes', reqInfo).then(async (response) => {
       const data = await response.json();
-      setLikesDislikes({ ...data });
+      setLikesDislikes({...data});
     })
   }, [flag])
   // like / dislike actions
@@ -131,7 +135,7 @@ function CommentBlock () {
       setFlag(!flag);
     }
   }
-
+  
   
   const deleteReview = async (review) => {
     // console.log(review);
@@ -141,7 +145,7 @@ function CommentBlock () {
     if (helpers.hasNoToken()) {
       return
     }
-
+    
     const reqInfo = {
       method: 'DELETE',
       headers: {
@@ -158,7 +162,7 @@ function CommentBlock () {
     }
   }
   return (
-    <Box sx={{ marginTop: 3 }}>
+    <Box sx={{marginTop: 3}}>
       <Typography variant={'h5'}>Comments:</Typography>
       <Divider/>
       {/*{Array.isArray(props) ? comments.map((review, idx) => {*/}
@@ -178,13 +182,14 @@ function CommentBlock () {
                     </Avatar>
                     <Box marginLeft={'10px'}>
                       <Typography variant={'h6'} color={'gray'} onClick={() => path('/profile/' + review.u_id)}
-                                  sx={{ cursor: 'pointer' }}>
+                                  sx={{cursor: 'pointer'}}>
                         {review.username}
                       </Typography>
                     </Box>
                   </Box>
                   {review.u_id === localStorage.getItem('uid') &&
-                  <Button variant={'outlined'} sx={{textTransform: 'none'}} onClick={() => deleteReview(review.r_id)} color={'warning'}>Delete</Button>
+                    <Button variant={'outlined'} sx={{textTransform: 'none'}} onClick={() => deleteReview(review.r_id)}
+                            color={'warning'}>Delete</Button>
                   }
                 </Box>
                 <Box marginLeft={'10px'}>
@@ -204,7 +209,7 @@ function CommentBlock () {
                   <Box display={'flex'} alignItems={'center'} onClick={() => reviewAction(review, 0)}>
                     <Thumb quantity={review.dislike} type={'down'}/>
                   </Box>
-                  <Box sx={{ marginLeft: '20px' }}>
+                  <Box sx={{marginLeft: '20px'}}>
                     {!helpers.hasNoToken() && Object.keys(likesDislikes).length > 0 &&
                     likesDislikes.likes.indexOf(review.r_id) !== -1 ?
                       <Chip label={'You Liked'} color={'success'} size={'small'} variant={'outlined'}/> : <></>
@@ -215,7 +220,7 @@ function CommentBlock () {
                     }
                   </Box>
                 </Box>
-
+                
                 <Box display={'flex'}
                      alignItems={'flex-end'}
                      justifyContent={"space-between"}
@@ -224,8 +229,8 @@ function CommentBlock () {
                   <Typography variant={'p'} color={'gray'}>
                     Posted on: {review.created_time.substring(0, 19)}
                   </Typography>
-                  {isAdmin ? <AdminDropdownMenu id={idx} props={review}/> : <></>}
-
+                  {isAdmin && !isSelf ? <AdminDropdownMenu id={idx} props={review}/> : <></>}
+                
                 </Box>
               </Grid>
             </Grid>
@@ -237,9 +242,9 @@ function CommentBlock () {
       <Divider/>
       {
         numDisplayedReviews <= rawComments.length &&
-        <Box sx={{ marginTop: 3, marginBottom: 3 }}>
+        <Box sx={{marginTop: 3, marginBottom: 3}}>
           <Typography display={'flex'} justifyContent={'center'}
-                      sx={{ cursor: 'pointer', "&:hover": { color: 'blueviolet' } }} onClick={() => {
+                      sx={{cursor: 'pointer', "&:hover": {color: 'blueviolet'}}} onClick={() => {
             setNumDisplayedReviews(numDisplayedReviews + 10)
           }}>
             Load More Comments.
