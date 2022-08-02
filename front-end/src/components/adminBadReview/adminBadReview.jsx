@@ -84,7 +84,7 @@ function AdminBadReview() {
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                <TableCell>movie name</TableCell>
+                {/*<TableCell>movie name</TableCell>*/}
                 <TableCell>content</TableCell>
                 <TableCell>created time</TableCell>
                 <TableCell></TableCell>
@@ -95,7 +95,7 @@ function AdminBadReview() {
                 key={row.rid}
                 sx={{'&:last-child td, &:last-child th': {border: 0}}}
               >
-                <TableCell>{row.rid}</TableCell>
+                {/*<TableCell>{row.rid}</TableCell>*/}
                 <TableCell>{row.content}</TableCell>
                 <TableCell>{row.created_time}</TableCell>
                 <TableCell>
