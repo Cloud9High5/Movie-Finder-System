@@ -9,13 +9,11 @@ import {
   TableContainer,
   TableHead,
   TablePagination,
-  TableRow,
-  Typography
+  TableRow, Typography
 } from "@mui/material";
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import ModeEditOutlineIcon from '@mui/icons-material/ModeEditOutline';
 import * as helpers from "../../helpers";
 
 const columns = [
@@ -37,7 +35,7 @@ function ProfileReview () {
   const [rawReviews, setRawReviews] = React.useState([]);
   const [reviews, setReviews] = React.useState([]);
   const [flag, setFlag] = React.useState(true);
-  const [likesDislikes, setLikesDislikes] = React.useState({ likes: [], dislikes: [] });
+  const [likesDislikes, setLikesDislikes] = React.useState({likes: [], dislikes: []});
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -75,9 +73,7 @@ function ProfileReview () {
 
   // update like / dislike list
   React.useEffect(() => {
-    if (helpers.hasNoToken()) {
-      return
-    }
+    if (helpers.hasNoToken()) {return}
     const reqInfo = {
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('token'),
@@ -112,7 +108,7 @@ function ProfileReview () {
     }
     fetch(`http://127.0.0.1:5000/auth/user/${uid}`, reqInfo).then(async (response) => {
       const data = await response.json();
-      setTargetInfo({ ...data });
+      setTargetInfo({...data});
     })
   }, [])
 
@@ -145,11 +141,6 @@ function ProfileReview () {
     if (response.status === 200) {
       setFlag(!flag);  // force refreshing the comment block
     }
-  }
-
-  const editReview = (review) => {
-    console.log(review);
-    path('../movie_detail/' + review.f_id, {state: {'edit': true, 'info': review}})
   }
 
   return (
@@ -188,8 +179,7 @@ function ProfileReview () {
                         } else if (column.id === 'title') {
                           return (
                             <TableCell key={column.id}>
-                              <Typography sx={{ cursor: 'pointer' }}
-                                          onClick={() => path('../movie_detail/' + row.f_id)}>{value}</Typography>
+                              <Typography sx={{ cursor: 'pointer' }} onClick={() => path('../movie_detail/' + row.f_id)}>{value}</Typography>
                             </TableCell>
                           )
                         } else if (column.id === 'operation') {
@@ -197,14 +187,9 @@ function ProfileReview () {
                             <TableCell key={column.id}>
                               {
                                 isSelf() ?
-                                  <>
-                                    <Button variant={'outlined'} color={'warning'} endIcon={<RemoveCircleOutlineIcon/>}
-                                            sx={{ textTransform: 'none' }}
-                                            onClick={() => deleteReview(row.r_id)}>Delete</Button>
-                                    <Button variant={'outlined'} color={'info'} endIcon={<ModeEditOutlineIcon/>}
-                                            sx={{ textTransform: 'none', marginLeft: '5px' }}
-                                            onClick={() => editReview(row)}>Edit</Button>
-                                  </>
+                                  <Button variant={'outlined'} color={'warning'} endIcon={<RemoveCircleOutlineIcon/>}
+                                          sx={{ textTransform: 'none' }}
+                                          onClick={() => deleteReview(row.r_id)}>Delete</Button>
                                   :
                                   <>
                                     <Button
@@ -231,7 +216,8 @@ function ProfileReview () {
                               }
                             </TableCell>
                           );
-                        } else {
+                        }
+                        else {
                           return (
                             <TableCell key={column.id} align={column.align}>
                               {column.format && typeof value === 'number'
