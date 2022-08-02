@@ -15,3 +15,5 @@ export {default as ProfileReview} from './profileReview/profileReview';
 export {default as UploadMovie} from './uploadMovie/uploadMovie';
 export {default as Wishlist} from './wishList/wishlist';
 export {default as AdminDropdownMenu} from './adminDropdownMenu/adminDropdownMenu';
+export {default as AdminBadReview} from './adminBadReview/adminBadReview';
+export {default as AdminBlockList} from './adminBlockList/adminBlockList';
