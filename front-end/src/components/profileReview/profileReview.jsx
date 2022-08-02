@@ -65,11 +65,12 @@ function ProfileReview () {
       },
     }
     fetch("http://localhost:5000/review?method=u_id&u_id=" + uid, reqInfo).then(async (response) => {
-      const data = await response.json();
-      Array.isArray(data) ?
-        setRawReviews(data)
-        :
-        setRawReviews([])
+      if (response.status === 200) {
+        const data = await response.json();
+        setRawReviews(data);
+      } else {
+        setRawReviews([]);
+      }
     })
   }, [flag])
 
@@ -90,6 +91,7 @@ function ProfileReview () {
   }, [flag])
   // fetch movie info of each review
   React.useEffect(() => {
+    if (rawReviews.length === 0) {setReviews([])}
     for (const r of rawReviews) {
       const reqInfo = {
         headers: {
@@ -155,108 +157,112 @@ function ProfileReview () {
   return (
     <>
       <h1>{isSelf() ? 'Your' : targetInfo.username + '\'s'} Review</h1>
+      {
+        reviews.length !== 0 ?
+          <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+            <TableContainer sx={{ maxHeight: 640 }}>
+              <Table stickyHeader aria-label="sticky table">
+                <TableHead>
+                  <TableRow>
+                    {columns.map((column) => (
+                      <TableCell
+                        key={column.id}
+                        align={column.align}
+                        style={{ minWidth: column.minWidth }}
+                      >
+                        {column.label}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {reviews.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row, idx) => {
+                      return (
+                        <TableRow hover role="checkbox" tabIndex={-1} key={idx}>
+                          {columns.map((column) => {
+                            const value = row[column.id];
+                            if (column.id === 'created_time') {
+                              return (
+                                <TableCell key={column.id}>
+                                  {row[column.id].substring(0, 19)}
+                                </TableCell>
+                              )
+                            } else if (column.id === 'title') {
+                              return (
+                                <TableCell key={column.id}>
+                                  <Typography sx={{ cursor: 'pointer' }}
+                                              onClick={() => path('../movie_detail/' + row.f_id)}>{value}</Typography>
+                                </TableCell>
+                              )
+                            } else if (column.id === 'operation') {
+                              return (
+                                <TableCell key={column.id}>
+                                  {
+                                    isSelf() ?
+                                      <>
+                                        <Button variant={'outlined'} color={'warning'} endIcon={<RemoveCircleOutlineIcon/>}
+                                                sx={{ textTransform: 'none' }}
+                                                onClick={() => deleteReview(row.r_id)}>Delete</Button>
+                                        <Button variant={'outlined'} color={'info'} endIcon={<ModeEditOutlineIcon/>}
+                                                sx={{ textTransform: 'none', marginLeft: '5px' }}
+                                                onClick={() => editReview(row)}>Edit</Button>
+                                      </>
+                                      :
+                                      <>
+                                        <Button
+                                          variant={likesDislikes.likes.indexOf(row.r_id) === -1 ? 'outlined' : 'contained'}
+                                          color={'info'}
+                                          endIcon={<ThumbUpIcon sx={{ marginLeft: '12px' }}/>}
+                                          onClick={() => reviewAction(row.r_id, 1)}
+                                          sx={{ width: '80px', marginBottom: '5px', textTransform: 'none' }}
+                                          disabled={likesDislikes.dislikes.indexOf(row.r_id) !== -1}
+                                        >
+                                          {likesDislikes.likes.indexOf(row.r_id) === -1 ? 'Like' : 'Liked'}
+                                        </Button>
+                                        <Button
+                                          variant={likesDislikes.dislikes.indexOf(row.r_id) === -1 ? 'outlined' : 'contained'}
+                                          color={'error'}
+                                          endIcon={<ThumbDownAltIcon/>}
+                                          onClick={() => reviewAction(row.r_id, 0)}
+                                          sx={{ width: '80px', marginTop: '5px', textTransform: 'none' }}
+                                          disabled={likesDislikes.likes.indexOf(row.r_id) !== -1}
+                                        >
+                                          {likesDislikes.dislikes.indexOf(row.r_id) === -1 ? 'Dislike' : 'Disliked'}
+                                        </Button>
+                                      </>
+                                  }
+                                </TableCell>
+                              );
+                            } else {
+                              return (
+                                <TableCell key={column.id} align={column.align}>
+                                  {column.format && typeof value === 'number'
+                                    ? column.format(value)
+                                    : value}
+                                </TableCell>
+                              );
+                            }
+                          })}
+                        </TableRow>
+                      );
+                    })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[10, 25, 100]}
+              component="div"
+              count={reviews.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Paper>
+          : <Typography variant={'body1'}>User have not done any reviews yet.</Typography>
+      }
 
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: 640 }}>
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                {columns.map((column) => (
-                  <TableCell
-                    key={column.id}
-                    align={column.align}
-                    style={{ minWidth: column.minWidth }}
-                  >
-                    {column.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {reviews.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, idx) => {
-                  return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={idx}>
-                      {columns.map((column) => {
-                        const value = row[column.id];
-                        if (column.id === 'created_time') {
-                          return (
-                            <TableCell key={column.id}>
-                              {row[column.id].substring(0, 19)}
-                            </TableCell>
-                          )
-                        } else if (column.id === 'title') {
-                          return (
-                            <TableCell key={column.id}>
-                              <Typography sx={{ cursor: 'pointer' }}
-                                          onClick={() => path('../movie_detail/' + row.f_id)}>{value}</Typography>
-                            </TableCell>
-                          )
-                        } else if (column.id === 'operation') {
-                          return (
-                            <TableCell key={column.id}>
-                              {
-                                isSelf() ?
-                                  <>
-                                    <Button variant={'outlined'} color={'warning'} endIcon={<RemoveCircleOutlineIcon/>}
-                                            sx={{ textTransform: 'none' }}
-                                            onClick={() => deleteReview(row.r_id)}>Delete</Button>
-                                    <Button variant={'outlined'} color={'info'} endIcon={<ModeEditOutlineIcon/>}
-                                            sx={{ textTransform: 'none', marginLeft: '5px' }}
-                                            onClick={() => editReview(row)}>Edit</Button>
-                                  </>
-                                  :
-                                  <>
-                                    <Button
-                                      variant={likesDislikes.likes.indexOf(row.r_id) === -1 ? 'outlined' : 'contained'}
-                                      color={'info'}
-                                      endIcon={<ThumbUpIcon sx={{ marginLeft: '12px' }}/>}
-                                      onClick={() => reviewAction(row.r_id, 1)}
-                                      sx={{ width: '80px', marginBottom: '5px', textTransform: 'none' }}
-                                      disabled={likesDislikes.dislikes.indexOf(row.r_id) !== -1}
-                                    >
-                                      {likesDislikes.likes.indexOf(row.r_id) === -1 ? 'Like' : 'Liked'}
-                                    </Button>
-                                    <Button
-                                      variant={likesDislikes.dislikes.indexOf(row.r_id) === -1 ? 'outlined' : 'contained'}
-                                      color={'error'}
-                                      endIcon={<ThumbDownAltIcon/>}
-                                      onClick={() => reviewAction(row.r_id, 0)}
-                                      sx={{ width: '80px', marginTop: '5px', textTransform: 'none' }}
-                                      disabled={likesDislikes.likes.indexOf(row.r_id) !== -1}
-                                    >
-                                      {likesDislikes.dislikes.indexOf(row.r_id) === -1 ? 'Dislike' : 'Disliked'}
-                                    </Button>
-                                  </>
-                              }
-                            </TableCell>
-                          );
-                        } else {
-                          return (
-                            <TableCell key={column.id} align={column.align}>
-                              {column.format && typeof value === 'number'
-                                ? column.format(value)
-                                : value}
-                            </TableCell>
-                          );
-                        }
-                      })}
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
-          component="div"
-          count={reviews.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
     </>
   )
 }
