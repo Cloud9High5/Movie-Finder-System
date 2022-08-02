@@ -54,6 +54,18 @@ review_rating_model = api.model('review_rating_model', {
     'r_id': fields.String(required=True, description="Review ID"),
 })
 
+review_badword_model = api.model("Review", {
+    "r_id": fields.String(required=True, description="Review ID"),
+    "f_id": fields.String(required=True, description="Film ID"),
+    "f_name": fields.String(required=True, description="Film Name"),
+    "u_id": fields.String(required=True, description="User ID"),
+    "u_name": fields.String(required=True, description="User Name"),
+    "rating": fields.Integer(required=True, description="Rating"),
+    "content": fields.String(required=False, description="Review Content"),
+    "created_time": fields.String(required=True, description="Review Released Time"),
+    "like": fields.Integer(required=True, description="Likes"),
+    "dislike": fields.Integer(required=True, description="Dislikes"),
+})
 
 ################################################################################
 #                                    ROUTES                                    #
@@ -257,6 +269,8 @@ class reviews(Resource):
                     db.session.delete(review)
                     db.session.commit()
                     return {'message': 'review deleted'}, 200
+                else:
+                    return {'message': 'you are not the author of this review'}, 400
 
 
 @api.route('/review/<string:review_id>', methods=['GET'])
@@ -374,11 +388,26 @@ class bad_word_review(Resource):
             200: 'Success'
         }
     )
-    @api.marshal_list_with(review_model)
+    @api.marshal_list_with(review_badword_model)
     @jwt_required()
     def get(self):
         if current_user.is_admin:
-            result = db.session.query(Review).filter(Review.bad_word==True).order_by(Review.created_time.desc()).all()
+            result = []
+            reviews = db.session.query(Review).filter(Review.bad_word==True).order_by(Review.created_time.desc()).all()
+
+            for review in reviews:
+                result.append({
+                    "r_id": review.r_id,
+                    "f_id": review.f_id,
+                    "f_name": Film.query.filter_by(f_id=review.f_id).first().title,
+                    "u_id": review.u_id,
+                    "u_name": User.query.filter_by(u_id=review.u_id).first().username,
+                    "rating": review.rating,
+                    "content": review.content,
+                    "created_time": review.created_time,
+                    "like": review.like,
+                    "dislike": review.dislike,
+                })
             return result, 200
         else:
             return {"message": "you are not admin"}, 400
