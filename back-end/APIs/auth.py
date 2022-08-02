@@ -318,6 +318,7 @@ class user_info(Resource):
     @jwt_required()
     def put(self, u_id):
         payload = json.loads(str(request.data, 'utf-8'))
+        print(payload)
         user = User.query.filter_by(u_id=u_id).first()
         if user == current_user:
             if 'username' in payload:
