@@ -6,8 +6,8 @@ import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
-import {UploadMovie} from "../../components/";
-import { useParams } from "react-router-dom";
+import {UploadMovie, AdminBlockList, AdminBadReview} from "../../components/";
+import {useParams} from "react-router-dom";
 import * as helpers from "../../helpers";
 
 function TabPanel(props) {
@@ -47,7 +47,7 @@ function Admin() {
   const [value, setValue] = React.useState(0);
   const uid = useParams().uid;
   const [userInfo, setUserInfo] = React.useState({});
-
+  
   React.useEffect(() => {
     const reqInfo = {
       headers: {
@@ -63,7 +63,7 @@ function Admin() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
+  
   return (
     <Container>
       <Header/>
@@ -80,23 +80,20 @@ function Admin() {
             sx={{borderRight: 1, borderColor: 'divider'}}
           >
             <Tab label="Upload Movie" {...a11yProps(0)} sx={{textTransform: 'none'}} style={{fontSize: "large"}}/>
-            {/*<Tab label="My Follows" {...a11yProps(1)} style={{fontSize: "large"}} sx={userInfo.is_self ? {display: 'inline-flex', textTransform: 'none'} : {display: 'none'}}/>*/}
-            {/*<Tab label="My Blacklist" {...a11yProps(2)} style={{fontSize: "large"}} sx={userInfo.is_self ? {display: 'inline-flex', textTransform: 'none'} : {display: 'none'}}/>*/}
-            {/*<Tab label="Reviews" {...a11yProps(3)} sx={{textTransform: 'none'}} style={{fontSize: "large"}}/>*/}
+            <Tab label="Blocklist" {...a11yProps(1)} sx={{textTransform: 'none'}} style={{fontSize: "large"}}/>
+            <Tab label="Review with bad words" {...a11yProps(2)} sx={{textTransform: 'none'}}
+                 style={{fontSize: "large"}}/>
           </Tabs>
           <Box style={{width: '100%'}}>
             <TabPanel value={value} index={0}>
               <UploadMovie/>
             </TabPanel>
-            {/*<TabPanel value={value} index={1}>*/}
-            {/*  <FollowList/>*/}
-            {/*</TabPanel>*/}
-            {/*<TabPanel value={value} index={2}>*/}
-            {/*  <BlackList/>*/}
-            {/*</TabPanel>*/}
-            {/*<TabPanel value={value} index={3}>*/}
-            {/*  <ProfileReview/>*/}
-            {/*</TabPanel>*/}
+            <TabPanel value={value} index={1}>
+              <AdminBlockList/>
+            </TabPanel>
+            <TabPanel value={value} index={2}>
+              <AdminBadReview/>
+            </TabPanel>
           </Box>
         </Box>
       </Box>
