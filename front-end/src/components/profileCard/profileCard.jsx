@@ -94,6 +94,9 @@ function ProfileCard() {
       if (res.status === 403) {
         setMessage('Old password is incorrect！');
       }
+      if (res.status === 405) {
+        setMessage('The username has been used！');
+      }
       
     })
   }
