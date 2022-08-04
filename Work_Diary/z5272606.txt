@@ -137,3 +137,158 @@ overcome (or what was tried and did not work):
 what is planned for the next week:
 
 1. fix sprint 1 bug
+
+
+--------------------------------------------------------------------------------------------------------
+
+Week 6
+
+What was planned for the period since the last work diary entry:
+
+1. Admin page
+2. MUI component coding
+3. Debugging
+
+What was finished:
+
+Sprint 1 done
+
+What were the main technical and non-technical obstacles and how they were
+overcome (or what was tried and did not work):
+
+1. React UI theme: decide which theme(color, form) is suitable for our website.
+2. Development Framework: self study.
+3. Ajax: fix bug
+
+what is planned for the next week:
+
+1. fix sprint 1 and work on sprint 2
+
+
+--------------------------------------------------------------------------------------------------------
+
+Week 7
+
+What was planned for the period since the last work diary entry:
+
+1. Admin page
+2. User blacklist and like/dislike comment
+3. upload movie file
+4. Debugging
+
+What was finished:
+
+Sprint 1 done
+admin almost done
+
+What were the main technical and non-technical obstacles and how they were
+overcome (or what was tried and did not work):
+
+1. React UI theme: decide which theme(color, form) is suitable for our website.
+2. Development Framework: self study.
+3. Ajax: fix bug
+
+what is planned for the next week:
+
+1. work on sprint 2
+
+--------------------------------------------------------------------------------------------------------
+
+Week 7
+
+What was planned for the period since the last work diary entry:
+
+1. Admin page
+2. User blacklist and like/dislike comment
+3. upload movie file
+4. Debugging
+
+What was finished:
+
+sprint2 done
+
+What were the main technical and non-technical obstacles and how they were
+overcome (or what was tried and did not work):
+
+1. React UI theme: decide which theme(color, form) is suitable for our website.
+2. Development Framework: self study.
+3. Ajax: fix bug
+
+what is planned for the next week:
+
+1. work on sprint 3
+
+--------------------------------------------------------------------------------------------------------
+
+Week 8
+
+What was planned for the period since the last work diary entry:
+
+1. Admin page
+2. Admin block user and delete comment
+3. admin ban user
+4. Debugging
+
+What was finished:
+
+sprint2 done
+
+What were the main technical and non-technical obstacles and how they were
+overcome (or what was tried and did not work):
+
+1. React UI theme: decide which theme(color, form) is suitable for our website.
+2. Development Framework: self study.
+3. Ajax: fix bug
+
+what is planned for the next week:
+
+1. work on sprint 3
+
+--------------------------------------------------------------------------------------------------------
+
+Week 9
+
+What was planned for the period since the last work diary entry:
+
+1. Admin page
+2. Admin block user and delete comment
+3. admin ban user
+4. Debugging
+
+What was finished:
+
+sprint2 done
+
+What were the main technical and non-technical obstacles and how they were
+overcome (or what was tried and did not work):
+
+1. React UI theme: decide which theme(color, form) is suitable for our website.
+2. Development Framework: self study.
+3. Ajax: fix bug
+
+what is planned for the next week:
+
+1. work on sprint 3
+
+--------------------------------------------------------------------------------------------------------
+
+Week 9
+
+What was planned for the period since the last work diary entry:
+
+1. report
+
+What was finished:
+
+sprint3 done
+
+What were the main technical and non-technical obstacles and how they were
+overcome (or what was tried and did not work):
+
+1. React UI theme: decide which theme(color, form) is suitable for our website.
+2. Development Framework: self study.
+3. Ajax: fix bug
+
+what is planned for the next week:
+
+1. report
