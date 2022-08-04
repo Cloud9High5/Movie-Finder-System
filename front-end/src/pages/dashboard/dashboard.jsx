@@ -87,7 +87,7 @@ function Dashboard() {
         <FormControl sx={{m: 1, minWidth: 120}} size={'small'}>
           <Select onChange={e => setOrderBy(e.target.value)} value={orderBy}>
             <MenuItem value={'year'}>Sort By Year</MenuItem>
-            <MenuItem value={'rating_imdb'}>Sort By Rating</MenuItem>
+            {/*<MenuItem value={'rating_imdb'}>Sort By Rating</MenuItem>*/}
             <MenuItem value={'rating_doubi'}>Sort By Rating On Doubi</MenuItem>
           </Select>
         </FormControl>
