@@ -30,10 +30,10 @@ Let's start it!
    Since we already prepared the package.json file, you can use yarn command line in the terminal:
 
 
-      cd front-end
-      yarn install
-      yarn run build
-      yarn start
+         cd front-end
+         yarn install
+         yarn run build
+         yarn start
       
 
 3. go to the localhost and see in the browser:
