@@ -34,6 +34,7 @@ Let's start it!
       yarn install
       yarn run build
       yarn start
+      
 
 3. go to the localhost and see in the browser:
 
