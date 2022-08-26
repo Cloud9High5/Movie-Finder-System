@@ -1,5 +1,4 @@
-# capstone-project-9900-t16p-ahduiduidui
-## Project 2-Movie Finder System
+# Movie Finder System
 
 ## Introduction
 This is a movie finder system that uses the React.js and Flask frameworks.
